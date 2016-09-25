@@ -1,12 +1,12 @@
 <resources>
-    <string name="app_name">Show And Sell</string>
+    <string name="app_name">Show &amp; Sell</string>
 
     <!-- Strings related to login -->
     <string name="prompt_username">Username</string>
     <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="action_sign_up">Sign up</string>
+    <string name="action_sign_in">Login</string>
+    <string name="action_sign_in_short">Login</string>
+    <string name="action_sign_up">Create Account</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
@@ -16,6 +16,13 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="title_activity_donate">DonateActivity</string>
     <string name="title_activity_main">Browse</string>
+
+    <!-- CreateAccountActivity -->
+    <string name="prompt_first_name">First Name</string>
+    <string name="prompt_last_name">Last Name</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_confirm_password">Confirm Password</string>
+    <string name="error_password_match">Passwords must match</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

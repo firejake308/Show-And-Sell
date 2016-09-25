@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.AsyncTask;
@@ -21,15 +22,15 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.net.HttpURLConnection;
+
 /**
  * A login screen that offers login via username/password.
  */
 public class LoginActivity extends AppCompatActivity {
 
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
-    private static final int REQUEST_READ_CONTACTS = 0;
+    private static final String CLOUD_SERVER_IP = "";
 
     /**
      * A dummy authentication store containing known user names and passwords.
@@ -201,12 +202,16 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
+            // variables that we will have to close in try loop
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
 
             try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
+                // construct the URL to fetch a user
+                Uri.Builder  builder = new Uri.Builder();
+                builder.scheme("http")
+                        .authority(CLOUD_SERVER_IP);
+            } catch (Exception e) {
                 return false;
             }
 
