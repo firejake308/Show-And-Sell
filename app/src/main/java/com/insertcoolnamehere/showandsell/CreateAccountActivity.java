@@ -1,14 +1,26 @@
 package com.insertcoolnamehere.showandsell;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class CreateAccountActivity extends AppCompatActivity {
 
@@ -107,6 +119,9 @@ public class CreateAccountActivity extends AppCompatActivity {
     }
 
     public class CreateAccountTask extends AsyncTask<Void, Void, Boolean> {
+
+        private final String LOG_TAG = CreateAccountTask.class.getSimpleName();
+
         private String firstName;
         private String lastName;
         private String email;
@@ -122,6 +137,52 @@ public class CreateAccountActivity extends AppCompatActivity {
         }
 
         protected Boolean doInBackground(Void... Params) {
+            String uri = new Uri.Builder().scheme("http")
+                    .encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
+                    .appendPath("groups")
+                    .build().toString();
+            ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo info = manager.getActiveNetworkInfo();
+            if(info != null && info.isConnected()) {
+                HttpURLConnection connection = null;
+                BufferedReader reader = null;
+                try {
+                    URL url = new URL(uri);
+
+                    connection = (HttpURLConnection) url.openConnection();
+                    connection.setReadTimeout(10000);
+                    connection.setConnectTimeout(15000);
+                    connection.setRequestMethod("POST");
+                    connection.setDoOutput(true);
+                    connection.connect();
+
+                    int responseCode = connection.getResponseCode();
+                    Log.d(LOG_TAG, "Response Code from Cloud Server: "+responseCode);
+
+                    reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    String response = "";
+                    String line = "";
+                    while((line = reader.readLine()) != null) {
+                        response += line + "\n";
+                    }
+                } catch (MalformedURLException e) {
+                    Log.e(LOG_TAG, "The URL was incorrectly formed");
+                } catch (Exception e) {
+                    Log.e(LOG_TAG, "Unidentified error in network operations while creating account");
+                } finally {
+                    if (connection != null) {
+                        connection.disconnect();
+                    }
+                    if (reader != null) {
+                        try {
+                            reader.close();
+                        } catch(IOException e) {
+                            Log.e(LOG_TAG, "Couldn't close BufferedReader");
+                        }
+                    }
+                }
+            }
+
             return false;
         }
     }

@@ -3,7 +3,11 @@ package com.insertcoolnamehere.showandsell;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 
@@ -21,16 +25,25 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * A login screen that offers login via username/password.
  */
 public class LoginActivity extends AppCompatActivity {
 
-    private static final String CLOUD_SERVER_IP = "";
+    public static final String CLOUD_SERVER_IP = "68.248.214.70:8080";
 
     /**
      * A dummy authentication store containing known user names and passwords.
@@ -140,8 +153,8 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            showProgress(true);
-            mAuthTask = new UserLoginTask(username, password);
+            // showProgress(true); TODO: bring back progress spinner
+            mAuthTask = new UserLoginTask(this, username, password);
             mAuthTask.execute((Void) null);
         }
     }
@@ -190,53 +203,99 @@ public class LoginActivity extends AppCompatActivity {
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserLoginTask extends AsyncTask<Void, Void, Integer> {
+        private final String LOG_TAG = UserLoginTask.class.getSimpleName();
 
+        private final Activity mParent;
         private final String mUsername;
         private final String mPassword;
 
-        UserLoginTask(String username, String password) {
+        UserLoginTask(Activity parent, String username, String password) {
+            mParent = parent;
             mUsername = username;
             mPassword = password;
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected Integer doInBackground(Void... params) {
             // variables that we will have to close in try loop
             HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
 
-            try {
-                // construct the URL to fetch a user
-                Uri.Builder  builder = new Uri.Builder();
-                builder.scheme("http")
-                        .authority(CLOUD_SERVER_IP);
-            } catch (Exception e) {
-                return false;
-            }
+            // the unparsed JSON response from the server
+            int responseCode = -1;
 
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mUsername)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
+            // check for internet connection
+            ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo info = manager.getActiveNetworkInfo();
+
+            //TODO: for Android 6.0+, request internet permission
+
+            if(info == null || !info.isConnected()) {
+                // if there is no network, inform user through a toast
+                mParent.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                        Log.d(LOG_TAG, "No connection available");
+                    }
+                });
+                return 2;
+            } else {
+                try {
+                    // construct the URL to fetch a user
+                    Uri.Builder  builder = new Uri.Builder();
+                    builder.scheme("http")
+                            .encodedAuthority(CLOUD_SERVER_IP)
+                            .appendPath("showandsell")
+                            .appendPath("api")
+                            .appendPath("users")
+                            .appendQueryParameter("username", mUsername)
+                            .appendQueryParameter("password", mPassword)
+                            .build();
+                    URL url = new URL(builder.toString());
+                    // connect to the URL and open the reader
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setReadTimeout(10000);
+                    urlConnection.setConnectTimeout(15000);
+                    urlConnection.setRequestMethod("GET");
+                    urlConnection.connect();
+
+                    // obtain status code
+                    responseCode = urlConnection.getResponseCode();
+                    if(responseCode == 200) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "Error getting response from server", e);
+                } finally {
+                    // release system resources
+                    if(urlConnection != null) {
+                        urlConnection.disconnect();
+                    }
                 }
             }
 
-            // TODO: register the new account here.
-            return true;
+            // if anything goes wrong, don't let them log in and act like the password was wrong
+            return 0;
         }
 
         @Override
-        protected void onPostExecute(final Boolean success) {
+        protected void onPostExecute(final Integer success) {
             mAuthTask = null;
             showProgress(false);
 
-            if (success) {
-                finish();
-            } else {
+            if (success == 1) {
+                // launch main activity so user can begin browsing
+                Intent intent = new Intent(mParent, MainActivity.class);
+                startActivity(intent);
+            } else if (success == 0){
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
+            } else if (success == 2) {
+                // this means there was no internet connection, so we will just
+                // wait for the user to turn on internet again
             }
         }
 
