@@ -1,5 +1,8 @@
 package com.insertcoolnamehere.showandsell;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -83,11 +86,28 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if(id == R.id.action_logout) {
+            logout();
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Log out the current user and return to the login screen
+     */
+    private void logout() {
+        // erase username from saved data
+        SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key),
+                Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = savedData.edit();
+        editor.remove(getString(R.string.prompt_username));
+
+        // go back to login
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+        finish();
+    }
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -118,7 +138,13 @@ public class MainActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_browse, container, false);
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+
+            // get username from saved data
+            SharedPreferences savedData = getActivity().getSharedPreferences(getString(R.string.saved_data_file_key),
+                    Context.MODE_PRIVATE);
+            String username = savedData.getString(getString(R.string.prompt_username), "undefined");
+
+            textView.setText(getString(R.string.section_format, username, getArguments().getInt(ARG_SECTION_NUMBER, 0)));
             return rootView;
         }
     }

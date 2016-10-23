@@ -6,6 +6,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -46,13 +47,6 @@ public class LoginActivity extends AppCompatActivity {
     public static final String CLOUD_SERVER_IP = "68.248.214.70:8080";
 
     /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "test_user1:hello", "test_user2:world"
-    };
-    /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
@@ -66,6 +60,16 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // if user is already logged in, go straight to main activity
+        SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key),
+                Context.MODE_PRIVATE);
+        if(savedData.contains(getString(R.string.prompt_username))) {
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
         setContentView(R.layout.activity_login);
         // Set up the login form.
         mUsernameView = (EditText) findViewById(R.id.username);
@@ -153,14 +157,14 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            // showProgress(true); TODO: bring back progress spinner
+            showProgress(true);
             mAuthTask = new UserLoginTask(this, username, password);
             mAuthTask.execute((Void) null);
         }
     }
 
     private boolean isPasswordValid(String password) {
-        return password.length() > 4;
+        return password.length() >= 4;
     }
 
     /**
@@ -287,9 +291,21 @@ public class LoginActivity extends AppCompatActivity {
             showProgress(false);
 
             if (success == 1) {
+                // store username for later use
+                SharedPreferences savedData = mParent.getSharedPreferences(getString(R.string.saved_data_file_key),
+                        Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = savedData.edit();
+                editor.putString(getString(R.string.prompt_username), mUsername);
+                editor.commit();
+
+                // clear text boxes so they're empty when user logs out
+                mUsernameView.setText("");
+                mPasswordView.setText("");
+
                 // launch main activity so user can begin browsing
                 Intent intent = new Intent(mParent, MainActivity.class);
                 startActivity(intent);
+                finish();
             } else if (success == 0){
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
