@@ -102,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
                 Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = savedData.edit();
         editor.remove(getString(R.string.prompt_username));
+        editor.commit();
 
         // go back to login
         Intent intent = new Intent(this, LoginActivity.class);

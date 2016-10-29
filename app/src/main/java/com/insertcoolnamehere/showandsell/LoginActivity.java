@@ -65,6 +65,7 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key),
                 Context.MODE_PRIVATE);
         if(savedData.contains(getString(R.string.prompt_username))) {
+            Log.d("LoginActivity", savedData.getString(getString(R.string.prompt_username), "there isn't any un here"));
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             finish();
