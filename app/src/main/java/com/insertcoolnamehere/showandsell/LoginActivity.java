@@ -65,7 +65,6 @@ public class LoginActivity extends AppCompatActivity {
         SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key),
                 Context.MODE_PRIVATE);
         if(savedData.contains(getString(R.string.prompt_username))) {
-            Log.d("LoginActivity", savedData.getString(getString(R.string.prompt_username), "there isn't any un here"));
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             finish();
@@ -214,6 +213,8 @@ public class LoginActivity extends AppCompatActivity {
         private final Activity mParent;
         private final String mUsername;
         private final String mPassword;
+        private String firstName;
+        private String lastName;
 
         UserLoginTask(Activity parent, String username, String password) {
             mParent = parent;
@@ -225,6 +226,7 @@ public class LoginActivity extends AppCompatActivity {
         protected Integer doInBackground(Void... params) {
             // variables that we will have to close in try loop
             HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
 
             // the unparsed JSON response from the server
             int responseCode = -1;
@@ -268,16 +270,39 @@ public class LoginActivity extends AppCompatActivity {
                     // obtain status code
                     responseCode = urlConnection.getResponseCode();
                     if(responseCode == 200) {
+                        // read response to get user data from server
+                        reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                        String line = "";
+                        String responseBody = "";
+                        while((line = reader.readLine()) != null) {
+                            responseBody += line + '\n';
+                        }
+
+                        // parse response as JSON
+                        JSONArray array = new JSONArray(responseBody);
+                        JSONObject user = array.getJSONObject(0);
+                        firstName = user.getString("firstName");
+                        lastName = user.getString("lastName");
+
                         return 1;
                     } else {
                         return 0;
                     }
                 } catch (IOException e) {
                     Log.e(LOG_TAG, "Error getting response from server", e);
+                } catch (JSONException e) {
+                    Log.e(LOG_TAG, "Error parsing JSON", e);
                 } finally {
                     // release system resources
                     if(urlConnection != null) {
                         urlConnection.disconnect();
+                    }
+                    if(reader != null) {
+                        try {
+                            reader.close();
+                        } catch(IOException e) {
+                            Log.e(LOG_TAG, "Error closing input stream", e);
+                        }
                     }
                 }
             }
@@ -297,6 +322,9 @@ public class LoginActivity extends AppCompatActivity {
                         Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = savedData.edit();
                 editor.putString(getString(R.string.prompt_username), mUsername);
+                editor.putString(getString(R.string.prompt_password), mPassword);
+                editor.putString(getString(R.string.prompt_first_name), firstName);
+                editor.putString(getString(R.string.prompt_last_name), lastName);
                 editor.commit();
 
                 // clear text boxes so they're empty when user logs out

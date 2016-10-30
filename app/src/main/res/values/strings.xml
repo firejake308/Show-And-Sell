@@ -30,6 +30,18 @@
     <string name="action_logout">Logout</string>
     <string name="section_format">Hello %1$s from section: %2$d</string>
 
+    <!-- Donate Fragment -->
+    <string name="prompt_item_description">Description</string>
+    <string name="prompt_item_details">Details</string>
+    <string name="prompt_item_condition">Condition</string>
+    <string name="prompt_suggested_price">Suggested Price</string>
+    <string-array name="possible_conditions">
+        <item>Used</item>
+        <item>New</item>
+    </string-array>
+    <string name="prompt_image_upload">Take a Picture</string>
+    <string name="action_donate">Donate</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

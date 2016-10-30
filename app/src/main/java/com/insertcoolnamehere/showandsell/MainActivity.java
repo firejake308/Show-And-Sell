@@ -14,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,7 +23,7 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DonateFragment.OnDonationListener, BookmarksFragment.OnOpenBookmarkListener{
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.setCurrentItem(1);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
@@ -93,6 +95,14 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void onDonation() {
+
+    }
+
+    public void onOpenBookmark(String itemId) {
+
+    }
+
     /**
      * Log out the current user and return to the login screen
      */
@@ -102,6 +112,9 @@ public class MainActivity extends AppCompatActivity {
                 Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = savedData.edit();
         editor.remove(getString(R.string.prompt_username));
+        editor.remove(getString(R.string.prompt_password));
+        editor.remove(getString(R.string.prompt_first_name));
+        editor.remove(getString(R.string.prompt_last_name));
         editor.commit();
 
         // go back to login
@@ -120,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
         private static final String ARG_SECTION_NUMBER = "section_number";
 
         public PlaceholderFragment() {
+
         }
 
         /**
@@ -143,9 +157,9 @@ public class MainActivity extends AppCompatActivity {
             // get username from saved data
             SharedPreferences savedData = getActivity().getSharedPreferences(getString(R.string.saved_data_file_key),
                     Context.MODE_PRIVATE);
-            String username = savedData.getString(getString(R.string.prompt_username), "undefined");
+            String firstName = savedData.getString(getString(R.string.prompt_first_name), "undefined");
 
-            textView.setText(getString(R.string.section_format, username, getArguments().getInt(ARG_SECTION_NUMBER, 0)));
+            textView.setText(getString(R.string.section_format, firstName, getArguments().getInt(ARG_SECTION_NUMBER, 0)));
             return rootView;
         }
     }
@@ -163,8 +177,18 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            switch(position) {
+                case 0:
+                    // donate tab
+                    return new DonateFragment();
+                case 1:
+                    // browse tab
+                    return PlaceholderFragment.newInstance(1);
+                case 2:
+                    // bookmarks tab
+                    return new BookmarksFragment();
+            }
+            return null;
         }
 
         @Override
@@ -177,11 +201,11 @@ public class MainActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "SECTION 1";
+                    return "DONATE";
                 case 1:
-                    return "SECTION 2";
+                    return "BROWSE";
                 case 2:
-                    return "SECTION 3";
+                    return "BOOKMARKS";
             }
             return null;
         }
