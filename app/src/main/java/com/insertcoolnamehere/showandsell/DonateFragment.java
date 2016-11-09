@@ -1,14 +1,13 @@
 package com.insertcoolnamehere.showandsell;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 
 
@@ -25,6 +24,7 @@ public class DonateFragment extends Fragment {
     private OnDonationListener mListener;
 
     private Spinner conditionEntry;
+    private Button takePicBtn;
 
     public DonateFragment() {
         // Required empty public constructor
@@ -64,12 +64,29 @@ public class DonateFragment extends Fragment {
                 R.array.possible_conditions, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         conditionEntry.setAdapter(adapter);
+
+        // hook up action listeners
+        takePicBtn = (Button) getActivity().findViewById(R.id.upload_img_btn);
+        takePicBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                attemptTakePic();
+            }
+        });
+
+        Button donateBtn = (Button) getActivity().findViewById(R.id.donate_btn);
+        donateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onDonation();
+            }
+        });
     }
 
     // TODO: Rename method and hook method into UI event
-    public void onButtonPressed() {
+    public void attemptTakePic() {
         if (mListener != null) {
-            mListener.onDonation();
+            mListener.takePic();
         }
     }
 
@@ -101,6 +118,7 @@ public class DonateFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnDonationListener {
+        void takePic();
         void onDonation();
     }
 }

@@ -65,6 +65,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/action_donate"
-        android:id="@+id/button" />
+        android:id="@+id/donate_btn" />
+
 
 </LinearLayout>

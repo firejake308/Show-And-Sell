@@ -215,6 +215,7 @@ public class LoginActivity extends AppCompatActivity {
         private final String mPassword;
         private String firstName;
         private String lastName;
+        private String userId;
 
         UserLoginTask(Activity parent, String username, String password) {
             mParent = parent;
@@ -283,6 +284,7 @@ public class LoginActivity extends AppCompatActivity {
                         JSONObject user = array.getJSONObject(0);
                         firstName = user.getString("firstName");
                         lastName = user.getString("lastName");
+                        userId = user.getString("ssUserId");
 
                         return 1;
                     } else {
@@ -325,6 +327,7 @@ public class LoginActivity extends AppCompatActivity {
                 editor.putString(getString(R.string.prompt_password), mPassword);
                 editor.putString(getString(R.string.prompt_first_name), firstName);
                 editor.putString(getString(R.string.prompt_last_name), lastName);
+                editor.putString(getString(R.string.userId), userId);
                 editor.commit();
 
                 // clear text boxes so they're empty when user logs out
