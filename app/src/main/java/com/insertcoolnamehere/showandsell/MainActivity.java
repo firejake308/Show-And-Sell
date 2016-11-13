@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -31,26 +30,24 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.insertcoolnamehere.showandsell.dummy.DummyContent;
+import com.insertcoolnamehere.showandsell.logic.Item;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity implements DonateFragment.OnDonationListener, BookmarksFragment.OnOpenBookmarkListener{
+public class MainActivity extends AppCompatActivity implements DonateFragment.OnDonationListener, BookmarksFragment.OnOpenBookmarkListener, BrowseFragment.OnListFragmentInteractionListener{
 
     private static final int REQUEST_IMAGE_CAPTURE = 0;
 
@@ -96,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+
             }
         });
 
@@ -158,6 +156,11 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
 
     public void onOpenBookmark(String itemId) {
 
+    }
+
+    @Override
+    public void onListFragmentInteraction(Item item) {
+        // TODO open ItemDetailActivity when an item is clicked
     }
 
     /**
@@ -243,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
                     return new DonateFragment();
                 case 1:
                     // browse tab
-                    return PlaceholderFragment.newInstance(1);
+                    return new BrowseFragment();
                 case 2:
                     // bookmarks tab
                     return new BookmarksFragment();
@@ -340,7 +343,7 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
                     // scale down image and convert to base64
                     Bitmap bmp = Bitmap.createScaledBitmap(mBitmap, 250, 250, false);
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    bmp.compress(Bitmap.CompressFormat.JPEG, 75, stream);
+                    bmp.compress(Bitmap.CompressFormat.PNG, 75, stream);
                     byte[] byteArray = stream.toByteArray();
                     String thumbnail = Base64.encodeToString(byteArray,Base64.DEFAULT);
 
@@ -396,3 +399,4 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
         }
     }
 }
+

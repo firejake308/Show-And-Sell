@@ -1,5 +1,6 @@
 package com.insertcoolnamehere.showandsell.logic;
 
+import android.graphics.Bitmap;
 import android.media.Image;
 
 import java.util.ArrayList;
@@ -7,25 +8,25 @@ import java.util.ArrayList;
 public class Item {
     private static ArrayList<Item> items = new ArrayList<Item>();
     private static int numOfItems = 0;
-    private String itemName;
-    private String itemDescription;
-    private int itemNumber;
-    private String itemCondition;
-    private double itemPrice;
-    private Image itemPic;
+    private String name;
+    private String description;
+    private int number;
+    private String condition;
+    private double price;
+    private Bitmap pic;
 
     public Item(/*database input*/) {
         //add setters here
         /*
-        setItemName();
-        setItemDescription();
-        setItemNumber();
-        setItemCondition();
-        setItemPrice();
-        setItemPic();
+        setName();
+        setDescription();
+        setNumber();
+        setCondition();
+        setPrice();
+        setPic();
          */
 
-        itemNumber = numOfItems;
+        number = numOfItems;
         numOfItems += 1;
         items.add(this);
     }
@@ -35,45 +36,45 @@ public class Item {
      * Getters and Setters
      * @return
      */
-    public String getItemName() {
-        return itemName;
+    public String getName() {
+        return name;
     }
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
-    }
-
-    public String getItemDescription() {
-        return itemDescription;
-    }
-    public void setItemDescription(String itemDescription) {
-        this.itemDescription = itemDescription;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public int getItemNumber() {
-        return itemNumber;
+    public String getDescription() {
+        return description;
     }
-    public void setItemNumber(int itemNumber) {
-        this.itemNumber = itemNumber;
-    }
-
-    public String getItemCondition() {
-        return itemCondition;
-    }
-    public void setItemCondition(String itemCondition) {
-        this.itemCondition = itemCondition;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public double getItemPrice() {
-        return itemPrice;
+    public int getNumber() {
+        return number;
     }
-    public void setItemPrice(double itemPrice) {
-        this.itemPrice = itemPrice;
+    public void setNumber(int number) {
+        this.number = number;
     }
 
-    public Image getItemPic() {
-        return itemPic;
+    public String getCondition() {
+        return condition;
     }
-    public void setItemPic(Image itemPic) {
-        this.itemPic = itemPic;
+    public void setCondition(String condition) {
+        this.condition = condition;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public Bitmap getPic() {
+        return pic;
+    }
+    public void setPic(Bitmap pic) {
+        this.pic = pic;
     }
 }
