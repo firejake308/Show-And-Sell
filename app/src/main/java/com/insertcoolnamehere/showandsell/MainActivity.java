@@ -345,7 +345,7 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     bmp.compress(Bitmap.CompressFormat.PNG, 75, stream);
                     byte[] byteArray = stream.toByteArray();
-                    String thumbnail = Base64.encodeToString(byteArray,Base64.DEFAULT);
+                    String thumbnail = Base64.encodeToString(byteArray,Base64.NO_WRAP);
 
                     // convert item to JSON
                     String body = "";
