@@ -1,5 +1,8 @@
 package com.insertcoolnamehere.showandsell;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -8,8 +11,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +23,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.insertcoolnamehere.showandsell.dummy.DummyContent;
@@ -41,16 +47,20 @@ import java.util.ArrayList;
  * interface.
  */
 
-public class BrowseFragment extends Fragment {
+public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 1;
+
     private OnListFragmentInteractionListener mListener;
     private ArrayList<Item> itemsList = new ArrayList<>();
     private BrowseItemRecyclerViewAdapter adapter;
     private AsyncTask mFetchItemsTask;
+
+    private RecyclerView mRecyclerView;
+    private ProgressBar mProgressView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -66,7 +76,17 @@ public class BrowseFragment extends Fragment {
         updateItems();
     }
 
+    /**
+     * Update items when user swipes to refresh
+     */
+    public void onRefresh() {
+        updateItems();
+    }
+
     public void updateItems() {
+        // show progress bar
+        showProgress(true);
+
         // fetch items from server
         if(mFetchItemsTask == null) {
             mFetchItemsTask = new FetchItemsTask(getActivity(), "12162f04-587f-4ca6-a80d-91e1cc58ffaa").execute();
@@ -104,17 +124,22 @@ public class BrowseFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_item_list, container, false);
 
+        View recyclerView = view.findViewById(R.id.list);
+        mProgressView = (ProgressBar) view.findViewById(R.id.fetch_items_progress);
+        SwipeRefreshLayout swiper = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
+        swiper.setOnRefreshListener(this);
+
         // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+        if (recyclerView instanceof RecyclerView) {
+            Context context = recyclerView.getContext();
+            mRecyclerView = (RecyclerView) recyclerView;
             if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
+                mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+                mRecyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
             adapter = new BrowseItemRecyclerViewAdapter(itemsList, mListener);
-            recyclerView.setAdapter(adapter);
+            mRecyclerView.setAdapter(adapter);
         }
         return view;
     }
@@ -149,8 +174,57 @@ public class BrowseFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onListFragmentInteraction(Item item);
+    }
+
+    /**
+     * Shows the progress UI and hides the RecyclerView
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    private void showProgress(final boolean show) {
+        /*
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            mRecyclerView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mRecyclerView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mRecyclerView.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressView.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            mRecyclerView.setVisibility(show ? View.GONE : View.VISIBLE);
+        }
+        */
+        if(show) {
+            final SwipeRefreshLayout swiper = (SwipeRefreshLayout) getActivity().findViewById(R.id.swiperefresh);
+            swiper.post(new Runnable() {
+                @Override
+                public void run() {
+                    swiper.setRefreshing(true);
+                }
+            });
+        } else {
+            SwipeRefreshLayout swiper = (SwipeRefreshLayout) getActivity().findViewById(R.id.swiperefresh);
+            swiper.setRefreshing(false);
+        }
     }
 
     // insert an AsyncTask here, using the ones in LoginActivity or DonateFragment as a reference
@@ -281,6 +355,7 @@ public class BrowseFragment extends Fragment {
         protected void onPostExecute(Integer result) {
             adapter.notifyDataSetChanged();
             Log.d(LOG_TAG, "data set changed");
+            showProgress(false);
             mFetchItemsTask = null;
         }
     }

@@ -83,7 +83,6 @@ public class DonateFragment extends Fragment {
         });
     }
 
-    // TODO: Rename method and hook method into UI event
     public void attemptTakePic() {
         if (mListener != null) {
             mListener.takePic();
