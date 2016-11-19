@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,4 +10,50 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.insertcoolnamehere.showandsell.ItemDetailActivity">
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="?android:attr/panelBackground"
+        android:id="@+id/item_detail_image" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/item_detail_name"
+        android:layout_below="@+id/item_detail_image"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/item_detail_price"
+        android:layout_below="@+id/item_detail_name"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/item_detail_condition"
+        android:layout_below="@+id/item_detail_price"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/item_detail_description"
+        android:layout_marginTop="16dp"
+        android:layout_below="@+id/item_detail_condition"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:text="Buy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/item_detail_buy" />
 </RelativeLayout>
