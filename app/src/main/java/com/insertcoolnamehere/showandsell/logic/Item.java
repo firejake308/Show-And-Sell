@@ -3,32 +3,32 @@ package com.insertcoolnamehere.showandsell.logic;
 import android.graphics.Bitmap;
 import android.media.Image;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
-public class Item {
-    private static ArrayList<Item> items = new ArrayList<Item>();
+public class Item implements Serializable{
+    private static HashMap<String, Item> items = new HashMap<String, Item>();
     private static int numOfItems = 0;
+
+    public static Item getItem(String guid) {
+        return items.get(guid);
+    }
+
     private String name;
     private String description;
     private int number;
+    private final String guid;
     private String condition;
     private double price;
     private Bitmap pic;
 
-    public Item(/*database input*/) {
-        //add setters here
-        /*
-        setName();
-        setDescription();
-        setNumber();
-        setCondition();
-        setPrice();
-        setPic();
-         */
+    public Item(String guid) {
+        this.guid = guid;
 
         number = numOfItems;
         numOfItems += 1;
-        items.add(this);
+        items.put(guid, this);
     }
 
 
@@ -55,6 +55,10 @@ public class Item {
     }
     public void setNumber(int number) {
         this.number = number;
+    }
+
+    public String getGuid() {
+        return guid;
     }
 
     public String getCondition() {

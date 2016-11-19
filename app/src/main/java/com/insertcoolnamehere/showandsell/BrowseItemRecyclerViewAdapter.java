@@ -40,7 +40,6 @@ public class BrowseItemRecyclerViewAdapter extends RecyclerView.Adapter<BrowseIt
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mItems.get(position);
         holder.mNameView.setText(mItems.get(position).getName());
-        holder.mDescriptionView.setText(mItems.get(position).getDescription());
         holder.mPriceView.setText("$"+mItems.get(position).getPrice());
         holder.mConditionView.setText(mItems.get(position).getCondition());
         holder.mThumbnailView.setImageBitmap(mItems.get(position).getPic());
@@ -51,7 +50,7 @@ public class BrowseItemRecyclerViewAdapter extends RecyclerView.Adapter<BrowseIt
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
+                    mListener.onListFragmentInteraction(holder.mItem.getGuid());
                 }
             }
         });
@@ -65,7 +64,6 @@ public class BrowseItemRecyclerViewAdapter extends RecyclerView.Adapter<BrowseIt
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final TextView mNameView;
-        public final TextView mDescriptionView;
         public final TextView mPriceView;
         public final TextView mConditionView;
         public final ImageView mThumbnailView;
@@ -75,7 +73,6 @@ public class BrowseItemRecyclerViewAdapter extends RecyclerView.Adapter<BrowseIt
             super(view);
             mView = view;
             mNameView = (TextView) view.findViewById(R.id.item_name);
-            mDescriptionView = (TextView) view.findViewById(R.id.item_description);
             mPriceView = (TextView) view.findViewById(R.id.item_price);
             mConditionView = (TextView) view.findViewById(R.id.item_condition);
             mThumbnailView = (ImageView) view.findViewById(R.id.item_picture);
@@ -83,7 +80,7 @@ public class BrowseItemRecyclerViewAdapter extends RecyclerView.Adapter<BrowseIt
 
         @Override
         public String toString() {
-            return super.toString() + " '" + mDescriptionView.getText() + "'";
+            return super.toString() + " '" + mNameView.getText() + "'";
         }
     }
 }

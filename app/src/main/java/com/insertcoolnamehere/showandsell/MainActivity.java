@@ -159,8 +159,11 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
     }
 
     @Override
-    public void onListFragmentInteraction(Item item) {
-        // TODO open ItemDetailActivity when an item is clicked
+    public void onListFragmentInteraction(String itemId) {
+        // start the ItemDetailActivity and tell it which item to show
+        Intent showItemDetailIntent = new Intent(this, ItemDetailActivity.class);
+        showItemDetailIntent.putExtra(ItemDetailActivity.ITEM_ID, itemId);
+        startActivity(showItemDetailIntent);
     }
 
     /**

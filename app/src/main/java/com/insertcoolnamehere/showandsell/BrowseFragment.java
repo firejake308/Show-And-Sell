@@ -60,6 +60,9 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private AsyncTask mFetchItemsTask;
 
     private RecyclerView mRecyclerView;
+    /**
+     * For other loading animation
+     */
     private ProgressBar mProgressView;
 
     /**
@@ -174,7 +177,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        void onListFragmentInteraction(Item item);
+        void onListFragmentInteraction(String itemId);
     }
 
     /**
@@ -308,7 +311,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                         for (int i = 0; i < items.length(); i++) {
                             JSONObject itemJson = items.getJSONObject(i);
 
-                            Item item = new Item();
+                            Item item = new Item(itemJson.getString("ssItemId"));
                             item.setName(itemJson.getString("name"));
                             item.setPrice(itemJson.getDouble("price"));
                             item.setCondition(itemJson.getString("condition"));
