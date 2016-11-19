@@ -47,6 +47,8 @@
     <string name="item_description">Description</string>
     <string name="item_details">Details</string>
     <string name="item_condition">Condition</string>
+    <string name="item_image">Image of Item</string>
+    <string name="action_buy">Buy</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

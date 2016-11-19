@@ -6,6 +6,8 @@ import android.media.Image;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class Item implements Serializable{
     private static HashMap<String, Item> items = new HashMap<String, Item>();
@@ -13,6 +15,20 @@ public class Item implements Serializable{
 
     public static Item getItem(String guid) {
         return items.get(guid);
+    }
+
+    public static boolean hasItems() {
+        return !items.isEmpty();
+    }
+    public static ArrayList<Item> getItemsList() {
+        ArrayList<Item> list = new ArrayList<Item>();
+        Item[] array = new Item[items.size()];
+        Set<Map.Entry<String, Item>> entries = items.entrySet();
+        for(Map.Entry<String, Item> entry: entries) {
+            list.add(entry.getValue());
+        }
+
+        return list;
     }
 
     private String name;

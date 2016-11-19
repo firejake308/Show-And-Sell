@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -29,6 +30,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -46,6 +48,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DecimalFormat;
 
 public class MainActivity extends AppCompatActivity implements DonateFragment.OnDonationListener, BookmarksFragment.OnOpenBookmarkListener, BrowseFragment.OnListFragmentInteractionListener{
 
@@ -67,6 +70,9 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
     private ViewPager mViewPager;
 
     private Bitmap itemPic;
+    private boolean imageTakenYet = false;
+
+    private final String LOG_TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +105,34 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
 
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+        if(imageTakenYet) {
+            Log.d(LOG_TAG, "I saved the image like a good boy");
+            double scaleFactor = Math.max(itemPic.getWidth() / 250.0, itemPic.getHeight() / 250.0);
+            Bitmap bmp = Bitmap.createScaledBitmap(itemPic, (int) (itemPic.getWidth() / scaleFactor), (int) (itemPic.getHeight() / scaleFactor), false);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+            savedInstanceState.putByteArray(getString(R.string.item_image), byteArray);
+        }
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        try {
+            byte[] byteArray = savedInstanceState.getByteArray(getString(R.string.item_image));
+            itemPic = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+            imageTakenYet = true;
+        } catch(Exception e) {
+            Log.e(LOG_TAG, "Couldn't restore image from saved Bundle", e);
+            return;
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -134,22 +168,66 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == REQUEST_IMAGE_CAPTURE) {
-            // when the camera app returns a picture to us
-            Bundle extras = data.getExtras();
-            itemPic = (Bitmap) extras.get("data");
+            try {
+                // when the camera app returns a picture to us
+                Bundle extras = data.getExtras();
+                itemPic = (Bitmap) extras.get("data");
+                imageTakenYet = true;
+            } catch (NullPointerException e) {
+                Log.d(LOG_TAG, "The user didn't actually take a picture");
+                Button donateBtn = (Button) findViewById(R.id.donate_btn);
+                donateBtn.setEnabled(false);
+                imageTakenYet = false;
+            }
         }
     }
 
-    public void onDonation() {
+    @Override
+    public void onDonation(String condition) {
+        // fetch user-entered data
         EditText descriptionEntry = (EditText) findViewById(R.id.item_description_entry);
         EditText detailsEntry = (EditText) findViewById(R.id.item_details_entry);
         EditText priceEntry = (EditText) findViewById(R.id.item_price_entry);
-        Spinner conditionEntry = (Spinner) findViewById(R.id.item_condition_entry);
 
         String description = descriptionEntry.getText().toString();
         String deets = detailsEntry.getText().toString();
         String price = priceEntry.getText().toString();
-        String condition = "Used"; // TODO make this actually work
+
+        // make sure the user has actually given us all the fields we asked for
+        Button donateBtn = (Button) findViewById(R.id.donate_btn);
+        if(description.length() == 0) {
+            descriptionEntry.setError("Please enter a description");
+            donateBtn.setEnabled(false);
+            return;
+        } else if(deets.length() == 0) {
+            detailsEntry.setError("Please provide details");
+            donateBtn.setEnabled(false);
+            return;
+        } else if(price.length() == 0) {
+            priceEntry.setError("Please enter a price");
+            donateBtn.setEnabled(false);
+            return;
+        } else if(!imageTakenYet || itemPic == null) {
+            Toast.makeText(this, "Please provide a picture", Toast.LENGTH_SHORT).show();
+            donateBtn.setEnabled(false);
+            return;
+        } else {
+            donateBtn.setEnabled(true);
+        }
+
+        // make our price look nice
+        price = DecimalFormat.getCurrencyInstance().format(price);
+
+        // clear EditTexts
+        descriptionEntry.setText("");
+        detailsEntry.setText("");
+        priceEntry.setText("");
+
+        // no need to save an image anymore
+        imageTakenYet = false;
+
+        // go back to browse fragment
+        mViewPager.setCurrentItem(1);
 
         new UploadItemTask(this, description, price, condition, deets, itemPic).execute();
     }
@@ -185,49 +263,6 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
         finish();
-    }
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        private Activity mParent;
-
-        public PlaceholderFragment() {
-
-        }
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_browse, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-
-            // get username from saved data
-            SharedPreferences savedData = getActivity().getSharedPreferences(getString(R.string.saved_data_file_key),
-                    Context.MODE_PRIVATE);
-            String firstName = savedData.getString(getString(R.string.prompt_first_name), "undefined");
-
-            textView.setText(getString(R.string.section_format, firstName, getArguments().getInt(ARG_SECTION_NUMBER, 0)));
-            return rootView;
-        }
     }
 
     /**
@@ -344,9 +379,11 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
                     String description = mDescription;
 
                     // scale down image and convert to base64
-                    Bitmap bmp = Bitmap.createScaledBitmap(mBitmap, 250, 250, false);
+                    Log.d(LOG_TAG, "is mBitmap null: "+(mBitmap == null));
+                    double scaleFactor = Math.max(mBitmap.getWidth()/250.0, mBitmap.getHeight()/250.0);
+                    Bitmap bmp = Bitmap.createScaledBitmap(mBitmap, (int)(mBitmap.getWidth()/scaleFactor),(int)(mBitmap.getHeight()/scaleFactor), false);
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    bmp.compress(Bitmap.CompressFormat.PNG, 75, stream);
+                    bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
                     byte[] byteArray = stream.toByteArray();
                     String thumbnail = Base64.encodeToString(byteArray,Base64.NO_WRAP);
 

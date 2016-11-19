@@ -65,6 +65,8 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
      */
     private ProgressBar mProgressView;
 
+    private boolean alreadyHaveItems = false;
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -76,7 +78,15 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        updateItems();
+        if(!Item.hasItems()) {
+            updateItems();
+        }
+        else {
+            itemsList.clear();
+            itemsList.addAll(Item.getItemsList());
+            Log.d("BrowseFragment", itemsList.toString());
+            adapter.notifyDataSetChanged();
+        }
     }
 
     /**
@@ -348,10 +358,6 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
             // if anything goes wrong, return the other failure code
             return OTHER_FAILURE;
-        }
-
-        protected void onProgressUpdate(Integer... progress) {
-            //setProgressPercent(progress[0]);
         }
 
         @Override

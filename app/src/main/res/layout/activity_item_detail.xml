@@ -14,10 +14,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="?android:attr/panelBackground"
-        android:id="@+id/item_detail_image" />
+        android:id="@+id/item_detail_image"
+        android:contentDescription="@string/item_image"/>
 
     <TextView
-        android:text="TextView"
+        android:text="@string/prompt_item_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/item_detail_name"
@@ -25,7 +26,7 @@
         android:layout_alignParentStart="true" />
 
     <TextView
-        android:text="TextView"
+        android:text="@string/prompt_suggested_price"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/item_detail_price"
@@ -33,7 +34,7 @@
         android:layout_alignParentStart="true" />
 
     <TextView
-        android:text="TextView"
+        android:text="@string/prompt_item_condition"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/item_detail_condition"
@@ -41,7 +42,7 @@
         android:layout_alignParentStart="true" />
 
     <TextView
-        android:text="TextView"
+        android:text="@string/prompt_item_details"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/item_detail_description"
@@ -50,10 +51,10 @@
         android:layout_alignParentStart="true" />
 
     <Button
-        android:text="Buy"
+        android:text="@string/action_buy"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
+        android:layout_alignTop="@id/item_detail_name"
         android:layout_alignParentEnd="true"
         android:id="@+id/item_detail_buy" />
 </RelativeLayout>
