@@ -43,6 +43,11 @@
     <string name="prompt_image_upload">Take a Picture</string>
     <string name="action_donate">Donate</string>
 
+    <!-- Item detail -->
+    <string name="item_description">Description</string>
+    <string name="item_details">Details</string>
+    <string name="item_condition">Condition</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
