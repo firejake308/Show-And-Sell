@@ -153,8 +153,6 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
             Intent showSettingsIntent = new Intent(this, SettingsActivity.class);
             startActivity(showSettingsIntent);
             return true;
-        } else if(id == R.id.action_logout) {
-            logout();
         }
 
         return super.onOptionsItemSelected(item);
@@ -244,27 +242,6 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
         Intent showItemDetailIntent = new Intent(this, ItemDetailActivity.class);
         showItemDetailIntent.putExtra(ItemDetailActivity.ITEM_ID, itemId);
         startActivity(showItemDetailIntent);
-    }
-
-    /**
-     * Log out the current user and return to the login screen
-     */
-    private void logout() {
-        // erase username from saved data
-        SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key),
-                Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = savedData.edit();
-        editor.remove(getString(R.string.prompt_username));
-        editor.remove(getString(R.string.prompt_password));
-        editor.remove(getString(R.string.prompt_first_name));
-        editor.remove(getString(R.string.prompt_last_name));
-        editor.remove(getString(R.string.userId));
-        editor.commit();
-
-        // go back to login
-        Intent intent = new Intent(this, LoginActivity.class);
-        startActivity(intent);
-        finish();
     }
 
     /**

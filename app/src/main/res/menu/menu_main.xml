@@ -3,11 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.insertcoolnamehere.showandsell.MainActivity">
     <item
-        android:id="@+id/action_logout"
-        android:orderInCategory="99"
-        android:title="@string/action_logout"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
