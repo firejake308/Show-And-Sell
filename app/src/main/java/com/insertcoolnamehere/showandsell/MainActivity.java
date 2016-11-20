@@ -150,6 +150,8 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent showSettingsIntent = new Intent(this, SettingsActivity.class);
+            startActivity(showSettingsIntent);
             return true;
         } else if(id == R.id.action_logout) {
             logout();
