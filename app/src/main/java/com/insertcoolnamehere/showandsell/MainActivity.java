@@ -155,6 +155,8 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
             return true;
         } else if(id == R.id.action_logout) {
             logout();
+        } else if(id == R.id.action_search) {
+            onSearchRequested();
         }
 
         return super.onOptionsItemSelected(item);

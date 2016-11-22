@@ -54,6 +54,9 @@
     <string name="action_refresh">Refresh</string>
     <string name="title_activity_settings">Settings</string>
 
+    <!-- Search -->
+    <string name="search_hint">Search for an item</string>
+
     <!-- Strings related to Settings -->
 
     <!-- Example General settings -->

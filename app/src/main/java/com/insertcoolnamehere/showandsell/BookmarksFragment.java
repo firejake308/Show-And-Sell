@@ -8,6 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -17,7 +20,7 @@ import android.view.ViewGroup;
  * Use the {@link BookmarksFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class BookmarksFragment extends Fragment {
+public class BookmarksFragment extends BrowseFragment {
 
     private OnOpenBookmarkListener mListener;
 
@@ -34,18 +37,6 @@ public class BookmarksFragment extends Fragment {
     public static BookmarksFragment newInstance(String param1, String param2) {
         BookmarksFragment fragment = new BookmarksFragment();
         return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_bookmarks, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -70,6 +61,20 @@ public class BookmarksFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    protected URL getAPICall(String id) throws MalformedURLException {
+        // construct the URL to fetch a user
+        Uri.Builder  builder = new Uri.Builder();
+        builder.scheme("http")
+                .encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
+                .appendPath("showandsell")
+                .appendPath("api")
+                .appendPath("items")
+                .appendQueryParameter("groupId", id)
+                .build();
+        return new URL(builder.toString());
     }
 
     /**
