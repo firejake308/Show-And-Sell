@@ -48,7 +48,21 @@ public class SettingsActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_settings);
 
-        // add action log out when the logout button is pressed
+        // add actions when buttons are pressed
+        Button logout = (Button) findViewById(R.id.settings_logout);
+        logout.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                logout();
+            }
+        });
+        Button logout = (Button) findViewById(R.id.settings_logout);
+        logout.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                logout();
+            }
+        });
         Button logout = (Button) findViewById(R.id.settings_logout);
         logout.setOnClickListener(new OnClickListener() {
             @Override
