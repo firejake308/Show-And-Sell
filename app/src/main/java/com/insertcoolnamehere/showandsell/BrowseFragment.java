@@ -40,6 +40,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -108,6 +109,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
+            updateItems();
             return true;
         }
 
@@ -265,6 +267,19 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
         }
     }
 
+    protected URL getAPICall(String id) throws MalformedURLException {
+        // construct the URL to fetch a user
+        Uri.Builder  builder = new Uri.Builder();
+        builder.scheme("http")
+                .encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
+                .appendPath("showandsell")
+                .appendPath("api")
+                .appendPath("items")
+                .appendQueryParameter("groupId", id)
+                .build();
+        return new URL(builder.toString());
+    }
+
     // insert an AsyncTask here, using the ones in LoginActivity or DonateFragment as a reference
     private class FetchItemsTask extends AsyncTask<Void, Integer, Integer> {
         /**
@@ -311,18 +326,8 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 return NO_INERNET;
             } else {
                 try {
-                    // construct the URL to fetch a user
-                    Uri.Builder  builder = new Uri.Builder();
-                    builder.scheme("http")
-                            .encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
-                            .appendPath("showandsell")
-                            .appendPath("api")
-                            .appendPath("items")
-                            .appendQueryParameter("groupId", mGroupId)
-                            .build();
-                    URL url = new URL(builder.toString());
                     // connect to the URL and open the reader
-                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection = (HttpURLConnection) getAPICall(mGroupId).openConnection();
                     urlConnection.setReadTimeout(10000);
                     urlConnection.setConnectTimeout(15000);
                     urlConnection.setRequestMethod("GET");
