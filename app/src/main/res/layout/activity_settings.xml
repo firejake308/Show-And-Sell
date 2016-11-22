@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1"
+    android:id="@+id/activity_settings">
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="27dp" />
+
+    <TextView
+        android:text="  OPTIONS"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView2" />
+
+    <Button
+        android:text="   Choose Default Group"
+        android:textAlignment="textStart"
+        android:layout_width="match_parent"
+        android:id="@+id/settings_choose_default_group"
+        android:background="@android:color/background_light"
+        android:layout_height="25dp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="5dp" />
+
+    <Button
+        android:text="   Manage Group"
+        android:textAlignment="textStart"
+        android:layout_width="match_parent"
+        android:id="@+id/settings_manage_group"
+        android:background="@android:color/background_light"
+        android:layout_weight="0.01"
+        android:layout_height="25dp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="35dp" />
+
+    <TextView
+        android:text="  ACTIONS"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView3" />
+
+    <Button
+        android:text="Log Out"
+        android:textColor="@android:color/holo_red_dark"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:id="@+id/settings_logout"
+        android:background="@android:color/background_light" />
+</LinearLayout>
