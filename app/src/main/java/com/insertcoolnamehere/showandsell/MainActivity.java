@@ -153,13 +153,8 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
             Intent showSettingsIntent = new Intent(this, SettingsActivity.class);
             startActivity(showSettingsIntent);
             return true;
-<<<<<<< HEAD
-=======
-        } else if(id == R.id.action_logout) {
-            logout();
         } else if(id == R.id.action_search) {
             onSearchRequested();
->>>>>>> origin/master
         }
 
         return super.onOptionsItemSelected(item);
