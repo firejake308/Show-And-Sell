@@ -57,4 +57,14 @@
         android:layout_alignTop="@id/item_detail_name"
         android:layout_alignParentEnd="true"
         android:id="@+id/item_detail_buy" />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/item_detail_description"
+        android:layout_toEndOf="@+id/item_detail_image"
+        android:layout_marginTop="20dp"
+        android:id="@+id/item_comments" />
+
+
 </RelativeLayout>
