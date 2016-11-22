@@ -75,7 +75,7 @@ public class SearchableActivity extends AppCompatActivity {
             View view;
             if(convertView == null) {
                 // inflate a view of an item and its details
-                view = getLayoutInflater().inflate(R.layout.fragment_item, parent);
+                view = getLayoutInflater().inflate(R.layout.fragment_item, parent, false);
             } else {
                 view = convertView;
             }
