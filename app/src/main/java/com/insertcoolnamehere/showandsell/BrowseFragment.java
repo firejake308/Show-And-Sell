@@ -53,9 +53,7 @@ import java.util.ArrayList;
 
 public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
 
-    // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
     private int mColumnCount = 1;
 
     private OnListFragmentInteractionListener mListener;
@@ -64,6 +62,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private AsyncTask mFetchItemsTask;
 
     private RecyclerView mRecyclerView;
+    private View fragView;
     /**
      * For other loading animation
      */
@@ -140,7 +139,6 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
         super.onResume(); // always have to call super
     }
 
-    // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
     public static BrowseFragment newInstance(int columnCount) {
         BrowseFragment fragment = new BrowseFragment();
@@ -164,6 +162,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_item_list, container, false);
 
+        fragView = view;
         View recyclerView = view.findViewById(R.id.list);
         mProgressView = (ProgressBar) view.findViewById(R.id.fetch_items_progress);
         SwipeRefreshLayout swiper = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
@@ -253,17 +252,24 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
             mRecyclerView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
         */
+
+        final SwipeRefreshLayout swiper = (SwipeRefreshLayout) fragView.findViewById(R.id.swiperefresh);
         if(show) {
-            final SwipeRefreshLayout swiper = (SwipeRefreshLayout) getActivity().findViewById(R.id.swiperefresh);
             swiper.post(new Runnable() {
                 @Override
                 public void run() {
                     swiper.setRefreshing(true);
+                    Log.d("BrowseFragment", "swiper is turning on");
                 }
             });
         } else {
-            SwipeRefreshLayout swiper = (SwipeRefreshLayout) getActivity().findViewById(R.id.swiperefresh);
-            swiper.setRefreshing(false);
+            swiper.post(new Runnable() {
+                @Override
+                public void run() {
+                    swiper.setRefreshing(false);
+                    Log.d("BrowseFragment", "swiper is turning off");
+                }
+            });
         }
     }
 

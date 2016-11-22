@@ -219,9 +219,6 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
             donateBtn.setEnabled(true);
         }
 
-        // make our price look nice
-        price = DecimalFormat.getCurrencyInstance().format(price);
-
         // clear EditTexts
         descriptionEntry.setText("");
         detailsEntry.setText("");
@@ -288,7 +285,7 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
                     return new DonateFragment();
                 case 1:
                     // browse tab
-                    return new BrowseFragment();
+                    return BrowseFragment.newInstance(2);
                 case 2:
                     // bookmarks tab
                     return new BookmarksFragment();
