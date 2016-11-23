@@ -348,7 +348,8 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
                     conn.connect();
 
                     // get values for item
-                    String groupId = "12162f04-587f-4ca6-a80d-91e1cc58ffaa"; // TODO let user choose group
+                    SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+                    String groupId = sharedPref.getString(getString(R.string.saved_group_id), "d57f3c49-907d-4e6f-ab2c-2e76969b3447");
                     SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
                     String userId = savedData.getString(getString(R.string.userId), "");
                     String name = mName;

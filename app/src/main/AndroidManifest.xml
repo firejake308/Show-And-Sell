@@ -54,6 +54,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.insertcoolnamehere.showandsell.MainActivity" />
         </activity>
+        <activity
+            android:name=".ChooseGroupActivity"
+            android:label="ChooseGroup"
+            android:parentActivityName=".MainActivity">
+        </activity>
     </application>
 
 </manifest>

@@ -5,6 +5,8 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
@@ -128,7 +130,9 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         // fetch items from server
         if(mFetchItemsTask == null) {
-            mFetchItemsTask = new FetchItemsTask(getActivity(), "12162f04-587f-4ca6-a80d-91e1cc58ffaa").execute();
+            SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+            String groupId = sharedPref.getString(getString(R.string.saved_group_id), "d57f3c49-907d-4e6f-ab2c-2e76969b3447");
+            mFetchItemsTask = new FetchItemsTask(getActivity(), groupId).execute();
             adapter.notifyDataSetChanged();
         }
     }
