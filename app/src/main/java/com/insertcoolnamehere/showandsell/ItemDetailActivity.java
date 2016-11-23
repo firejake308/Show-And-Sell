@@ -1,8 +1,11 @@
 package com.insertcoolnamehere.showandsell;
 
-import android.support.annotation.NonNull;
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -12,8 +15,6 @@ import com.insertcoolnamehere.showandsell.dummy.DummyContent;
 import com.insertcoolnamehere.showandsell.logic.Item;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -54,7 +55,59 @@ public class ItemDetailActivity extends AppCompatActivity {
             DummyContent.DummyItem item = iter.next();
             list.add(item.content);
         }
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.text_view_comment, R.id.textView_comment, list);
+        CommentAdapter<String> adapter = new CommentAdapter<String>(this, R.layout.text_view_comment_right, list);
         listView.setAdapter(adapter);
+    }
+
+    private class CommentAdapter<T extends String> extends ArrayAdapter<String> {
+        private final int LEFT_COMMENT = 0;
+        private final int RIGHT_COMMENT = 1;
+
+        private ArrayList<String> mList;
+
+        private CommentAdapter(Context context, int layout, ArrayList<String> list) {
+            super(context, layout, list);
+
+            mList = list;
+        }
+
+        @Override
+        public int getViewTypeCount() {
+            return 2;
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            return position % 2;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if(convertView == null) {
+                if(getItemViewType(position) == LEFT_COMMENT) {
+                    Log.d("CommentAdapter", "creating left comment");
+                    View rootView = getLayoutInflater().inflate(R.layout.text_view_comment_left, parent, false);
+                    TextView comment = (TextView) rootView.findViewById(R.id.textView_comment_left);
+                    comment.setText(mList.get(position));
+                    return rootView;
+                } else {
+                    View rootView = getLayoutInflater().inflate(R.layout.text_view_comment_right, parent, false);
+                    TextView comment = (TextView) rootView.findViewById(R.id.textView_comment_right);
+                    comment.setText(mList.get(position));
+                    return rootView;
+                }
+            } else {
+                if(getItemViewType(position) == LEFT_COMMENT) {
+                    Log.d("CommentAdapter", "creating left comment");
+                    TextView comment = (TextView) convertView.findViewById(R.id.textView_comment_left);
+                    comment.setText(mList.get(position));
+                    return convertView;
+                } else {
+                    TextView comment = (TextView) convertView.findViewById(R.id.textView_comment_right);
+                    comment.setText(mList.get(position));
+                    return convertView;
+                }
+            }
+        }
     }
 }

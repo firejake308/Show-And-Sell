@@ -167,6 +167,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
         mProgressView = (ProgressBar) view.findViewById(R.id.fetch_items_progress);
         SwipeRefreshLayout swiper = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
         swiper.setOnRefreshListener(this);
+        swiper.setColorSchemeResources(R.color.colorAccent);
 
         // Set the adapter
         if (recyclerView instanceof RecyclerView) {

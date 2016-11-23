@@ -61,10 +61,19 @@
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/item_detail_description"
-        android:layout_toEndOf="@+id/item_detail_image"
-        android:layout_marginTop="20dp"
-        android:id="@+id/item_comments" />
+        android:id="@+id/item_comments"
+        android:divider="@null"
+        android:layout_below="@+id/enter_comment" />
 
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:id="@+id/enter_comment"
+        android:hint="Add a comment"
+        android:layout_below="@+id/item_detail_description"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>
