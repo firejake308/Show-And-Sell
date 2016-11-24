@@ -9,16 +9,18 @@
         android:layout_height="27dp" />
 
     <TextView
-        android:text="   CURRENT GROUP"
+        android:text="@string/current_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/textView" />
+        android:id="@+id/textView"
+        android:paddingLeft="10dp"/>
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAlignment="textStart"
         android:id="@+id/current_group"
+        android:paddingLeft="10dp"
         android:background="@android:color/background_light" />
 
     <Space
@@ -26,10 +28,11 @@
         android:layout_height="35dp" />
 
     <TextView
-        android:text="   GROUPS"
+        android:text="@string/groups"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/textView4" />
+        android:id="@+id/textView4"
+        android:paddingLeft="10dp"/>
 
     <ListView
         android:layout_width="match_parent"

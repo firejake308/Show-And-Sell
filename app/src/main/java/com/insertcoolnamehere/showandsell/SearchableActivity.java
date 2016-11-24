@@ -82,14 +82,12 @@ public class SearchableActivity extends AppCompatActivity {
 
             // populate the view
             TextView nameView = (TextView) view.findViewById(R.id.item_name);
-            TextView descriptionView = (TextView) view.findViewById(R.id.item_description);
             TextView priceView = (TextView) view.findViewById(R.id.item_price);
             TextView conditionView = (TextView) view.findViewById(R.id.item_condition);
             ImageView imageView = (ImageView) view.findViewById(R.id.item_picture);
 
             Item item = getItem(position);
             nameView.setText(item.getName());
-            descriptionView.setText(item.getDescription());
             priceView.setText(String.format("$%.2f", item.getPrice()));
             conditionView.setText(item.getCondition());
             imageView.setImageBitmap(item.getPic());

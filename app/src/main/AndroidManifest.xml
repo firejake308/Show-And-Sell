@@ -47,21 +47,17 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.insertcoolnamehere.showandsell.MainActivity" />
-        </activity>
-
-        <service
-            android:name=".GetUpdatesService"
-            android:enabled="true"
-            android:exported="true"></service>
+        <activity android:name=".SettingsActivity"
+            android:parentActivityName=".MainActivity"/>
         <activity
             android:name=".ChooseGroupActivity"
             android:label="ChooseGroup"
             android:parentActivityName=".MainActivity">
         </activity>
+        <service
+            android:name=".GetUpdatesService"
+            android:enabled="true"
+            android:exported="true" />
     </application>
 
 </manifest>

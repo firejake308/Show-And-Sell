@@ -60,6 +60,8 @@
     <string name="search_hint">Search for an item</string>
 
     <!-- Strings related to Settings -->
+    <string name="current_group">CURRENT GROUP</string>
+    <string name="groups">AVAILABLE GROUPS</string>
 
     <!-- Example General settings -->
     <string name="pref_header_general">General</string>

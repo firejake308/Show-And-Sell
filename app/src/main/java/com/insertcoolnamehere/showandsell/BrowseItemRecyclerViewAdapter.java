@@ -13,6 +13,7 @@ import com.insertcoolnamehere.showandsell.dummy.DummyContent.DummyItem;
 import com.insertcoolnamehere.showandsell.logic.Item;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
@@ -40,7 +41,7 @@ public class BrowseItemRecyclerViewAdapter extends RecyclerView.Adapter<BrowseIt
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mItems.get(position);
         holder.mNameView.setText(mItems.get(position).getName());
-        holder.mPriceView.setText("$"+mItems.get(position).getPrice());
+        holder.mPriceView.setText(String.format(Locale.ENGLISH, "$%.2f", mItems.get(position).getPrice()));
         holder.mConditionView.setText(mItems.get(position).getCondition());
         holder.mThumbnailView.setImageBitmap(mItems.get(position).getPic());
 

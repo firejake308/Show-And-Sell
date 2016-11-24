@@ -17,6 +17,7 @@ import com.insertcoolnamehere.showandsell.logic.Item;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 
 public class ItemDetailActivity extends AppCompatActivity {
 
@@ -41,7 +42,7 @@ public class ItemDetailActivity extends AppCompatActivity {
         TextView itemName = (TextView) findViewById(R.id.item_detail_name);
         itemName.setText(mItem.getName());
         TextView itemPrice = (TextView) findViewById(R.id.item_detail_price);
-        itemPrice.setText("" + mItem.getPrice());
+        itemPrice.setText(String.format(Locale.ENGLISH, "$%.2f", mItem.getPrice()));
         TextView itemCondition = (TextView) findViewById(R.id.item_detail_condition);
         itemCondition.setText(mItem.getCondition());
         TextView itemDescription = (TextView) findViewById(R.id.item_detail_description);
@@ -85,7 +86,6 @@ public class ItemDetailActivity extends AppCompatActivity {
         public View getView(int position, View convertView, ViewGroup parent) {
             if(convertView == null) {
                 if(getItemViewType(position) == LEFT_COMMENT) {
-                    Log.d("CommentAdapter", "creating left comment");
                     View rootView = getLayoutInflater().inflate(R.layout.text_view_comment_left, parent, false);
                     TextView comment = (TextView) rootView.findViewById(R.id.textView_comment_left);
                     comment.setText(mList.get(position));
@@ -98,7 +98,6 @@ public class ItemDetailActivity extends AppCompatActivity {
                 }
             } else {
                 if(getItemViewType(position) == LEFT_COMMENT) {
-                    Log.d("CommentAdapter", "creating left comment");
                     TextView comment = (TextView) convertView.findViewById(R.id.textView_comment_left);
                     comment.setText(mList.get(position));
                     return convertView;

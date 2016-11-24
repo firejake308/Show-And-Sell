@@ -130,8 +130,9 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         // fetch items from server
         if(mFetchItemsTask == null) {
-            SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-            String groupId = sharedPref.getString(getString(R.string.saved_group_id), "d57f3c49-907d-4e6f-ab2c-2e76969b3447");
+            SharedPreferences sharedPref = getActivity().getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+            String groupId = sharedPref.getString(getString(R.string.saved_group_id), "NULL");
+            Log.d("BrowseFragment", groupId);
             mFetchItemsTask = new FetchItemsTask(getActivity(), groupId).execute();
             adapter.notifyDataSetChanged();
         }
@@ -264,7 +265,6 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 @Override
                 public void run() {
                     swiper.setRefreshing(true);
-                    Log.d("BrowseFragment", "swiper is turning on");
                 }
             });
         } else {
@@ -272,7 +272,6 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 @Override
                 public void run() {
                     swiper.setRefreshing(false);
-                    Log.d("BrowseFragment", "swiper is turning off");
                 }
             });
         }

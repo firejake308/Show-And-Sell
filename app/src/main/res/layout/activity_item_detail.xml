@@ -23,7 +23,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/item_detail_name"
         android:layout_below="@+id/item_detail_image"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:textAppearance="?textAppearanceSearchResultTitle"/>
 
     <TextView
         android:text="@string/prompt_suggested_price"
@@ -31,7 +32,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/item_detail_price"
         android:layout_below="@+id/item_detail_name"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:textAppearance="?textAppearanceSearchResultSubtitle"/>
 
     <TextView
         android:text="@string/prompt_item_condition"
@@ -39,7 +41,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/item_detail_condition"
         android:layout_below="@+id/item_detail_price"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:textAppearance="?textAppearanceSearchResultSubtitle"/>
 
     <TextView
         android:text="@string/prompt_item_details"
@@ -56,7 +59,8 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/item_detail_name"
         android:layout_alignParentEnd="true"
-        android:id="@+id/item_detail_buy" />
+        android:id="@+id/item_detail_buy"
+        android:background="@color/colorAccent"/>
 
     <ListView
         android:layout_width="match_parent"

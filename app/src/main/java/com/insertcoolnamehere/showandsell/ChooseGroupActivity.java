@@ -3,15 +3,12 @@ package com.insertcoolnamehere.showandsell;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -19,8 +16,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
-
-import com.insertcoolnamehere.showandsell.logic.Item;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -47,6 +42,7 @@ public class ChooseGroupActivity extends AppCompatActivity {
     private List<String> groupIds   = new ArrayList<>();
     private Button currentGroup;
     private AsyncTask mFetchGroupsTask;
+    private ArrayAdapter<String> mAdapter;
 
     // creates the choose group activity
     @Override
@@ -58,17 +54,17 @@ public class ChooseGroupActivity extends AppCompatActivity {
 
         // update current group text
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-        groupName = sharedPref.getString(getString(R.string.saved_group_id), "No Group Selected");
+        groupName = sharedPref.getString(getString(R.string.saved_group_name), "No Group Selected");
         currentGroup = (Button) findViewById(R.id.current_group);
-        currentGroup.setText("   " + groupName);
+        currentGroup.setText(groupName);
 
         // add group buttons to list
         ListView groups = (ListView) findViewById(R.id.list_of_groups);
-        ArrayAdapter groupButtons = new ArrayAdapter<>(
+        mAdapter = new ArrayAdapter<String>(
                 this,
                 android.R.layout.simple_list_item_1,
-                groupIds);
-        groups.setAdapter(groupButtons);
+                groupTexts);
+        groups.setAdapter(mAdapter);
         groups.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -99,10 +95,12 @@ public class ChooseGroupActivity extends AppCompatActivity {
         String currentGroupName = groupTexts.get(position);
 
         // update text in current group button
-        currentGroup.setText("   " + currentGroupId);
+        currentGroup.setText(currentGroupName);
+
+        Log.d("ChooseGroupActivity", "curr grp id: "+currentGroupId);
 
         // update group name and id in the app
-        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(getString(R.string.saved_group_id), currentGroupId);
         editor.putString(getString(R.string.saved_group_name), currentGroupName);
@@ -130,7 +128,7 @@ public class ChooseGroupActivity extends AppCompatActivity {
         private Activity mParent;
 
         private final String LOG_TAG = ChooseGroupActivity.FetchGroupsTask.class.getSimpleName();
-        private final int NO_INERNET = 2;
+        private final int NO_INTERNET = 2;
         private final int SUCCESS = 1;
         private final int OTHER_FAILURE = 0;
 
@@ -163,7 +161,7 @@ public class ChooseGroupActivity extends AppCompatActivity {
                         Log.d(LOG_TAG, "No connection available");
                     }
                 });
-                return NO_INERNET;
+                return NO_INTERNET;
             } else {
                 try {
                     // connect to the URL and open the reader
@@ -225,6 +223,8 @@ public class ChooseGroupActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Integer result) {
+            // update list view
+            mAdapter.notifyDataSetChanged();
             Log.d(LOG_TAG, "data set changed");
         }
     }
