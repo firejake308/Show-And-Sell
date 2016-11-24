@@ -56,6 +56,32 @@ public class SettingsActivity extends AppCompatActivity {
                 logout();
             }
         });
+
+        Button chooseGroup = (Button) findViewById(R.id.settings_choose_default_group);
+        chooseGroup.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openChooseGroup();
+            }
+        });
+
+        Button manageGroup = (Button) findViewById(R.id.settings_manage_group);
+        manageGroup.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+    }
+
+    /**
+     * Exit settings activity and open choose group activity
+     */
+    private void openChooseGroup() {
+        //go to choose group activity
+        Intent intent = new Intent(this, ChooseGroupActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     /**
