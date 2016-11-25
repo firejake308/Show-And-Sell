@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ImageView;
@@ -58,6 +59,19 @@ public class ItemDetailActivity extends AppCompatActivity {
         }
         CommentAdapter<String> adapter = new CommentAdapter<String>(this, R.layout.text_view_comment_right, list);
         listView.setAdapter(adapter);
+
+        // set up buy button
+        Button buyButton = (Button) findViewById(R.id.item_detail_buy);
+        buyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                initiatePurchase();
+            }
+        });
+    }
+
+    private void initiatePurchase() {
+        // TODO get client token
     }
 
     private class CommentAdapter<T extends String> extends ArrayAdapter<String> {

@@ -81,7 +81,6 @@ public class SettingsActivity extends AppCompatActivity {
         //go to choose group activity
         Intent intent = new Intent(this, ChooseGroupActivity.class);
         startActivity(intent);
-        finish();
     }
 
     /**

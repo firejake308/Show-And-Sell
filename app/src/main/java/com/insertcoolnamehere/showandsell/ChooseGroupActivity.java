@@ -53,7 +53,7 @@ public class ChooseGroupActivity extends AppCompatActivity {
         updateGroups();
 
         // update current group text
-        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
         groupName = sharedPref.getString(getString(R.string.saved_group_name), "No Group Selected");
         currentGroup = (Button) findViewById(R.id.current_group);
         currentGroup.setText(groupName);

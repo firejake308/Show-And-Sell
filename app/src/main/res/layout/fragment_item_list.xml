@@ -24,16 +24,12 @@
             android:layout_alignParentTop="true"
             android:layout_marginTop="0dp" />
     </android.support.v4.widget.SwipeRefreshLayout>
-    <ProgressBar
-        android:id="@+id/fetch_items_progress"
+    <TextView
+        android:id="@+id/error_no_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:visibility="gone"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_marginBottom="8dp"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="0dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="0dp" />
+        android:layout_margin="@dimen/text_margin"
+        android:text="@string/error_no_group"
+        android:textColor="@color/hintOrDisabledText"
+        android:visibility="gone"/>
 </RelativeLayout>

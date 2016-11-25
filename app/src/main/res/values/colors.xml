@@ -4,4 +4,6 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="commentText">#FFFFFF</color>
+    <color name="secondaryText">#8A000000</color>
+    <color name="hintOrDisabledText">#61000000</color>
 </resources>

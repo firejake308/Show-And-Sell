@@ -4,6 +4,13 @@
     android:layout_height="match_parent"
     android:id="@+id/activity_choose_group">
 
+    <TextView
+        android:text="@string/choose_group_instructions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/text_margin"
+        android:id="@+id/choose_group_instructions" />
+
     <Space
         android:layout_width="match_parent"
         android:layout_height="27dp" />

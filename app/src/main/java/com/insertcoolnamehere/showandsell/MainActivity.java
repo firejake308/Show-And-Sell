@@ -92,17 +92,6 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-
-            }
-        });
-
     }
 
     @Override
@@ -243,6 +232,12 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
         startActivity(showItemDetailIntent);
     }
 
+    @Override
+    public void openChooseGroup() {
+        Intent intent = new Intent(this, ChooseGroupActivity.class);
+        startActivity(intent);
+    }
+
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -348,9 +343,8 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
                     conn.connect();
 
                     // get values for item
-                    SharedPreferences sharedPref = getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
-                    String groupId = sharedPref.getString(getString(R.string.saved_group_id), "d57f3c49-907d-4e6f-ab2c-2e76969b3447");
                     SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+                    String groupId = savedData.getString(getString(R.string.saved_group_id), "d57f3c49-907d-4e6f-ab2c-2e76969b3447");
                     String userId = savedData.getString(getString(R.string.userId), "");
                     String name = mName;
                     String price = mPrice;

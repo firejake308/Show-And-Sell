@@ -1,19 +1,13 @@
 package com.insertcoolnamehere.showandsell;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -28,10 +22,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.insertcoolnamehere.showandsell.dummy.DummyContent;
 import com.insertcoolnamehere.showandsell.logic.Item;
 
 import org.json.JSONArray;
@@ -65,12 +57,8 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     private RecyclerView mRecyclerView;
     private View fragView;
-    /**
-     * For other loading animation
-     */
-    private ProgressBar mProgressView;
 
-    private boolean alreadyHaveItems = false;
+    private String lastGroupId;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -98,7 +86,6 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
         inflater.inflate(R.menu.menu_browse, menu);
-        return;
     }
 
     @Override
@@ -125,23 +112,63 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
     }
 
     public void updateItems() {
-        // show progress bar
-        showProgress(true);
-
         // fetch items from server
         if(mFetchItemsTask == null) {
             SharedPreferences sharedPref = getActivity().getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
-            String groupId = sharedPref.getString(getString(R.string.saved_group_id), "NULL");
-            Log.d("BrowseFragment", groupId);
-            mFetchItemsTask = new FetchItemsTask(getActivity(), groupId).execute();
-            adapter.notifyDataSetChanged();
+            String groupId = sharedPref.getString(getString(R.string.saved_group_id), null);
+            lastGroupId = groupId;
+
+            if(groupId == null) {
+                // direct user to choose a group if they haven't done so yet
+                View view = fragView.findViewById(R.id.error_no_group);
+                view.setVisibility(View.VISIBLE);
+                mRecyclerView.setVisibility(View.GONE);
+
+                // link text view to choose group activity
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mListener.openChooseGroup();
+                    }
+                });
+            } else {
+                // if there is a group selected, turn back on recycler view and hide error
+                View errorView = fragView.findViewById(R.id.error_no_group);
+                if(errorView.getVisibility() == View.VISIBLE) {
+                    errorView.setVisibility(View.GONE);
+                    mRecyclerView.setVisibility(View.VISIBLE);
+                }
+
+                // show progress bar
+                showProgress(true);
+
+                // find all items in that group and update the list
+                mFetchItemsTask = new FetchItemsTask(getActivity(), groupId).execute();
+                adapter.notifyDataSetChanged();
+            }
         }
     }
 
-    // update item list when fragment opened
     @Override
     public void onResume() {
         super.onResume(); // always have to call super
+
+        // if group id has changed, we must refresh
+        SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences savedData = getActivity().getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+        if(!prefs.getString(getString(R.string.last_group_loaded), "NULL").equals(savedData.getString(getString(R.string.saved_group_id), "NULL"))) {
+            updateItems();
+        }
+    }
+
+    public void onPause() {
+        super.onPause();
+
+        // save last group loaded
+        SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(getString(R.string.last_group_loaded), lastGroupId);
+        editor.apply();
     }
 
     @SuppressWarnings("unused")
@@ -169,7 +196,6 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         fragView = view;
         View recyclerView = view.findViewById(R.id.list);
-        mProgressView = (ProgressBar) view.findViewById(R.id.fetch_items_progress);
         SwipeRefreshLayout swiper = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
         swiper.setOnRefreshListener(this);
         swiper.setColorSchemeResources(R.color.colorAccent);
@@ -220,45 +246,13 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
      */
     public interface OnListFragmentInteractionListener {
         void onListFragmentInteraction(String itemId);
+        void openChooseGroup();
     }
 
     /**
      * Shows the progress UI and hides the RecyclerView
      */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
-        /*
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-
-            mRecyclerView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mRecyclerView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mRecyclerView.setVisibility(show ? View.GONE : View.VISIBLE);
-                }
-            });
-
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mRecyclerView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
-        */
-
         final SwipeRefreshLayout swiper = (SwipeRefreshLayout) fragView.findViewById(R.id.swiperefresh);
         if(show) {
             swiper.post(new Runnable() {
