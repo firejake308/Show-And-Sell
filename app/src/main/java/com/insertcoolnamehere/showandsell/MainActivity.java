@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
 
     private Bitmap itemPic;
     private boolean imageTakenYet = false;
+    private boolean isGroupOwner = false;
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -229,6 +230,7 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
         // start the ItemDetailActivity and tell it which item to show
         Intent showItemDetailIntent = new Intent(this, ItemDetailActivity.class);
         showItemDetailIntent.putExtra(ItemDetailActivity.ITEM_ID, itemId);
+        showItemDetailIntent.putExtra(ItemDetailActivity.OWNER_POWERS, isGroupOwner);
         startActivity(showItemDetailIntent);
     }
 
@@ -236,6 +238,12 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
     public void openChooseGroup() {
         Intent intent = new Intent(this, ChooseGroupActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void setGroupOwner(boolean isOwner) {
+        Item.setShowUnapproved(isOwner);
+        isGroupOwner = isOwner;
     }
 
     /**

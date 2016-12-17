@@ -37,6 +37,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * A fragment representing a list of Items.
@@ -51,7 +52,6 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private int mColumnCount = 1;
 
     private OnListFragmentInteractionListener mListener;
-    private ArrayList<Item> itemsList = new ArrayList<>();
     private BrowseItemRecyclerViewAdapter adapter;
     private AsyncTask mFetchItemsTask;
 
@@ -73,12 +73,6 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         if(!Item.hasItems()) {
             updateItems();
-        }
-        else {
-            itemsList.clear();
-            itemsList.addAll(Item.getItemsList());
-            Log.d("BrowseFragment", itemsList.toString());
-            adapter.notifyDataSetChanged();
         }
     }
 
@@ -209,7 +203,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
             } else {
                 mRecyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            adapter = new BrowseItemRecyclerViewAdapter(itemsList, mListener);
+            adapter = new BrowseItemRecyclerViewAdapter(Item.itemsToShow, mListener);
             mRecyclerView.setAdapter(adapter);
         }
         return view;
@@ -247,6 +241,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
     public interface OnListFragmentInteractionListener {
         void onListFragmentInteraction(String itemId);
         void openChooseGroup();
+        void setGroupOwner(boolean isOwner);
     }
 
     /**
@@ -308,10 +303,12 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
 
-
             // the unparsed JSON response from the server
             int responseCode = -1;
 
+            // cancel if task is detached from activity
+            if(getActivity() == null)
+                return OTHER_FAILURE;
             // check for internet connection
             ConnectivityManager manager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo info = manager.getActiveNetworkInfo();
@@ -330,6 +327,40 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 return NO_INERNET;
             } else {
                 try {
+                    // first determine if the user is a group owner or not
+                    URL url = new URL(new Uri.Builder().scheme("http")
+                            .encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
+                            .appendPath("showandsell")
+                            .appendPath("api")
+                            .appendPath("groups")
+                            .appendPath(mGroupId)
+                            .build().toString());
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setReadTimeout(10000);
+                    urlConnection.setConnectTimeout(15000);
+                    urlConnection.setRequestMethod("GET");
+                    urlConnection.connect();
+
+                    reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                    String line = "";
+                    String responseBody = "";
+                    while((line = reader.readLine()) != null) {
+                        responseBody += line + '\n';
+                    }
+
+                    // parse response as JSON
+                    JSONObject group = new JSONObject(responseBody);
+                    String ownerId = group.getString("admin");
+                    SharedPreferences savedData = getActivity().getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+                    String myId = savedData.getString(getString(R.string.userId), "NULL");
+                    if (ownerId.equals(myId)) {
+                        mListener.setGroupOwner(true);
+                    } else {
+                        mListener.setGroupOwner(false);
+                    }
+
+                    urlConnection.disconnect();
+
                     // connect to the URL and open the reader
                     urlConnection = (HttpURLConnection) getAPICall(mGroupId).openConnection();
                     urlConnection.setReadTimeout(10000);
@@ -342,15 +373,14 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                     if(responseCode == 200) {
                         // read response to get user data from server
                         reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                        String line = "";
-                        String responseBody = "";
+                        line = "";
+                        responseBody = "";
                         while((line = reader.readLine()) != null) {
                             responseBody += line + '\n';
                         }
 
                         // parse response as JSON
                         JSONArray items = new JSONArray(responseBody);
-                        itemsList.clear();
 
                         for (int i = 0; i < items.length(); i++) {
                             JSONObject itemJson = items.getJSONObject(i);
@@ -360,11 +390,9 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                             item.setPrice(itemJson.getDouble("price"));
                             item.setCondition(itemJson.getString("condition"));
                             item.setDescription(itemJson.getString("description"));
-                            Log.d(LOG_TAG, itemJson.getString("thumbnail")); // debug
                             byte[] imgBytes = Base64.decode(itemJson.getString("thumbnail"), Base64.NO_PADDING);
                             item.setPic(BitmapFactory.decodeByteArray(imgBytes, 0, imgBytes.length));
-
-                            itemsList.add(item);
+                            item.setApproved(itemJson.getBoolean("approved"));
                         }
 
                         return SUCCESS;
@@ -397,7 +425,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
         @Override
         protected void onPostExecute(Integer result) {
             adapter.notifyDataSetChanged();
-            Log.d(LOG_TAG, "data set changed");
+            Log.d(LOG_TAG, Item.allItems.toString());
             showProgress(false);
             mFetchItemsTask = null;
         }

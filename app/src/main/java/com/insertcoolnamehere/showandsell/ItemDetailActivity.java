@@ -23,8 +23,10 @@ import java.util.Locale;
 public class ItemDetailActivity extends AppCompatActivity {
 
     public static final String ITEM_ID = "ITEM_ID";
+    public static final String OWNER_POWERS = "OWNER_POWERS";
 
     private Item mItem;
+    private boolean giveOwnerPowers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +37,7 @@ public class ItemDetailActivity extends AppCompatActivity {
 
         // get item data from intent
         mItem = (Item) Item.getItem(getIntent().getStringExtra(ITEM_ID));
+        giveOwnerPowers = getIntent().getBooleanExtra(OWNER_POWERS, false);
 
         // set text and images for the activity view
         ImageView itemImage = (ImageView) findViewById(R.id.item_detail_image);
@@ -48,6 +51,11 @@ public class ItemDetailActivity extends AppCompatActivity {
         itemCondition.setText(mItem.getCondition());
         TextView itemDescription = (TextView) findViewById(R.id.item_detail_description);
         itemDescription.setText(mItem.getDescription());
+
+        // show approve button if group owner and needs approving
+        Button approveBtn = (Button) findViewById(R.id.btn_approve);
+        if(giveOwnerPowers && !mItem.isApproved())
+            approveBtn.setVisibility(View.VISIBLE);
 
         // set up comments list view
         ListView listView = (ListView) findViewById(R.id.item_comments);

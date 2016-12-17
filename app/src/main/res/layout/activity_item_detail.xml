@@ -80,4 +80,15 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true" />
 
+    <Button
+        android:text="Approve"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@id/item_detail_buy"
+        android:layout_above="@id/item_detail_buy"
+        android:id="@+id/btn_approve"
+        android:layout_marginBottom="@dimen/comment_margin"
+        android:background="@color/colorAccent"
+        android:visibility="gone"/>
+
 </RelativeLayout>
