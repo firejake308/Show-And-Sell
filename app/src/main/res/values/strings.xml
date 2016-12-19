@@ -32,7 +32,7 @@
     <string name="section_format">Hello %1$s from section: %2$d</string>
 
     <!-- Donate Fragment -->
-    <string name="prompt_item_description">Description</string>
+    <string name="prompt_item_description">Title</string>
     <string name="prompt_item_details">Details</string>
     <string name="prompt_item_condition">Condition</string>
     <string name="prompt_suggested_price">Suggested Price</string>
@@ -41,6 +41,7 @@
         <item>New</item>
     </string-array>
     <string name="prompt_image_upload">Take a Picture</string>
+    <string name="prompt_picture_taken">Picture Taken!</string>
     <string name="action_donate">Donate</string>
 
     <!-- Item detail -->
@@ -67,6 +68,9 @@
     <string name="groups">AVAILABLE GROUPS</string>
     <string name="choose_group_instructions">Selecting a group here will affect what items appear in
         your feed and where your donated items go.</string>
+
+    <!-- Saved data -->
+    <string name="group_owner_boolean">isGroupOwner</string>
 
     <!-- Example General settings -->
     <string name="pref_header_general">General</string>

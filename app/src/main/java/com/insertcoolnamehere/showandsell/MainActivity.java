@@ -71,9 +71,9 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
 
     private Bitmap itemPic;
     private boolean imageTakenYet = false;
-    private boolean isGroupOwner = false;
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
+    private boolean isGroupOwner = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +93,17 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // check if still group owner and set private boolean to reflect that
+        // User will still be group owner unless user logs out or changes group
+        SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+        isGroupOwner = savedData.getBoolean(getString(R.string.group_owner_boolean), false);
+        Log.d(LOG_TAG, "when resumed, isGroupOwner: "+isGroupOwner);
     }
 
     @Override
@@ -120,8 +131,19 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
             imageTakenYet = true;
         } catch(Exception e) {
             Log.e(LOG_TAG, "Couldn't restore image from saved Bundle", e);
-            return;
         }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        // save group owner status
+        SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = savedData.edit();
+        editor.putBoolean(getString(R.string.group_owner_boolean), isGroupOwner);
+        editor.commit();
+        Log.d(LOG_TAG, "when paused, isGroupOwner: "+isGroupOwner);
     }
 
     @Override
@@ -165,6 +187,10 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
                 Bundle extras = data.getExtras();
                 itemPic = (Bitmap) extras.get("data");
                 imageTakenYet = true;
+
+                // update text of button
+                Button takePicBtn = (Button) findViewById(R.id.upload_img_btn);
+                takePicBtn.setText(getString(R.string.prompt_picture_taken));
             } catch (NullPointerException e) {
                 Log.d(LOG_TAG, "The user didn't actually take a picture");
                 Button donateBtn = (Button) findViewById(R.id.donate_btn);
@@ -244,6 +270,11 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
     public void setGroupOwner(boolean isOwner) {
         Item.setShowUnapproved(isOwner);
         isGroupOwner = isOwner;
+
+        SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = savedData.edit();
+        editor.putBoolean(getString(R.string.group_owner_boolean), isOwner);
+        editor.apply();
     }
 
     /**
@@ -417,6 +448,13 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
 
             // in case of failure
             return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            // update text of button
+            Button takePicBtn = (Button) findViewById(R.id.upload_img_btn);
+            takePicBtn.setText(getString(R.string.prompt_image_upload));
         }
     }
 }

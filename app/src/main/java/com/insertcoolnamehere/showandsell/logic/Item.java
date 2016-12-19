@@ -12,14 +12,13 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class Item implements Serializable {
-
-    public static ArrayList<Item> allItems = new ArrayList<>();
-    public static ArrayList<Item> approvedItems = new ArrayList<>();
+    private static ArrayList<Item> allItems = new ArrayList<>();
+    private static ArrayList<Item> approvedItems = new ArrayList<>();
     public static ArrayList<Item> itemsToShow = new ArrayList<>();
     /**
-     * TODO deprecate this hash map
+     * TODO deprecate this hash map after we write a better search method for the array list
      */
-    private static HashMap<String, Item> items = new HashMap<String, Item>();
+    private static HashMap<String, Item> items = new HashMap<>();
     private static int numOfItems = 0;
 
     private static boolean showUnapproved = false;
@@ -46,7 +45,7 @@ public class Item implements Serializable {
         return !items.isEmpty();
     }
     public static ArrayList<Item> getItemsList() {
-        ArrayList<Item> list = new ArrayList<Item>();
+        ArrayList<Item> list = new ArrayList<>();
         Set<Map.Entry<String, Item>> entries = items.entrySet();
         for(Map.Entry<String, Item> entry: entries) {
             list.add(entry.getValue());
@@ -56,7 +55,7 @@ public class Item implements Serializable {
     }
 
     public static ArrayList<Item> getApprovedItems() {
-        ArrayList<Item> list = new ArrayList<Item>();
+        ArrayList<Item> list = new ArrayList<>();
         Set<Map.Entry<String, Item>> entries = items.entrySet();
         for(Map.Entry<String, Item> entry: entries) {
             if(entry.getValue().isApproved())
@@ -66,7 +65,7 @@ public class Item implements Serializable {
         return list;
     }
 
-    public static void attemptAddToItemsToShow(Item item) {
+    private static void attemptAddToItemsToShow(Item item) {
         if(showUnapproved) {
             if(!itemsToShow.contains(item))
                 itemsToShow.add(item);
@@ -92,12 +91,15 @@ public class Item implements Serializable {
         number = numOfItems;
         numOfItems += 1;
         items.put(guid, this);
-        if(allItems.contains(this))
+        if(allItems.contains(this)) {
+            // remove old and insert new
+            int i = allItems.indexOf(this);
+            Log.d("Item", "item found @ index "+i);
+            allItems.remove(i);
+            allItems.add(i, this);
+        } else {
+            Log.d("Item", "new item going in");
             allItems.add(this);
-
-        // debug
-        if(number == 2) {
-            setApproved(true);
         }
 
         attemptAddToItemsToShow(this);
@@ -106,7 +108,6 @@ public class Item implements Serializable {
 
     /**
      * Getters and Setters
-     * @return
      */
     public String getName() {
         return name;
@@ -177,9 +178,6 @@ public class Item implements Serializable {
 
     @Override
     public boolean equals(Object other) {
-        if(this.guid.equals(((Item)other).guid))
-            return true;
-        else
-            return false;
+        return this.guid.equals(((Item)other).guid);
     }
 }

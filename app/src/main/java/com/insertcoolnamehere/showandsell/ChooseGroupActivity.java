@@ -60,7 +60,7 @@ public class ChooseGroupActivity extends AppCompatActivity {
 
         // add group buttons to list
         ListView groups = (ListView) findViewById(R.id.list_of_groups);
-        mAdapter = new ArrayAdapter<String>(
+        mAdapter = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_list_item_1,
                 groupTexts);
@@ -104,6 +104,9 @@ public class ChooseGroupActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(getString(R.string.saved_group_id), currentGroupId);
         editor.putString(getString(R.string.saved_group_name), currentGroupName);
+        // also, user may or may not be the owner of this group, so we'll set that to false and let
+        // the FetchItemsTask figure it out
+        editor.putBoolean(getString(R.string.group_owner_boolean), false);
         editor.commit();
     }
 
@@ -132,7 +135,7 @@ public class ChooseGroupActivity extends AppCompatActivity {
         private final int SUCCESS = 1;
         private final int OTHER_FAILURE = 0;
 
-        public FetchGroupsTask(Activity parent) {
+        FetchGroupsTask(Activity parent) {
             mParent = parent;
         }
 
@@ -144,7 +147,7 @@ public class ChooseGroupActivity extends AppCompatActivity {
 
 
             // the unparsed JSON response from the server
-            int responseCode = -1;
+            int responseCode;
 
             // check for internet connection
             ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -176,8 +179,8 @@ public class ChooseGroupActivity extends AppCompatActivity {
                     if(responseCode == 200) {
                         // read response to get user data from server
                         reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                        String line = "";
                         String responseBody = "";
+                        String line;
                         while((line = reader.readLine()) != null) {
                             responseBody += line + '\n';
                         }

@@ -111,6 +111,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
             SharedPreferences sharedPref = getActivity().getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
             String groupId = sharedPref.getString(getString(R.string.saved_group_id), null);
             lastGroupId = groupId;
+            Log.d("FetchItemsTask", "lgi: "+lastGroupId);
 
             if(groupId == null) {
                 // direct user to choose a group if they haven't done so yet
@@ -147,10 +148,13 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
     public void onResume() {
         super.onResume(); // always have to call super
 
-        // if group id has changed, we must refresh
+        // update in-fragment lastGroupId to match persistent storage
         SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+        lastGroupId = prefs.getString(getString(R.string.last_group_loaded), "NULL");
+
+        // if group id has changed, we must refresh
         SharedPreferences savedData = getActivity().getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
-        if(!prefs.getString(getString(R.string.last_group_loaded), "NULL").equals(savedData.getString(getString(R.string.saved_group_id), "NULL"))) {
+        if(!lastGroupId.equals(savedData.getString(getString(R.string.saved_group_id), "NULL"))) {
             updateItems();
         }
     }
@@ -425,7 +429,6 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
         @Override
         protected void onPostExecute(Integer result) {
             adapter.notifyDataSetChanged();
-            Log.d(LOG_TAG, Item.allItems.toString());
             showProgress(false);
             mFetchItemsTask = null;
         }

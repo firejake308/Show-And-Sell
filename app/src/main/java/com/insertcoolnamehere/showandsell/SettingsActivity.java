@@ -96,6 +96,8 @@ public class SettingsActivity extends AppCompatActivity {
         editor.remove(getString(R.string.prompt_first_name));
         editor.remove(getString(R.string.prompt_last_name));
         editor.remove(getString(R.string.userId));
+        // the next user to log in may or may not be a group owner
+        editor.putBoolean(getString(R.string.group_owner_boolean), false);
         editor.commit();
 
         // go back to login

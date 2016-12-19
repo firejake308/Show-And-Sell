@@ -1,8 +1,16 @@
 package com.insertcoolnamehere.showandsell;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,10 +19,20 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.insertcoolnamehere.showandsell.dummy.DummyContent;
 import com.insertcoolnamehere.showandsell.logic.Item;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
@@ -36,7 +54,7 @@ public class ItemDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_item_detail);
 
         // get item data from intent
-        mItem = (Item) Item.getItem(getIntent().getStringExtra(ITEM_ID));
+        mItem = Item.getItem(getIntent().getStringExtra(ITEM_ID));
         giveOwnerPowers = getIntent().getBooleanExtra(OWNER_POWERS, false);
 
         // set text and images for the activity view
@@ -54,18 +72,26 @@ public class ItemDetailActivity extends AppCompatActivity {
 
         // show approve button if group owner and needs approving
         Button approveBtn = (Button) findViewById(R.id.btn_approve);
-        if(giveOwnerPowers && !mItem.isApproved())
+        final Activity parentForTask = this;
+        if(giveOwnerPowers && !mItem.isApproved()) {
             approveBtn.setVisibility(View.VISIBLE);
+            approveBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new ApproveItemTask(parentForTask).execute();
+                }
+            });
+        }
 
         // set up comments list view
         ListView listView = (ListView) findViewById(R.id.item_comments);
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
         ListIterator<DummyContent.DummyItem> iter = DummyContent.ITEMS.listIterator();
         while(iter.hasNext()) {
             DummyContent.DummyItem item = iter.next();
             list.add(item.content);
         }
-        CommentAdapter<String> adapter = new CommentAdapter<String>(this, R.layout.text_view_comment_right, list);
+        CommentAdapter<String> adapter = new CommentAdapter<>(this, R.layout.text_view_comment_right, list);
         listView.setAdapter(adapter);
 
         // set up buy button
@@ -129,6 +155,135 @@ public class ItemDetailActivity extends AppCompatActivity {
                     return convertView;
                 }
             }
+        }
+    }
+
+    private class ApproveItemTask extends AsyncTask<Void, Integer, Integer> {
+        private static final String LOG_TAG = "ApproveItemTask";
+        private static final int SUCCESS = 0;
+        private static final int NO_INTERNET = 1;
+        private static final int OTHER_FAILURE = 2;
+
+        private Activity mParent;
+
+        ApproveItemTask(Activity parent) {
+            mParent = parent;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... urls) {
+            // check if we have an Internet connection
+            ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo info = manager.getActiveNetworkInfo();
+
+            if(info == null || !info.isConnected()) {
+                // if there is no network, inform user through a toast
+                mParent.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                        Log.d(LOG_TAG, "No connection available");
+                    }
+                });
+                return NO_INTERNET;
+            } else {
+                // declare resources to close in finally clause
+                HttpURLConnection conn = null;
+                BufferedOutputStream out = null;
+                try {
+                    // get group owner password
+                    SharedPreferences savedData = mParent.getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+                    String pw = savedData.getString(getString(R.string.prompt_password), "");
+
+                    // form a URL to connect to
+                    Uri.Builder builder = new Uri.Builder();
+                    String uri = builder.encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
+                            .scheme("http")
+                            .appendPath("showandsell")
+                            .appendPath("api")
+                            .appendPath("items")
+                            .appendEncodedPath(mItem.getGuid())
+                            .appendQueryParameter("groupOwnerPassword", pw).build().toString();
+                    URL url = new URL(uri);
+
+                    // form connection
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setDoOutput(true);
+                    conn.setRequestMethod("PUT");
+                    conn.setConnectTimeout(10000);
+                    conn.setReadTimeout(15000);
+                    conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    conn.setChunkedStreamingMode(0);
+                    conn.connect();
+
+                    // get values for item
+                    String groupId = savedData.getString(getString(R.string.saved_group_id), "d57f3c49-907d-4e6f-ab2c-2e76969b3447");
+                    String userId = savedData.getString(getString(R.string.userId), "");
+                    String name = mItem.getName();
+                    String price = ""+mItem.getPrice();
+                    String condition = mItem.getCondition();
+                    String description = mItem.getDescription();
+                    Bitmap itemBitmap = mItem.getPic();
+
+                    // scale down image and convert to base64
+                    Log.d(LOG_TAG, "is itemBitmap null: "+(itemBitmap == null));
+                    double scaleFactor = Math.max(itemBitmap.getWidth()/250.0, itemBitmap.getHeight()/250.0);
+                    Bitmap bmp = Bitmap.createScaledBitmap(itemBitmap, (int)(itemBitmap.getWidth()/scaleFactor),(int)(itemBitmap.getHeight()/scaleFactor), false);
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    byte[] byteArray = stream.toByteArray();
+                    String thumbnail = Base64.encodeToString(byteArray, Base64.NO_WRAP);
+
+                    // convert item to JSON
+                    JSONObject item = new JSONObject();
+                    item.put("groupId", groupId);
+                    item.put("ownerId", userId);
+                    item.put("name", name);
+                    item.put("price", price);
+                    item.put("condition", condition);
+                    item.put("description", description);
+                    item.put("thumbnail", thumbnail);
+                    item.put("approved", "true");
+                    String body = item.toString();
+                    Log.d(LOG_TAG, body);
+
+                    // write to output stream
+                    out = new BufferedOutputStream(conn.getOutputStream());
+                    out.write(body.getBytes());
+                    out.flush();
+
+                    // see if post was a success
+                    int responseCode = conn.getResponseCode();
+                    Log.d(LOG_TAG, "Response Code from Cloud Server: "+responseCode);
+
+                    if(responseCode == 201) {
+                        Log.d(LOG_TAG, "Post was success");
+                        return SUCCESS;
+                    } else if(responseCode == 449) {
+                        Log.d(LOG_TAG, "Post failure");
+                        return OTHER_FAILURE;
+                    } else {
+                        Log.e(LOG_TAG, "response Code = "+responseCode);
+                        return OTHER_FAILURE;
+                    }
+                } catch (MalformedURLException e) {
+                    Log.e(LOG_TAG, "Bad URL", e);
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "Error opening URL connection (probably?)", e);
+                } catch (JSONException e) {
+                    Log.e(LOG_TAG, "Error forming JSON", e);
+                } finally {
+                    conn.disconnect();
+                    try {
+                        out.close();
+                    } catch(Exception e) {
+                        Log.e(LOG_TAG, "Error closing output stream", e);
+                    }
+                }
+            }
+
+            // in case of failure
+            return OTHER_FAILURE;
         }
     }
 }
