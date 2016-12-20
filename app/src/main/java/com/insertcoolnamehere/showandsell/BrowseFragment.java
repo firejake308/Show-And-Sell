@@ -111,7 +111,6 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
             SharedPreferences sharedPref = getActivity().getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
             String groupId = sharedPref.getString(getString(R.string.saved_group_id), null);
             lastGroupId = groupId;
-            Log.d("FetchItemsTask", "lgi: "+lastGroupId);
 
             if(groupId == null) {
                 // direct user to choose a group if they haven't done so yet

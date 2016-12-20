@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class Item implements Serializable {
-    private static ArrayList<Item> allItems = new ArrayList<>();
+    public static ArrayList<Item> allItems = new ArrayList<>();
     private static ArrayList<Item> approvedItems = new ArrayList<>();
     public static ArrayList<Item> itemsToShow = new ArrayList<>();
     /**
@@ -69,6 +69,33 @@ public class Item implements Serializable {
         if(showUnapproved) {
             if(!itemsToShow.contains(item))
                 itemsToShow.add(item);
+            else {
+                // remove old version of item
+                int i = itemsToShow.indexOf(item);
+                itemsToShow.remove(i);
+                // insert at same position
+                itemsToShow.add(i, item);
+            }
+
+            // sort unapproved items to top of list
+            Log.d("Item", "about to start sorting");
+            ArrayList<Item> unapproved = new ArrayList<>();
+            ArrayList<Item> approved = new ArrayList<>();
+            for(int i = 0; i < itemsToShow.size(); i++) {
+                if(itemsToShow.get(i).isApproved()) {
+                    approved.add(itemsToShow.get(i));
+                } else {
+                    unapproved.add(itemsToShow.get(i));
+                }
+            }
+
+            itemsToShow.clear();
+            for(int i = 0; i < unapproved.size(); i++) {
+                itemsToShow.add(unapproved.get(i));
+            }
+            for(int i = 0; i < approved.size(); i++) {
+                itemsToShow.add(approved.get(i));
+            }
         } else {
             Log.d("Item", "Adding only approved items");
             if(item.isApproved() && itemsToShow.contains(item))
@@ -91,10 +118,12 @@ public class Item implements Serializable {
         number = numOfItems;
         numOfItems += 1;
         items.put(guid, this);
+
+        // update allItems with new item
         if(allItems.contains(this)) {
             // remove old and insert new
             int i = allItems.indexOf(this);
-            Log.d("Item", "item found @ index "+i);
+            Log.d("Item", "Old item#"+i+" was "+allItems.get(i).isApproved());
             allItems.remove(i);
             allItems.add(i, this);
         } else {
@@ -173,11 +202,11 @@ public class Item implements Serializable {
 
     @Override
     public String toString() {
-        return this.guid;
+        return this.name + " #" + this.guid.substring(0,4);
     }
 
     @Override
     public boolean equals(Object other) {
-        return this.guid.equals(((Item)other).guid);
+        return other instanceof  Item && this.guid.equals(((Item)other).guid);
     }
 }

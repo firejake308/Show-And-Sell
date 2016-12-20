@@ -62,6 +62,8 @@ public class BrowseItemRecyclerViewAdapter extends RecyclerView.Adapter<BrowseIt
         // grey out unapproved items
         if(!holder.mItem.isApproved()) {
             holder.mView.setAlpha(0.5f);
+        } else {
+            holder.mView.setAlpha(1.0f);
         }
     }
 

@@ -217,8 +217,6 @@ public class ItemDetailActivity extends AppCompatActivity {
                     conn.connect();
 
                     // get values for item
-                    String groupId = savedData.getString(getString(R.string.saved_group_id), "d57f3c49-907d-4e6f-ab2c-2e76969b3447");
-                    String userId = savedData.getString(getString(R.string.userId), "");
                     String name = mItem.getName();
                     String price = ""+mItem.getPrice();
                     String condition = mItem.getCondition();
@@ -236,14 +234,12 @@ public class ItemDetailActivity extends AppCompatActivity {
 
                     // convert item to JSON
                     JSONObject item = new JSONObject();
-                    item.put("groupId", groupId);
-                    item.put("ownerId", userId);
-                    item.put("name", name);
-                    item.put("price", price);
-                    item.put("condition", condition);
-                    item.put("description", description);
-                    item.put("thumbnail", thumbnail);
+                    item.put("newName", name);
+                    item.put("newPrice", price);
+                    item.put("newCondition", condition);
+                    item.put("newDescription", description);
                     item.put("approved", "true");
+                    item.put("newThumbnail", thumbnail);
                     String body = item.toString();
                     Log.d(LOG_TAG, body);
 
@@ -256,7 +252,7 @@ public class ItemDetailActivity extends AppCompatActivity {
                     int responseCode = conn.getResponseCode();
                     Log.d(LOG_TAG, "Response Code from Cloud Server: "+responseCode);
 
-                    if(responseCode == 201) {
+                    if(responseCode == 200) {
                         Log.d(LOG_TAG, "Post was success");
                         return SUCCESS;
                     } else if(responseCode == 449) {

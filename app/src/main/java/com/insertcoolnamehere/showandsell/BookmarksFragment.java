@@ -1,9 +1,11 @@
 package com.insertcoolnamehere.showandsell;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,16 +67,26 @@ public class BookmarksFragment extends BrowseFragment {
 
     @Override
     protected URL getAPICall(String id) throws MalformedURLException {
-        // construct the URL to fetch a user
-        Uri.Builder  builder = new Uri.Builder();
-        builder.scheme("http")
-                .encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
-                .appendPath("showandsell")
-                .appendPath("api")
-                .appendPath("items")
-                .appendQueryParameter("groupId", id)
-                .build();
-        return new URL(builder.toString());
+        // get user id and pass
+        if(getActivity() == null) {
+            return null;
+        } else {
+            SharedPreferences savedData = getActivity().getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+            String userId = savedData.getString(getString(R.string.userId), "NULL");
+            String pw = savedData.getString(getString(R.string.prompt_password), "NULL");
+
+            // construct the URL to fetch bookmarks
+            Uri.Builder  builder = new Uri.Builder();
+            builder.scheme("http")
+                    .encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
+                    .appendPath("showandsell")
+                    .appendPath("api")
+                    .appendPath("bookmarks")
+                    .appendQueryParameter("userId", userId)
+                    .appendQueryParameter("password", pw)
+                    .build();
+            return new URL(builder.toString());
+        }
     }
 
     /**
