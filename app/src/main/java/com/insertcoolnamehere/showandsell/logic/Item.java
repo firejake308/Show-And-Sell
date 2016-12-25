@@ -5,6 +5,7 @@ import android.media.Image;
 import android.util.Log;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,9 +13,11 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class Item implements Serializable {
-    public static ArrayList<Item> allItems = new ArrayList<>();
+    private static ArrayList<Item> allItems = new ArrayList<>();
     private static ArrayList<Item> approvedItems = new ArrayList<>();
+
     public static ArrayList<Item> itemsToShow = new ArrayList<>();
+    public static ArrayList<Item> bookmarkedItems = new ArrayList<>();
     /**
      * TODO deprecate this hash map after we write a better search method for the array list
      */
@@ -112,26 +115,31 @@ public class Item implements Serializable {
     private Bitmap pic;
     private boolean approved;
 
-    public Item(String guid) {
+    public Item(String guid, boolean isBookmark) {
         this.guid = guid;
 
-        number = numOfItems;
-        numOfItems += 1;
-        items.put(guid, this);
-
-        // update allItems with new item
-        if(allItems.contains(this)) {
-            // remove old and insert new
-            int i = allItems.indexOf(this);
-            Log.d("Item", "Old item#"+i+" was "+allItems.get(i).isApproved());
-            allItems.remove(i);
-            allItems.add(i, this);
+        if(isBookmark) {
+            if(!bookmarkedItems.contains(this))
+                bookmarkedItems.add(this);
         } else {
-            Log.d("Item", "new item going in");
-            allItems.add(this);
-        }
+            number = numOfItems;
+            numOfItems += 1;
+            items.put(guid, this);
 
-        attemptAddToItemsToShow(this);
+            // update allItems with new item
+            if (allItems.contains(this)) {
+                // remove old and insert new
+                int i = allItems.indexOf(this);
+                Log.d("Item", "Old item#" + i + " was " + allItems.get(i).isApproved());
+                allItems.remove(i);
+                allItems.add(i, this);
+            } else {
+                Log.d("Item", "new item going in");
+                allItems.add(this);
+            }
+
+            attemptAddToItemsToShow(this);
+        }
     }
 
 

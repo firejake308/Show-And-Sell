@@ -2,6 +2,7 @@ package com.insertcoolnamehere.showandsell;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
@@ -78,7 +79,7 @@ public class ItemDetailActivity extends AppCompatActivity {
             approveBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    new ApproveItemTask(parentForTask).execute();
+                    new ApproveItemTask(parentForTask, true).execute();
                 }
             });
         }
@@ -106,6 +107,11 @@ public class ItemDetailActivity extends AppCompatActivity {
 
     private void initiatePurchase() {
         // TODO get client token
+        attemptPostBookmark();
+    }
+
+    private void attemptPostBookmark() {
+        new PostBookmarkTask(this).execute();
     }
 
     private class CommentAdapter<T extends String> extends ArrayAdapter<String> {
@@ -165,9 +171,11 @@ public class ItemDetailActivity extends AppCompatActivity {
         private static final int OTHER_FAILURE = 2;
 
         private Activity mParent;
+        private boolean doApprove;
 
-        ApproveItemTask(Activity parent) {
+        ApproveItemTask(Activity parent, boolean doApprove) {
             mParent = parent;
+            this.doApprove = doApprove;
         }
 
         @Override
@@ -238,9 +246,123 @@ public class ItemDetailActivity extends AppCompatActivity {
                     item.put("newPrice", price);
                     item.put("newCondition", condition);
                     item.put("newDescription", description);
-                    item.put("approved", "true");
+                    item.put("approved", doApprove);
                     item.put("newThumbnail", thumbnail);
                     String body = item.toString();
+
+                    // write to output stream
+                    out = new BufferedOutputStream(conn.getOutputStream());
+                    out.write(body.getBytes());
+                    out.flush();
+
+                    // see if post was a success
+                    int responseCode = conn.getResponseCode();
+                    Log.d(LOG_TAG, "Response Code from Cloud Server: "+responseCode);
+
+                    if(responseCode == 200) {
+                        Log.d(LOG_TAG, "Post was success");
+                        return SUCCESS;
+                    } else if(responseCode == 449) {
+                        Log.d(LOG_TAG, "Post failure");
+                        return OTHER_FAILURE;
+                    } else {
+                        Log.e(LOG_TAG, "response Code = "+responseCode);
+                        return OTHER_FAILURE;
+                    }
+                } catch (MalformedURLException e) {
+                    Log.e(LOG_TAG, "Bad URL", e);
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "Error opening URL connection (probably?)", e);
+                } catch (JSONException e) {
+                    Log.e(LOG_TAG, "Error forming JSON", e);
+                } finally {
+                    conn.disconnect();
+                    try {
+                        out.close();
+                    } catch(Exception e) {
+                        Log.e(LOG_TAG, "Error closing output stream", e);
+                    }
+                }
+            }
+
+            // in case of failure
+            return OTHER_FAILURE;
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            if(result == SUCCESS) {
+                // return to previous activity
+                Intent goHomeIntent = new Intent(mParent, MainActivity.class);
+                startActivity(goHomeIntent);
+            }
+        }
+    }
+
+    private class PostBookmarkTask extends AsyncTask<Void, Integer, Integer> {
+        private static final int SUCCESS = 0;
+        private static final int NO_INTERNET = 1;
+        private static final int OTHER_FAILURE = 2;
+        private final String LOG_TAG = PostBookmarkTask.class.getSimpleName();
+
+        private final Activity mParent;
+
+        PostBookmarkTask(Activity parent) {
+            mParent = parent;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            // check if we have an Internet connection
+            ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo info = manager.getActiveNetworkInfo();
+
+            if(info == null || !info.isConnected()) {
+                // if there is no network, inform user through a toast
+                mParent.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                        Log.d(LOG_TAG, "No connection available");
+                    }
+                });
+                return NO_INTERNET;
+            } else {
+                // declare resources to close in finally clause
+                HttpURLConnection conn = null;
+                BufferedOutputStream out = null;
+                try {
+                    // get group owner password
+                    SharedPreferences savedData = mParent.getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+                    String un = savedData.getString(getString(R.string.prompt_username), "");
+
+                    // form a URL to connect to
+                    Uri.Builder builder = new Uri.Builder();
+                    String uri = builder.encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
+                            .scheme("http")
+                            .appendPath("showandsell")
+                            .appendPath("api")
+                            .appendPath("bookmarks").build().toString();
+                    URL url = new URL(uri);
+
+                    // form connection
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setDoOutput(true);
+                    conn.setRequestMethod("POST");
+                    conn.setConnectTimeout(10000);
+                    conn.setReadTimeout(15000);
+                    conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    conn.setChunkedStreamingMode(0);
+                    conn.connect();
+
+                    // get values for item
+                    String itemId = mItem.getGuid();
+
+                    // convert item to JSON
+                    JSONObject bookmark = new JSONObject();
+                    bookmark.put("userId", un);
+                    bookmark.put("itemId", itemId);
+                    String body = bookmark.toString();
                     Log.d(LOG_TAG, body);
 
                     // write to output stream
@@ -280,6 +402,15 @@ public class ItemDetailActivity extends AppCompatActivity {
 
             // in case of failure
             return OTHER_FAILURE;
+        }
+        @Override
+        protected void onPostExecute(Integer result) {
+            if(result == SUCCESS) {
+                Toast.makeText(mParent, "Item bought!", Toast.LENGTH_SHORT).show();
+                new ApproveItemTask(mParent, false).execute();
+            }
+            else
+                Toast.makeText(mParent, "Item purchase failed :(", Toast.LENGTH_SHORT).show();
         }
     }
 }

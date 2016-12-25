@@ -206,7 +206,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
             } else {
                 mRecyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            adapter = new BrowseItemRecyclerViewAdapter(Item.itemsToShow, mListener);
+            adapter = new BrowseItemRecyclerViewAdapter(isBookmark()?Item.bookmarkedItems:Item.itemsToShow, mListener);
             mRecyclerView.setAdapter(adapter);
         }
         return view;
@@ -280,6 +280,10 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 .appendQueryParameter("groupId", id)
                 .build();
         return new URL(builder.toString());
+    }
+
+    protected boolean isBookmark() {
+        return false;
     }
 
     // insert an AsyncTask here, using the ones in LoginActivity or DonateFragment as a reference
@@ -388,7 +392,13 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                         for (int i = 0; i < items.length(); i++) {
                             JSONObject itemJson = items.getJSONObject(i);
 
-                            Item item = new Item(itemJson.getString("ssItemId"));
+                            // special for bookmarks
+                            if(isBookmark()) {
+                                itemJson = itemJson.getJSONObject("item");
+                            }
+
+                            Item item = new Item(itemJson.getString("ssItemId"), isBookmark());
+                            Log.d(LOG_TAG, "Server contains item #"+item.getGuid());
                             item.setName(itemJson.getString("name"));
                             item.setPrice(itemJson.getDouble("price"));
                             item.setCondition(itemJson.getString("condition"));
@@ -427,9 +437,15 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         @Override
         protected void onPostExecute(Integer result) {
-            adapter.notifyDataSetChanged();
-            showProgress(false);
-            mFetchItemsTask = null;
+            if(result == SUCCESS) {
+                adapter.notifyDataSetChanged();
+                showProgress(false);
+                mFetchItemsTask = null;
+            } else {
+                Log.e(LOG_TAG, "It appears that the task failed :(");
+                showProgress(false);
+                mFetchItemsTask = null;
+            }
         }
     }
 }

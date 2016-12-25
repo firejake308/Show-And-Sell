@@ -67,13 +67,14 @@ public class BookmarksFragment extends BrowseFragment {
 
     @Override
     protected URL getAPICall(String id) throws MalformedURLException {
-        // get user id and pass
         if(getActivity() == null) {
             return null;
         } else {
+            // get user id and pass
             SharedPreferences savedData = getActivity().getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
-            String userId = savedData.getString(getString(R.string.userId), "NULL");
+            String userId = savedData.getString(getString(R.string.prompt_username), "NULL");
             String pw = savedData.getString(getString(R.string.prompt_password), "NULL");
+            Log.d("BookmarksFragment", "Using bookmarks call");
 
             // construct the URL to fetch bookmarks
             Uri.Builder  builder = new Uri.Builder();
@@ -87,6 +88,11 @@ public class BookmarksFragment extends BrowseFragment {
                     .build();
             return new URL(builder.toString());
         }
+    }
+
+    @Override
+    protected boolean isBookmark() {
+        return true;
     }
 
     /**
