@@ -24,8 +24,6 @@ import java.net.URL;
  */
 public class BookmarksFragment extends BrowseFragment {
 
-    private OnOpenBookmarkListener mListener;
-
     public BookmarksFragment() {
         // Required empty public constructor
     }
@@ -39,30 +37,6 @@ public class BookmarksFragment extends BrowseFragment {
     public static BookmarksFragment newInstance(String param1, String param2) {
         BookmarksFragment fragment = new BookmarksFragment();
         return fragment;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(String itemId) {
-        if (mListener != null) {
-            mListener.onOpenBookmark(itemId);
-        }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnOpenBookmarkListener) {
-            mListener = (OnOpenBookmarkListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnOpenBookmarkListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
     }
 
     @Override
@@ -93,19 +67,5 @@ public class BookmarksFragment extends BrowseFragment {
     @Override
     protected boolean isBookmark() {
         return true;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnOpenBookmarkListener {
-        void onOpenBookmark(String itemId);
     }
 }

@@ -51,7 +51,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
 
-    private OnListFragmentInteractionListener mListener;
+    protected OnListFragmentInteractionListener mListener;
     private BrowseItemRecyclerViewAdapter adapter;
     private AsyncTask mFetchItemsTask;
 
@@ -319,8 +319,6 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
             // check for internet connection
             ConnectivityManager manager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo info = manager.getActiveNetworkInfo();
-
-            //TODO: for Android 6.0+, request internet permission
 
             if(info == null || !info.isConnected()) {
                 // if there is no network, inform user through a toast

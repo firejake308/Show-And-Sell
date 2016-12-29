@@ -236,8 +236,6 @@ public class LoginActivity extends AppCompatActivity {
             ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo info = manager.getActiveNetworkInfo();
 
-            //TODO: for Android 6.0+, request internet permission
-
             if(info == null || !info.isConnected()) {
                 // if there is no network, inform user through a toast
                 mParent.runOnUiThread(new Runnable() {

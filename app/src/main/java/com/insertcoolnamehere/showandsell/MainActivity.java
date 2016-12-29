@@ -12,8 +12,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -24,19 +22,13 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.insertcoolnamehere.showandsell.dummy.DummyContent;
 import com.insertcoolnamehere.showandsell.logic.Item;
 
 import org.json.JSONException;
@@ -48,9 +40,8 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.DecimalFormat;
 
-public class MainActivity extends AppCompatActivity implements DonateFragment.OnDonationListener, BookmarksFragment.OnOpenBookmarkListener, BrowseFragment.OnListFragmentInteractionListener{
+public class MainActivity extends AppCompatActivity implements DonateFragment.OnDonationListener, BrowseFragment.OnListFragmentInteractionListener{
 
     private static final int REQUEST_IMAGE_CAPTURE = 0;
 
