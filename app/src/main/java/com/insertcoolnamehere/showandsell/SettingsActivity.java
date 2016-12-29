@@ -29,6 +29,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
+import com.insertcoolnamehere.showandsell.logic.Item;
+
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
  * handset devices, settings are presented as a single list. On tablets,
@@ -98,7 +100,10 @@ public class SettingsActivity extends AppCompatActivity {
         editor.remove(getString(R.string.userId));
         // the next user to log in may or may not be a group owner
         editor.putBoolean(getString(R.string.group_owner_boolean), false);
-        editor.commit();
+        editor.apply();
+
+        // when you log out, clear the items cache
+        Item.clearItemsCache();
 
         // go back to login
         Intent intent = new Intent(this, LoginActivity.class);

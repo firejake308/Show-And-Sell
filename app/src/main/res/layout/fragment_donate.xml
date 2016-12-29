@@ -14,7 +14,7 @@
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-                <EditText
+                <android.support.design.widget.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/item_description_entry"
@@ -28,7 +28,7 @@
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-                <EditText
+                <android.support.design.widget.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/item_details_entry"
@@ -42,7 +42,7 @@
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-                <EditText
+                <android.support.design.widget.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="numberDecimal"
@@ -64,12 +64,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/prompt_image_upload"
-                android:id="@+id/upload_img_btn" />
+                android:id="@+id/upload_img_btn"
+                android:background="@color/colorAccent"/>
 
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/action_donate"
-                android:id="@+id/donate_btn" />
+                android:id="@+id/donate_btn"
+                android:background="@color/colorAccent"
+                android:layout_marginTop="5dp"/>
         </LinearLayout>
 </ScrollView>

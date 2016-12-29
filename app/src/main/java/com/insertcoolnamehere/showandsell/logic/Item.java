@@ -57,15 +57,11 @@ public class Item implements Serializable {
         return list;
     }
 
-    public static ArrayList<Item> getApprovedItems() {
-        ArrayList<Item> list = new ArrayList<>();
-        Set<Map.Entry<String, Item>> entries = items.entrySet();
-        for(Map.Entry<String, Item> entry: entries) {
-            if(entry.getValue().isApproved())
-                list.add(entry.getValue());
-        }
-
-        return list;
+    public static void clearItemsCache() {
+        itemsToShow.clear();
+        allItems.clear();
+        approvedItems.clear();
+        bookmarkedItems.clear();
     }
 
     private static void attemptAddToItemsToShow(Item item) {
@@ -100,9 +96,28 @@ public class Item implements Serializable {
                 itemsToShow.add(approved.get(i));
             }
         } else {
-            Log.d("Item", "Adding only approved items");
-            if(item.isApproved() && itemsToShow.contains(item))
-                itemsToShow.add(item);
+            // Add only approved items
+            if(item.isApproved()) {
+                // if the item is already being shown, update it
+                if(itemsToShow.contains(item)) {
+                    int i = itemsToShow.indexOf(item);
+                    itemsToShow.remove(i);
+                    itemsToShow.add(i, item);
+                }
+                // otherwise, just add it
+                else {
+                    itemsToShow.add(item);
+                }
+
+                // same deal for approved items
+                if(approvedItems.contains(item)) {
+                    int i = approvedItems.indexOf(item);
+                    approvedItems.remove(i);
+                    approvedItems.add(i, item);
+                } else {
+                    approvedItems.add(item);
+                }
+            }
         }
     }
 

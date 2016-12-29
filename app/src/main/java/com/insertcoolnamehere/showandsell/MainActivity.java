@@ -125,12 +125,10 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
 
-        try {
-            byte[] byteArray = savedInstanceState.getByteArray(getString(R.string.item_image));
+        byte[] byteArray = savedInstanceState.getByteArray(getString(R.string.item_image));
+        if(byteArray != null) {
             itemPic = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
             imageTakenYet = true;
-        } catch(Exception e) {
-            Log.e(LOG_TAG, "Couldn't restore image from saved Bundle", e);
         }
     }
 
