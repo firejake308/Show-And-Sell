@@ -71,7 +71,7 @@ public class SettingsActivity extends AppCompatActivity {
         manageGroup.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                openManageGroup();
             }
         });
     }
@@ -82,6 +82,12 @@ public class SettingsActivity extends AppCompatActivity {
     private void openChooseGroup() {
         //go to choose group activity
         Intent intent = new Intent(this, ChooseGroupActivity.class);
+        startActivity(intent);
+    }
+
+    private void openManageGroup() {
+        //go to manage group activity
+        Intent intent = new Intent(this, ManageGroupActivity.class);
         startActivity(intent);
     }
 

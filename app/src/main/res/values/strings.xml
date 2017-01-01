@@ -63,6 +63,10 @@
     <!-- Search -->
     <string name="search_hint">Search for an item</string>
 
+    <!-- Manage Group -->
+    <string name="error_not_group_owner">It looks like you haven\'t created a group yet. If
+        you\'d like to start your own yard sale, tap here and we\'ll help you out.</string>
+
     <!-- Strings related to Settings -->
     <string name="current_group">CURRENT GROUP</string>
     <string name="groups">AVAILABLE GROUPS</string>
