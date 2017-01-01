@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
@@ -71,17 +72,29 @@ public class ItemDetailActivity extends AppCompatActivity {
         TextView itemDescription = (TextView) findViewById(R.id.item_detail_description);
         itemDescription.setText(mItem.getDescription());
 
-        // show approve button if group owner and needs approving
-        Button approveBtn = (Button) findViewById(R.id.btn_approve);
+        FloatingActionButton approveBtn = (FloatingActionButton) findViewById(R.id.btn_approve);
         final Activity parentForTask = this;
-        if(giveOwnerPowers && !mItem.isApproved()) {
-            approveBtn.setVisibility(View.VISIBLE);
-            approveBtn.setOnClickListener(new View.OnClickListener() {
+        if(giveOwnerPowers) {
+            // show reject button if group owner
+            FloatingActionButton rejectButton = (FloatingActionButton) findViewById(R.id.btn_reject);
+            rejectButton.setVisibility(View.VISIBLE);
+            rejectButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    new ApproveItemTask(parentForTask, true).execute();
+                    new RejectItemTask(parentForTask).execute();
                 }
             });
+
+            // show approve button if group owner and item needs approval
+            if (!mItem.isApproved()) {
+                approveBtn.setVisibility(View.VISIBLE);
+                approveBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        new ApproveItemTask(parentForTask, true).execute();
+                    }
+                });
+            }
         }
 
         // set up comments list view
@@ -411,6 +424,107 @@ public class ItemDetailActivity extends AppCompatActivity {
             }
             else
                 Toast.makeText(mParent, "Item purchase failed :(", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private class RejectItemTask extends AsyncTask<Void, Integer, Integer> {
+        private static final String LOG_TAG = "RejectItemTask";
+        private static final int SUCCESS = 0;
+        private static final int NO_INTERNET = 1;
+        private static final int OTHER_FAILURE = 2;
+
+        private Activity mParent;
+        private boolean doApprove;
+
+        RejectItemTask(Activity parent) {
+            mParent = parent;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... urls) {
+            // check if we have an Internet connection
+            ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo info = manager.getActiveNetworkInfo();
+
+            if(info == null || !info.isConnected()) {
+                // if there is no network, inform user through a toast
+                mParent.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                        Log.d(LOG_TAG, "No connection available");
+                    }
+                });
+                return NO_INTERNET;
+            } else {
+                // declare resources to close in finally clause
+                HttpURLConnection conn = null;
+                try {
+                    // get group owner password
+                    SharedPreferences savedData = mParent.getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+                    String pw = savedData.getString(getString(R.string.prompt_password), "");
+
+                    // form a URL to connect to
+                    Uri.Builder builder = new Uri.Builder();
+                    String uri = builder.encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
+                            .scheme("http")
+                            .appendPath("showandsell")
+                            .appendPath("api")
+                            .appendPath("items")
+                            .appendEncodedPath(mItem.getGuid())
+                            .appendQueryParameter("ownerPassword", pw).build().toString();
+                    URL url = new URL(uri);
+
+                    // form connection
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setDoOutput(true);
+                    conn.setRequestMethod("DELETE");
+                    conn.setConnectTimeout(10000);
+                    conn.setReadTimeout(15000);
+                    conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    conn.setChunkedStreamingMode(0);
+                    conn.connect();
+
+                    // get values for item
+                    String name = mItem.getName();
+                    String price = ""+mItem.getPrice();
+                    String condition = mItem.getCondition();
+                    String description = mItem.getDescription();
+                    Bitmap itemBitmap = mItem.getPic();
+                    // see if post was a success
+                    int responseCode = conn.getResponseCode();
+                    Log.d(LOG_TAG, "Response Code from Cloud Server: "+responseCode);
+
+                    if(responseCode == 200) {
+                        Log.d(LOG_TAG, "Post was success");
+                        return SUCCESS;
+                    } else if(responseCode == 449) {
+                        Log.d(LOG_TAG, "Post failure");
+                        return OTHER_FAILURE;
+                    } else {
+                        Log.e(LOG_TAG, "response Code = "+responseCode);
+                        return OTHER_FAILURE;
+                    }
+                } catch (MalformedURLException e) {
+                    Log.e(LOG_TAG, "Bad URL", e);
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "Error opening URL connection (probably?)", e);
+                } finally {
+                    conn.disconnect();
+                }
+            }
+
+            // in case of failure
+            return OTHER_FAILURE;
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            if(result == SUCCESS) {
+                // return to previous activity
+                Intent goHomeIntent = new Intent(mParent, MainActivity.class);
+                startActivity(goHomeIntent);
+            }
         }
     }
 }

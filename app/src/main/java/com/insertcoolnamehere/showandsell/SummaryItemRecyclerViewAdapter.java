@@ -1,51 +1,41 @@
 package com.insertcoolnamehere.showandsell;
 
-import android.media.Image;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.insertcoolnamehere.showandsell.BrowseFragment.OnListFragmentInteractionListener;
-import com.insertcoolnamehere.showandsell.dummy.DummyContent.DummyItem;
 import com.insertcoolnamehere.showandsell.logic.Item;
 
 import java.util.List;
 import java.util.Locale;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
- */
-public class BrowseItemRecyclerViewAdapter extends RecyclerView.Adapter<BrowseItemRecyclerViewAdapter.ViewHolder> {
+public class SummaryItemRecyclerViewAdapter extends RecyclerView.Adapter<SummaryItemRecyclerViewAdapter.ViewHolder> {
 
     private final List<Item> mItems;
-    private final OnListFragmentInteractionListener mListener;
+    private final BrowseFragment.OnListFragmentInteractionListener mListener;
 
     private ViewGroup mParent;
 
-    public BrowseItemRecyclerViewAdapter(List<Item> items, OnListFragmentInteractionListener listener) {
+    public SummaryItemRecyclerViewAdapter(List<Item> items, BrowseFragment.OnListFragmentInteractionListener listener) {
         mItems = items;
         mListener = listener;
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public SummaryItemRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_item, parent, false);
+                .inflate(R.layout.browse_item, parent, false);
         mParent = parent;
-        return new ViewHolder(view);
+        return new SummaryItemRecyclerViewAdapter.ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final SummaryItemRecyclerViewAdapter.ViewHolder holder, int position) {
         holder.mItem = mItems.get(position);
-        holder.mNameView.setText(mItems.get(position).getName());
         holder.mPriceView.setText(String.format(Locale.ENGLISH, "$%.2f", mItems.get(position).getPrice()));
-        holder.mConditionView.setText(mItems.get(position).getCondition());
         holder.mThumbnailView.setImageBitmap(mItems.get(position).getPic());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
@@ -62,8 +52,6 @@ public class BrowseItemRecyclerViewAdapter extends RecyclerView.Adapter<BrowseIt
         // grey out unapproved items
         if(!holder.mItem.isApproved()) {
             holder.mView.setAlpha(0.5f);
-        } else {
-            holder.mView.setAlpha(1.0f);
         }
     }
 
@@ -74,24 +62,20 @@ public class BrowseItemRecyclerViewAdapter extends RecyclerView.Adapter<BrowseIt
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView mNameView;
         public final TextView mPriceView;
-        public final TextView mConditionView;
         public final ImageView mThumbnailView;
         public Item mItem;
 
-        public ViewHolder(View view) {
+        ViewHolder(View view) {
             super(view);
             mView = view;
-            mNameView = (TextView) view.findViewById(R.id.item_name);
             mPriceView = (TextView) view.findViewById(R.id.item_price);
-            mConditionView = (TextView) view.findViewById(R.id.item_condition);
             mThumbnailView = (ImageView) view.findViewById(R.id.item_picture);
         }
 
         @Override
         public String toString() {
-            return super.toString() + " '" + mNameView.getText() + "'";
+            return super.toString() + " '" + mItem.getName() + "'";
         }
     }
 }

@@ -18,7 +18,6 @@ import com.insertcoolnamehere.showandsell.logic.Item;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Locale;
 
 public class SearchableActivity extends AppCompatActivity {
     private ArrayList<Item> mResults;
@@ -89,7 +88,7 @@ public class SearchableActivity extends AppCompatActivity {
 
             Item item = getItem(position);
             nameView.setText(item.getName());
-            priceView.setText(String.format(Locale.ENGLISH, "$%.2f", item.getPrice()));
+            priceView.setText(String.format("$%.2f", item.getPrice()));
             conditionView.setText(item.getCondition());
             imageView.setImageBitmap(item.getPic());
 

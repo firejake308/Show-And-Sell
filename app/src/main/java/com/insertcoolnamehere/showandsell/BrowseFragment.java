@@ -17,8 +17,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -49,7 +47,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private int mColumnCount = 1;
 
     protected OnListFragmentInteractionListener mListener;
-    private BrowseItemRecyclerViewAdapter adapter;
+    private SummaryItemRecyclerViewAdapter adapter;
     private AsyncTask mFetchItemsTask;
 
     private RecyclerView mRecyclerView;
@@ -111,9 +109,11 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 // show progress bar
                 showProgress(true);
 
+                // clear items list
+                Item.browseGroupItems.clear();
+
                 // find all items in that group and update the list
                 mFetchItemsTask = new FetchItemsTask(getActivity(), groupId).execute();
-                adapter.notifyDataSetChanged();
             }
         }
     }
@@ -181,7 +181,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
             } else {
                 mRecyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            adapter = new BrowseItemRecyclerViewAdapter(isBookmark()?Item.bookmarkedItems:Item.browseGroupItems, mListener);
+            adapter = new SummaryItemRecyclerViewAdapter(isBookmark()?Item.bookmarkedItems:Item.browseGroupItems, mListener);
             mRecyclerView.setAdapter(adapter);
         }
         return view;

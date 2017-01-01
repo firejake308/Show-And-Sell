@@ -36,7 +36,7 @@ public class ManageGroupActivity extends AppCompatActivity implements SwipeRefre
 
     private static final String LOG_TAG = ManageGroupActivity.class.getSimpleName();
 
-    private BrowseItemRecyclerViewAdapter adapter;
+    private FullItemRecyclerViewAdapter adapter;
     private AsyncTask mFetchItemsTask;
 
     private RecyclerView mRecyclerView;
@@ -57,7 +57,7 @@ public class ManageGroupActivity extends AppCompatActivity implements SwipeRefre
             Context context = recyclerView.getContext();
             mRecyclerView = (RecyclerView) recyclerView;
             mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-            adapter = new BrowseItemRecyclerViewAdapter(Item.managedGroupItems, this);
+            adapter = new FullItemRecyclerViewAdapter(Item.managedGroupItems, this);
             mRecyclerView.setAdapter(adapter);
         }
 
