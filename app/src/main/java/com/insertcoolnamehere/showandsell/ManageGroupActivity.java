@@ -12,7 +12,6 @@ import android.os.AsyncTask;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
@@ -58,7 +57,7 @@ public class ManageGroupActivity extends AppCompatActivity implements SwipeRefre
             Context context = recyclerView.getContext();
             mRecyclerView = (RecyclerView) recyclerView;
             mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
-            adapter = new BrowseItemRecyclerViewAdapter(Item.itemsToShow, this);
+            adapter = new BrowseItemRecyclerViewAdapter(Item.managedGroupItems, this);
             mRecyclerView.setAdapter(adapter);
         }
 
@@ -137,11 +136,6 @@ public class ManageGroupActivity extends AppCompatActivity implements SwipeRefre
         startActivity(intent);
     }
 
-    @Override
-    public void setGroupOwner(boolean isGroupOwner) {
-        Log.e(LOG_TAG, "Someone tried to abuse me!");
-    }
-
     protected URL getAPICall(String id) throws MalformedURLException {
         // construct the URL to fetch a user
         Uri.Builder  builder = new Uri.Builder();
@@ -172,7 +166,6 @@ public class ManageGroupActivity extends AppCompatActivity implements SwipeRefre
         }
 
         protected Integer doInBackground(Void... urls) {
-            // im gonna copy paste the networking code from Login here
             // variables that we will have to close in try loop
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
@@ -264,7 +257,7 @@ public class ManageGroupActivity extends AppCompatActivity implements SwipeRefre
                         for (int i = 0; i < items.length(); i++) {
                             JSONObject itemJson = items.getJSONObject(i);
 
-                            Item item = new Item(itemJson.getString("ssItemId"), false);
+                            Item item = new Item(itemJson.getString("ssItemId"), Item.MANAGE);
                             Log.d(LOG_TAG, "Server contains item #"+item.getGuid());
                             item.setName(itemJson.getString("name"));
                             item.setPrice(itemJson.getDouble("price"));
@@ -308,7 +301,7 @@ public class ManageGroupActivity extends AppCompatActivity implements SwipeRefre
             if (result == SUCCESS) {
                 adapter.notifyDataSetChanged();
                 showProgress(false);
-                for(Item item: Item.itemsToShow) {
+                for(Item item: Item.managedGroupItems) {
                     Log.d(LOG_TAG, item.toString()+item.isApproved());
                 }
 

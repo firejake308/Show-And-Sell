@@ -255,17 +255,6 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
         startActivity(intent);
     }
 
-    @Override
-    public void setGroupOwner(boolean isOwner) {
-        Item.setShowUnapproved(isOwner);
-        isGroupOwner = isOwner;
-
-        SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = savedData.edit();
-        editor.putBoolean(getString(R.string.group_owner_boolean), isOwner);
-        editor.apply();
-    }
-
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.

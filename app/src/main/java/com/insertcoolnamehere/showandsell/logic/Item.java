@@ -1,124 +1,79 @@
 package com.insertcoolnamehere.showandsell.logic;
 
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.util.Log;
 
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 public class Item implements Serializable {
-    private static ArrayList<Item> allItems = new ArrayList<>();
-    private static ArrayList<Item> approvedItems = new ArrayList<>();
-
-    public static ArrayList<Item> itemsToShow = new ArrayList<>();
-    public static ArrayList<Item> bookmarkedItems = new ArrayList<>();
     /**
-     * TODO deprecate this hash map after we write a better search method for the array list
+     * An ArrayList of all items, both approved and unapproved, in the selected default group
      */
-    private static HashMap<String, Item> items = new HashMap<>();
+    public static ArrayList<Item> managedGroupItems = new ArrayList<>();
+    /**
+     * An ArrayList of all approved items returned by the server in the selected default group
+     */
+    public static ArrayList<Item> browseGroupItems = new ArrayList<>();
+
+    /**
+     * ArrayList of all items that have been bookmarked by this user
+     */
+    public static ArrayList<Item> bookmarkedItems = new ArrayList<>();
+
+    public static final int BROWSE = 0;
+    public static final int BOOKMARK = 1;
+    public static final int MANAGE = 2;
+
     private static int numOfItems = 0;
 
-    private static boolean showUnapproved = false;
-
-    public static void setShowUnapproved(boolean show) {
-        // if this changes, we have to re-check our list of items to show
-        if(showUnapproved != show) {
-            // first reset <code>showUnapproved</code>
-            showUnapproved = show;
-            // then clear list
-            itemsToShow.clear();
-            // then recheck all items to make sure they're approved
-            for(Item item: allItems) {
-                attemptAddToItemsToShow(item);
-            }
-        }
-    }
-
     public static Item getItem(String guid) {
-        return items.get(guid);
+        // search for item in browse items
+        for (Item item: browseGroupItems) {
+            if (item.guid.equals(guid))
+                return item;
+        }
+
+        // search for item in manage group items
+        for (Item item: managedGroupItems) {
+            if (item.guid.equals(guid))
+                return item;
+        }
+
+        // search for item in bookmarked items, whic h could be from any group
+        for (Item item: bookmarkedItems) {
+            if(item.guid.equals(guid))
+                return item;
+        }
+
+        // if the item is not found, return null
+        return null;
     }
 
-    public static boolean hasItems() {
-        return !items.isEmpty();
+    public static boolean hasBrowseItems() {
+        return !browseGroupItems.isEmpty();
     }
+
+    /**
+     * Returns a list of all items in either the browse group or the managed group
+     * @return
+     */
     public static ArrayList<Item> getItemsList() {
         ArrayList<Item> list = new ArrayList<>();
-        Set<Map.Entry<String, Item>> entries = items.entrySet();
-        for(Map.Entry<String, Item> entry: entries) {
-            list.add(entry.getValue());
+        for(Item item: browseGroupItems) {
+            list.add(item);
         }
 
+        for(Item item: managedGroupItems) {
+            list.add(item);
+        }
         return list;
     }
 
     public static void clearItemsCache() {
-        itemsToShow.clear();
-        allItems.clear();
-        approvedItems.clear();
+        managedGroupItems.clear();
+        browseGroupItems.clear();
         bookmarkedItems.clear();
-    }
-
-    private static void attemptAddToItemsToShow(Item item) {
-        if(showUnapproved) {
-            if(!itemsToShow.contains(item))
-                itemsToShow.add(item);
-            else {
-                // remove old version of item
-                int i = itemsToShow.indexOf(item);
-                itemsToShow.remove(i);
-                // insert at same position
-                itemsToShow.add(i, item);
-            }
-
-            // sort unapproved items to top of list
-            Log.d("Item", "about to start sorting");
-            ArrayList<Item> unapproved = new ArrayList<>();
-            ArrayList<Item> approved = new ArrayList<>();
-            for(int i = 0; i < itemsToShow.size(); i++) {
-                if(itemsToShow.get(i).isApproved()) {
-                    approved.add(itemsToShow.get(i));
-                } else {
-                    unapproved.add(itemsToShow.get(i));
-                }
-            }
-
-            itemsToShow.clear();
-            for(int i = 0; i < unapproved.size(); i++) {
-                itemsToShow.add(unapproved.get(i));
-            }
-            for(int i = 0; i < approved.size(); i++) {
-                itemsToShow.add(approved.get(i));
-            }
-        } else {
-            // Add only approved items
-            if(item.isApproved()) {
-                // if the item is already being shown, update it
-                if(itemsToShow.contains(item)) {
-                    int i = itemsToShow.indexOf(item);
-                    itemsToShow.remove(i);
-                    itemsToShow.add(i, item);
-                }
-                // otherwise, just add it
-                else {
-                    itemsToShow.add(item);
-                }
-
-                // same deal for approved items
-                if(approvedItems.contains(item)) {
-                    int i = approvedItems.indexOf(item);
-                    approvedItems.remove(i);
-                    approvedItems.add(i, item);
-                } else {
-                    approvedItems.add(item);
-                }
-            }
-        }
     }
 
     private String name;
@@ -129,31 +84,32 @@ public class Item implements Serializable {
     private double price;
     private Bitmap pic;
     private boolean approved;
+    private int mItemType;
 
-    public Item(String guid, boolean isBookmark) {
+    public Item(String guid, int itemType) {
         this.guid = guid;
+        mItemType = itemType;
 
-        if(isBookmark) {
+        if(itemType == BOOKMARK) {
             if(!bookmarkedItems.contains(this))
                 bookmarkedItems.add(this);
-        } else {
+        } else if (itemType == BROWSE) {
             number = numOfItems;
             numOfItems += 1;
-            items.put(guid, this);
 
-            // update allItems with new item
-            if (allItems.contains(this)) {
+            // don't add this item to browse feed unless and until it is approved
+        } else if(itemType == MANAGE) {
+            // update managedGroupItems with new item
+            if (managedGroupItems.contains(this)) {
                 // remove old and insert new
-                int i = allItems.indexOf(this);
-                Log.d("Item", "Old item#" + i + " was " + allItems.get(i).isApproved());
-                allItems.remove(i);
-                allItems.add(i, this);
+                int i = managedGroupItems.indexOf(this);
+                Log.d("Item", "Old item#" + i + " was " + managedGroupItems.get(i).isApproved());
+                managedGroupItems.remove(i);
+                managedGroupItems.add(i, this);
             } else {
                 Log.d("Item", "new item going in");
-                allItems.add(this);
+                managedGroupItems.add(this);
             }
-
-            attemptAddToItemsToShow(this);
         }
     }
 
@@ -214,12 +170,14 @@ public class Item implements Serializable {
     public void setApproved(boolean approved) {
         this.approved = approved;
 
+        if(mItemType != BROWSE)
+            return;
+
         // update approved items list
-        if(approved && !approvedItems.contains(this)) {
-            approvedItems.add(this);
-            attemptAddToItemsToShow(this);
-        } else if(!approved && approvedItems.contains(this)) {
-            approvedItems.remove(this);
+        if(approved && !browseGroupItems.contains(this)) {
+            browseGroupItems.add(this);
+        } else if(!approved && browseGroupItems.contains(this)) {
+            browseGroupItems.remove(this);
         }
     }
 

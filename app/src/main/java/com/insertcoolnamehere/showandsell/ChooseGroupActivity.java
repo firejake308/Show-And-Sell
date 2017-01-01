@@ -17,6 +17,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.insertcoolnamehere.showandsell.logic.Item;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -96,6 +98,9 @@ public class ChooseGroupActivity extends AppCompatActivity {
 
         // update text in current group button
         currentGroup.setText(currentGroupName);
+
+        // clear browse group items, because that has changed
+        Item.browseGroupItems.clear();
 
         Log.d("ChooseGroupActivity", "curr grp id: "+currentGroupId);
 

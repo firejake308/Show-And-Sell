@@ -19,7 +19,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -36,8 +35,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * A fragment representing a list of Items.
@@ -71,15 +68,9 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        if(!Item.hasItems()) {
+        if(!Item.hasBrowseItems()) {
             updateItems();
         }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        inflater.inflate(R.menu.menu_browse, menu);
     }
 
     /**
@@ -190,7 +181,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
             } else {
                 mRecyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            adapter = new BrowseItemRecyclerViewAdapter(isBookmark()?Item.bookmarkedItems:Item.itemsToShow, mListener);
+            adapter = new BrowseItemRecyclerViewAdapter(isBookmark()?Item.bookmarkedItems:Item.browseGroupItems, mListener);
             mRecyclerView.setAdapter(adapter);
         }
         return view;
@@ -228,7 +219,6 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
     public interface OnListFragmentInteractionListener {
         void onListFragmentInteraction(String itemId);
         void openChooseGroup();
-        void setGroupOwner(boolean isOwner);
     }
 
     /**
@@ -315,40 +305,6 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 return NO_INERNET;
             } else {
                 try {
-                    // first determine if the user is a group owner or not
-                    URL url = new URL(new Uri.Builder().scheme("http")
-                            .encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
-                            .appendPath("showandsell")
-                            .appendPath("api")
-                            .appendPath("groups")
-                            .appendPath(mGroupId)
-                            .build().toString());
-                    urlConnection = (HttpURLConnection) url.openConnection();
-                    urlConnection.setReadTimeout(10000);
-                    urlConnection.setConnectTimeout(15000);
-                    urlConnection.setRequestMethod("GET");
-                    urlConnection.connect();
-
-                    reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                    String line = "";
-                    String responseBody = "";
-                    while((line = reader.readLine()) != null) {
-                        responseBody += line + '\n';
-                    }
-
-                    // parse response as JSON
-                    JSONObject group = new JSONObject(responseBody);
-                    String ownerId = group.getString("admin");
-                    SharedPreferences savedData = getActivity().getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
-                    String myId = savedData.getString(getString(R.string.userId), "NULL");
-                    if (ownerId.equals(myId)) {
-                        mListener.setGroupOwner(true);
-                    } else {
-                        mListener.setGroupOwner(false);
-                    }
-
-                    urlConnection.disconnect();
-
                     // connect to the URL and open the reader
                     urlConnection = (HttpURLConnection) getAPICall(mGroupId).openConnection();
                     urlConnection.setReadTimeout(10000);
@@ -361,8 +317,8 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                     if(responseCode == 200) {
                         // read response to get user data from server
                         reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                        line = "";
-                        responseBody = "";
+                        String line = "";
+                        String responseBody = "";
                         while((line = reader.readLine()) != null) {
                             responseBody += line + '\n';
                         }
@@ -378,7 +334,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                                 itemJson = itemJson.getJSONObject("item");
                             }
 
-                            Item item = new Item(itemJson.getString("ssItemId"), isBookmark());
+                            Item item = new Item(itemJson.getString("ssItemId"), isBookmark()?Item.BOOKMARK:Item.BROWSE);
                             Log.d(LOG_TAG, "Server contains item #"+item.getGuid());
                             item.setName(itemJson.getString("name"));
                             item.setPrice(itemJson.getDouble("price"));
@@ -422,9 +378,12 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
             if(result == SUCCESS) {
                 adapter.notifyDataSetChanged();
                 showProgress(false);
-                for(Item item: Item.itemsToShow) {
+
+                // old debug code
+                /*for(Item item: Item.browseGroupItems) {
                     Log.d(LOG_TAG, item.toString()+item.isApproved());
                 }
+                */
                 mFetchItemsTask = null;
             } else {
                 Log.e(LOG_TAG, "It appears that the task failed :(");
