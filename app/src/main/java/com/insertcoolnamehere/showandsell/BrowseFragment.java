@@ -48,7 +48,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
     private int mColumnCount = 1;
 
     protected OnListFragmentInteractionListener mListener;
-    private SummaryItemRecyclerViewAdapter adapter;
+    private RecyclerView.Adapter adapter;
     private AsyncTask mFetchItemsTask;
 
     private RecyclerView mRecyclerView;
@@ -182,7 +182,10 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
             } else {
                 mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(mColumnCount, StaggeredGridLayoutManager.VERTICAL));
             }
-            adapter = new SummaryItemRecyclerViewAdapter(isBookmark()?Item.bookmarkedItems:Item.browseGroupItems, mListener);
+            if(isBookmark())
+                adapter = new FullItemRecyclerViewAdapter(Item.bookmarkedItems, mListener);
+            else
+                adapter = new SummaryItemRecyclerViewAdapter(Item.browseGroupItems, mListener);
             mRecyclerView.setAdapter(adapter);
         }
         return view;
