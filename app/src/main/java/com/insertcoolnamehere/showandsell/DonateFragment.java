@@ -34,18 +34,6 @@ public class DonateFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment DonateFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static DonateFragment newInstance(String param1, String param2) {
-        DonateFragment fragment = new DonateFragment();
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

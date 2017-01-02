@@ -132,7 +132,7 @@ public class ManageGroupActivity extends AppCompatActivity implements SwipeRefre
     }
 
     private void openCreateGroup() {
-        Intent intent = new Intent(this, SettingsActivity.class);
+        Intent intent = new Intent(this, CreateGroupActivity.class);
         startActivity(intent);
     }
 

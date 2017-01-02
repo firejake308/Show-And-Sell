@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -82,6 +83,7 @@ public class ItemDetailActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     new RejectItemTask(parentForTask).execute();
+                    showProgress(true);
                 }
             });
 
@@ -92,6 +94,7 @@ public class ItemDetailActivity extends AppCompatActivity {
                     @Override
                     public void onClick(View v) {
                         new ApproveItemTask(parentForTask, true).execute();
+                        showProgress(true);
                     }
                 });
             }
@@ -125,6 +128,24 @@ public class ItemDetailActivity extends AppCompatActivity {
 
     private void attemptPostBookmark() {
         new PostBookmarkTask(this).execute();
+    }
+
+    private void showProgress(boolean isLoading) {
+        View actual = findViewById(R.id.items_actual_details);
+        ProgressBar loading = (ProgressBar) findViewById(R.id.progress_bar);
+        if(isLoading) {
+            // hide actual details
+            actual.setVisibility(View.GONE);
+
+            // show progress bar
+            loading.setVisibility(View.VISIBLE);
+        } else {
+            // show actual details
+            actual.setVisibility(View.VISIBLE);
+
+            // hide progress bar
+            loading.setVisibility(View.GONE);
+        }
     }
 
     private class CommentAdapter<T extends String> extends ArrayAdapter<String> {
@@ -305,6 +326,9 @@ public class ItemDetailActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Integer result) {
             if(result == SUCCESS) {
+                // turn off progress spinner in case the user comes back
+                showProgress(false);
+
                 // return to previous activity
                 Intent goHomeIntent = new Intent(mParent, MainActivity.class);
                 startActivity(goHomeIntent);
@@ -424,6 +448,7 @@ public class ItemDetailActivity extends AppCompatActivity {
             }
             else
                 Toast.makeText(mParent, "Item purchase failed :(", Toast.LENGTH_SHORT).show();
+                showProgress(false);
         }
     }
 
@@ -521,6 +546,9 @@ public class ItemDetailActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Integer result) {
             if(result == SUCCESS) {
+                // turn off progress spinner in case user comes back
+                showProgress(false);
+
                 // return to previous activity
                 Intent goHomeIntent = new Intent(mParent, MainActivity.class);
                 startActivity(goHomeIntent);

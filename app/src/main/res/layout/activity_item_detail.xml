@@ -9,103 +9,112 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.insertcoolnamehere.showandsell.ItemDetailActivity">
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:srcCompat="?android:attr/panelBackground"
-        android:id="@+id/item_detail_image"
-        android:contentDescription="@string/item_image"/>
-
-    <TextView
-        android:text="@string/prompt_item_description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/item_detail_name"
-        android:layout_below="@+id/item_detail_image"
-        android:layout_alignParentStart="true"
-        android:textAppearance="?textAppearanceSearchResultTitle"/>
-
-    <TextView
-        android:text="@string/prompt_suggested_price"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/item_detail_price"
-        android:layout_below="@+id/item_detail_name"
-        android:layout_alignParentStart="true"
-        android:textAppearance="?textAppearanceSearchResultSubtitle"/>
-
-    <TextView
-        android:text="@string/prompt_item_condition"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/item_detail_condition"
-        android:layout_below="@+id/item_detail_price"
-        android:layout_alignParentStart="true"
-        android:textAppearance="?textAppearanceSearchResultSubtitle"/>
-
-    <TextView
-        android:text="@string/prompt_item_details"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/item_detail_description"
-        android:layout_marginTop="16dp"
-        android:layout_below="@+id/item_detail_condition"
-        android:layout_alignParentStart="true" />
-
-    <Button
-        android:text="@string/action_buy"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@id/item_detail_name"
-        android:layout_alignParentEnd="true"
-        android:id="@+id/item_detail_buy"
-        android:background="@color/colorAccent"/>
-
-    <ListView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/item_comments"
-        android:divider="@null"
-        android:layout_below="@+id/enter_comment" />
+        android:id="@+id/items_actual_details">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="?android:attr/panelBackground"
+            android:id="@+id/item_detail_image"
+            android:contentDescription="@string/item_image"/>
 
-    <EditText
+        <TextView
+            android:text="@string/prompt_item_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/item_detail_name"
+            android:layout_below="@+id/item_detail_image"
+            android:layout_alignParentStart="true"
+            android:textAppearance="?textAppearanceSearchResultTitle"/>
+
+        <TextView
+            android:text="@string/prompt_suggested_price"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/item_detail_price"
+            android:layout_below="@+id/item_detail_name"
+            android:layout_alignParentStart="true"
+            android:textAppearance="?textAppearanceSearchResultSubtitle"/>
+
+        <TextView
+            android:text="@string/prompt_item_condition"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/item_detail_condition"
+            android:layout_below="@+id/item_detail_price"
+            android:layout_alignParentStart="true"
+            android:textAppearance="?textAppearanceSearchResultSubtitle"/>
+
+        <TextView
+            android:text="@string/prompt_item_details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/item_detail_description"
+            android:layout_marginTop="16dp"
+            android:layout_below="@+id/item_detail_condition"
+            android:layout_alignParentStart="true" />
+
+        <Button
+            android:text="@string/action_buy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/item_detail_name"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/item_detail_buy"
+            android:background="@color/colorAccent"/>
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/item_comments"
+            android:divider="@null"
+            android:layout_below="@+id/enter_comment" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:ems="10"
+            android:id="@+id/enter_comment"
+            android:hint="Add a comment"
+            android:layout_below="@+id/item_detail_description"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            app:fabSize="mini"
+            app:srcCompat="@drawable/ic_close_white_48px"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="6dp"
+            android:id="@+id/btn_reject"
+            app:backgroundTint="#F44336"
+            android:visibility="gone"
+            app:elevation="6dp"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            app:fabSize="mini"
+            app:srcCompat="@drawable/ic_approve"
+            android:layout_alignParentTop="true"
+            android:layout_toStartOf="@id/btn_reject"
+            android:layout_marginEnd="12dp"
+            android:id="@+id/btn_approve"
+            app:backgroundTint="?attr/colorPrimary"
+            android:visibility="gone"
+            app:elevation="6dp"/>
+    </RelativeLayout>
+
+    <ProgressBar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:ems="10"
-        android:id="@+id/enter_comment"
-        android:hint="Add a comment"
-        android:layout_below="@+id/item_detail_description"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        app:fabSize="mini"
-        app:srcCompat="@drawable/ic_close_white_48px"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="6dp"
-        android:id="@+id/btn_reject"
-        app:backgroundTint="#F44336"
-        android:visibility="gone"
-        app:elevation="6dp"/>
-
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        app:fabSize="mini"
-        app:srcCompat="@drawable/ic_approve"
-        android:layout_alignParentTop="true"
-        android:layout_toStartOf="@id/btn_reject"
-        android:layout_marginEnd="12dp"
-        android:id="@+id/btn_approve"
-        app:backgroundTint="?attr/colorPrimary"
-        android:visibility="gone"
-        app:elevation="6dp"/>
-
+        android:id="@+id/progress_bar"
+        android:visibility="gone" />
 </RelativeLayout>

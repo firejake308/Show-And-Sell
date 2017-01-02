@@ -14,6 +14,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -179,7 +180,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
             if (mColumnCount <= 1) {
                 mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
-                mRecyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+                mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(mColumnCount, StaggeredGridLayoutManager.VERTICAL));
             }
             adapter = new SummaryItemRecyclerViewAdapter(isBookmark()?Item.bookmarkedItems:Item.browseGroupItems, mListener);
             mRecyclerView.setAdapter(adapter);

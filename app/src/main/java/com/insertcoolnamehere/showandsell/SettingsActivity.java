@@ -86,20 +86,12 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     /**
-     * Exit settings activity and open choose group activity
-     * TODO actually check if the user has a group
+     * Exit settings activity and open manage group activity
      */
     private void openManageGroup() {
-        boolean userHasGroup = false;
-        if (userHasGroup) {
-            //go to manage group activity
-            Intent intent = new Intent(this, ManageGroupActivity.class);
-            startActivity(intent);
-        }
-        else {
-            Intent createGroupIntent = new Intent(this, CreateGroupActivity.class);
-            startActivity(createGroupIntent);
-        }
+        //go to manage group activity
+        Intent intent = new Intent(this, ManageGroupActivity.class);
+        startActivity(intent);
     }
 
     /**
