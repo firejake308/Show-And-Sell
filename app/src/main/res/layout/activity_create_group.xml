@@ -8,70 +8,49 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.insertcoolnamehere.showandsell.CreateAccountActivity">
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical" >
+
             <EditText
-            android:id="@+id/first_name_entry"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/prompt_first_name"
-            android:inputType="text"
-            android:maxLines="1"
-            android:singleLine="true"/>
-            <EditText
-                android:id="@+id/last_name_entry"
+                android:id="@+id/group_name_entry"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/prompt_last_name"
+                android:hint="@string/prompt_group_name"
                 android:inputType="text"
                 android:maxLines="1"
                 android:singleLine="true"/>
+
             <EditText
-                android:id="@+id/email_entry"
+                android:id="@+id/location_name_entry"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/prompt_email"
-                android:inputType="textEmailAddress"
-                android:maxLines="1"
-                android:singleLine="true"/>
-            <EditText
-                android:id="@+id/username_entry"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/prompt_username"
+                android:hint="@string/prompt_location_name"
                 android:inputType="text"
                 android:maxLines="1"
                 android:singleLine="true"/>
+
             <EditText
-                android:id="@+id/password_entry"
+                android:id="@+id/extra_location_data_entry"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/prompt_password"
-                android:inputType="textPassword"
+                android:hint="@string/prompt_extra_location_data"
+                android:inputType="text"
                 android:maxLines="1"
                 android:singleLine="true"/>
-            <EditText
-                android:id="@+id/confirm_password"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/prompt_confirm_password"
-                android:imeActionId="@+id/create_account"
-                android:imeActionLabel="@string/action_sign_up"
-                android:imeOptions="actionUnspecified"
-                android:inputType="textPassword"
-                android:maxLines="1"
-                android:singleLine="true"/>
+
             <Button
-                android:id="@+id/create_account_btn"
+                android:id="@+id/create_group_btn"
                 style="?android:textAppearanceSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/action_sign_up"
+                android:text="@string/action_create_group"
                 android:textStyle="bold"
                 android:background="@color/colorAccent" />
         </LinearLayout>

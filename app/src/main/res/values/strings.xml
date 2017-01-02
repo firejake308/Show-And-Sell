@@ -146,4 +146,13 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
 
+    <!-- CreateGroupActivity -->
+    <string name="prompt_group_name">Group Name</string>
+    <string name="prompt_location_name">Location</string>
+    <string name="prompt_extra_location_data">Extra Location Information</string>
+    <string name="prompt_group_password">Account Password</string>
+    <string name="error_un_group_name_duplicate">Group name already in use</string>
+    <string name="action_create_group">Create Group</string>
+
+
 </resources>

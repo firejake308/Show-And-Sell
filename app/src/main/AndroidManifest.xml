@@ -28,6 +28,9 @@
             android:name=".CreateAccountActivity"
             android:parentActivityName=".LoginActivity" />
         <activity
+            android:name=".CreateGroupActivity"
+            android:parentActivityName=".SettingsActivity" />
+        <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar">

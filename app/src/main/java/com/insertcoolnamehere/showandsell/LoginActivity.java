@@ -317,7 +317,7 @@ public class LoginActivity extends AppCompatActivity {
             showProgress(false);
 
             if (success == 1) {
-                // store username for later use
+                // store data for later use
                 SharedPreferences savedData = mParent.getSharedPreferences(getString(R.string.saved_data_file_key),
                         Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = savedData.edit();
