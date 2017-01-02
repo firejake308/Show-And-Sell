@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         android:id="@+id/items_actual_details">
         <ImageView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:srcCompat="?android:attr/panelBackground"
             android:id="@+id/item_detail_image"

@@ -265,12 +265,20 @@ public class ItemDetailActivity extends AppCompatActivity {
                     String description = mItem.getDescription();
                     Bitmap itemBitmap = mItem.getPic();
 
+                    /*
                     // scale down image and convert to base64
                     Log.d(LOG_TAG, "is itemBitmap null: "+(itemBitmap == null));
                     double scaleFactor = Math.max(itemBitmap.getWidth()/250.0, itemBitmap.getHeight()/250.0);
                     Bitmap bmp = Bitmap.createScaledBitmap(itemBitmap, (int)(itemBitmap.getWidth()/scaleFactor),(int)(itemBitmap.getHeight()/scaleFactor), false);
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    byte[] byteArray = stream.toByteArray();
+                    String thumbnail = Base64.encodeToString(byteArray, Base64.NO_WRAP);
+                    */
+
+                    // just convert to base 64, no scale
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    itemBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
                     byte[] byteArray = stream.toByteArray();
                     String thumbnail = Base64.encodeToString(byteArray, Base64.NO_WRAP);
 

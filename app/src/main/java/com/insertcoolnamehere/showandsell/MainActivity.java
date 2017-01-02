@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
 
         if(imageTakenYet) {
             Log.d(LOG_TAG, "I saved the image like a good boy");
-            double scaleFactor = Math.max(itemPic.getWidth() / 250.0, itemPic.getHeight() / 250.0);
+            double scaleFactor = 1;
             Bitmap bmp = Bitmap.createScaledBitmap(itemPic, (int) (itemPic.getWidth() / scaleFactor), (int) (itemPic.getHeight() / scaleFactor), false);
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
@@ -175,6 +175,7 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
                 // when the camera app returns a picture to us
                 Bundle extras = data.getExtras();
                 itemPic = (Bitmap) extras.get("data");
+                Log.d(LOG_TAG, "When camera takes picture, height is: "+itemPic.getHeight());
                 imageTakenYet = true;
 
                 // update text of button
@@ -368,6 +369,8 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
                     String condition = mCondition;
                     String description = mDescription;
 
+
+                    /*
                     // scale down image and convert to base64
                     Log.d(LOG_TAG, "is mBitmap null: "+(mBitmap == null));
                     double scaleFactor = Math.max(mBitmap.getWidth()/250.0, mBitmap.getHeight()/250.0);
@@ -376,6 +379,13 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
                     bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
                     byte[] byteArray = stream.toByteArray();
                     String thumbnail = Base64.encodeToString(byteArray,Base64.NO_WRAP);
+                    */
+
+                    // just convert to base64, no scaling
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    mBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    byte[] byteArray = stream.toByteArray();
+                    String thumbnail = Base64.encodeToString(byteArray, Base64.NO_WRAP);
 
                     // convert item to JSON
                     String body = "";

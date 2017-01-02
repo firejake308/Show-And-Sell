@@ -161,8 +161,8 @@ public class CreateGroupActivity extends AppCompatActivity {
                     JSONObject group = new JSONObject();
                     group.put("name", groupName);
                     group.put("admin", GUID);
-                    group.put("location", locationName);
-                    group.put("extra_location_data", extraLocationData);
+                    //group.put("location", locationName);
+                    //group.put("extra_location_data", extraLocationData);
                     groupData.put("group", group);
                     groupData.put("password", password);
                     body = String.valueOf(groupData);
@@ -176,7 +176,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                     int responseCode = connection.getResponseCode();
                     Log.d(LOG_TAG, "Response Code from Cloud Server: "+responseCode);
 
-                    if(responseCode == 201) {
+                    if(responseCode == 200) {
                         return true;
                     } else if(responseCode == 449) {
                         return false;

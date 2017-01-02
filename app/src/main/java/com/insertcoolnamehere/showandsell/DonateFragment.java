@@ -18,8 +18,6 @@ import android.widget.Spinner;
  * Activities that contain this fragment must implement the
  * {@link OnDonationListener} interface
  * to handle interaction events.
- * Use the {@link DonateFragment#newInstance} factory method to
- * create an instance of this fragment.
  */
 public class DonateFragment extends Fragment {
 
