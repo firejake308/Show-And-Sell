@@ -72,6 +72,10 @@
     <string name="groups">AVAILABLE GROUPS</string>
     <string name="choose_group_instructions">Selecting a group here will affect what items appear in
         your feed and where your donated items go.</string>
+    <string name="manage_group">My Group</string>
+    <string name="choose_group">Choose Primary Group</string>
+    <string name="options">OPTIONS</string>
+    <string name="actions">ACTIONS</string>
 
     <!-- Saved data -->
     <string name="group_owner_boolean">isGroupOwner</string>

@@ -9,14 +9,16 @@
         android:layout_height="27dp" />
 
     <TextView
-        android:text="  OPTIONS"
+        android:text="@string/options"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/patricks_btn_padding"
         android:id="@+id/textView2" />
 
     <Button
-        android:text="   Choose Default Group"
+        android:text="@string/choose_group"
         android:textAlignment="textStart"
+        android:paddingLeft="@dimen/patricks_btn_padding"
         android:layout_width="match_parent"
         android:id="@+id/settings_choose_default_group"
         android:background="@android:color/background_light"
@@ -27,11 +29,12 @@
         android:layout_height="5dp" />
 
     <Button
-        android:text="   Manage Group"
+        android:text="@string/manage_group"
         android:textAlignment="textStart"
         android:layout_width="match_parent"
         android:id="@+id/settings_manage_group"
         android:background="@android:color/background_light"
+        android:paddingLeft="@dimen/patricks_btn_padding"
         android:layout_height="wrap_content" />
 
     <Space
@@ -39,9 +42,10 @@
         android:layout_height="35dp" />
 
     <TextView
-        android:text="  ACTIONS"
+        android:text="@string/actions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/patricks_btn_padding"
         android:id="@+id/textView3" />
 
     <Button

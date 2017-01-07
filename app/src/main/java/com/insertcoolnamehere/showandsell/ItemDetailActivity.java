@@ -46,8 +46,10 @@ public class ItemDetailActivity extends AppCompatActivity {
     public static final String ITEM_ID = "ITEM_ID";
     public static final String OWNER_POWERS = "OWNER_POWERS";
 
+    /**
+     * This is the particular Item object whose data are displayed in this activity
+     */
     private Item mItem;
-    private boolean giveOwnerPowers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +60,7 @@ public class ItemDetailActivity extends AppCompatActivity {
 
         // get item data from intent
         mItem = Item.getItem(getIntent().getStringExtra(ITEM_ID));
-        giveOwnerPowers = getIntent().getBooleanExtra(OWNER_POWERS, false);
+        boolean giveOwnerPowers = getIntent().getBooleanExtra(OWNER_POWERS, false);
 
         // set text and images for the activity view
         ImageView itemImage = (ImageView) findViewById(R.id.item_detail_image);
@@ -87,7 +89,7 @@ public class ItemDetailActivity extends AppCompatActivity {
                 }
             });
 
-            // show approve button if group owner and item needs approval
+            // show approve button if user is group owner and item needs approval
             if (!mItem.isApproved()) {
                 approveBtn.setVisibility(View.VISIBLE);
                 approveBtn.setOnClickListener(new View.OnClickListener() {
@@ -122,14 +124,22 @@ public class ItemDetailActivity extends AppCompatActivity {
     }
 
     private void initiatePurchase() {
-        // TODO get client token
-        attemptPostBookmark();
+        // TODO get client token for online purchasing
+        new ApproveItemTask(this, false).execute();
     }
 
+    /**
+     * Initiates an Async Task that will attempt to post a bookmark for this user and this item to
+     * the server.
+     */
     private void attemptPostBookmark() {
         new PostBookmarkTask(this).execute();
     }
 
+    /**
+     * Turns the progress spinner on/off
+     * @param isLoading whether or not to show the progress spinner
+     */
     private void showProgress(boolean isLoading) {
         View actual = findViewById(R.id.items_actual_details);
         ProgressBar loading = (ProgressBar) findViewById(R.id.progress_bar);
@@ -148,12 +158,34 @@ public class ItemDetailActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Serves as the bridge between the comment data and the comment list view
+     * @param <T>
+     */
     private class CommentAdapter<T extends String> extends ArrayAdapter<String> {
+        /**
+         * Indicates that a comment will be displayed on the left side of the screen, where
+         * messages from the seller and/or group owner will appear.
+         */
         private final int LEFT_COMMENT = 0;
+        /**
+         * Indicates that a comment will be displayed on the right side of the screen, where
+         * messages from potential buyers will appear.
+         */
         private final int RIGHT_COMMENT = 1;
 
+        /**
+         * ArrayList representing all comments to show in this screen
+         */
         private ArrayList<String> mList;
 
+        /**
+         * Creates an adapter that fills the comment area of the screen with the comments
+         * contained in list
+         * @param context the Activity in which this class is being used
+         * @param layout effectively ignored
+         * @param list the list of comments to display
+         */
         private CommentAdapter(Context context, int layout, ArrayList<String> list) {
             super(context, layout, list);
 
@@ -165,18 +197,31 @@ public class ItemDetailActivity extends AppCompatActivity {
             return 2;
         }
 
+        /**
+         * Determines whether the comment at a given position should be displayed on the left or
+         * right side of the screen.
+         * @param position position of comment in list
+         * @return LEFT_COMMENT or RIGHT_COMMENT
+         */
         @Override
         public int getItemViewType(int position) {
+            // currently, sides alternate between left and right
+            // TODO actually check which comments were posted by which users
             return position % 2;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            // see if a View has already been created
             if(convertView == null) {
                 if(getItemViewType(position) == LEFT_COMMENT) {
+                    // inflate the layout of the left-side comment
                     View rootView = getLayoutInflater().inflate(R.layout.text_view_comment_left, parent, false);
+                    // identify the TextView of interest
                     TextView comment = (TextView) rootView.findViewById(R.id.textView_comment_left);
+                    // Get the comment from the list and set the text of the TextView
                     comment.setText(mList.get(position));
+                    // return the inflated layout
                     return rootView;
                 } else {
                     View rootView = getLayoutInflater().inflate(R.layout.text_view_comment_right, parent, false);
@@ -198,6 +243,9 @@ public class ItemDetailActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Changes the approved value of the displayed item on the server.
+     */
     private class ApproveItemTask extends AsyncTask<Void, Integer, Integer> {
         private static final String LOG_TAG = "ApproveItemTask";
         private static final int SUCCESS = 0;
@@ -207,6 +255,11 @@ public class ItemDetailActivity extends AppCompatActivity {
         private Activity mParent;
         private boolean doApprove;
 
+        /**
+         * Creates a new ApproveTask to approve/disapprove an item
+         * @param parent the parent activity to which the AsyncTask is bound
+         * @param doApprove whether or not to approve the item
+         */
         ApproveItemTask(Activity parent, boolean doApprove) {
             mParent = parent;
             this.doApprove = doApprove;
@@ -265,20 +318,12 @@ public class ItemDetailActivity extends AppCompatActivity {
                     String description = mItem.getDescription();
                     Bitmap itemBitmap = mItem.getPic();
 
-                    /*
                     // scale down image and convert to base64
                     Log.d(LOG_TAG, "is itemBitmap null: "+(itemBitmap == null));
                     double scaleFactor = Math.max(itemBitmap.getWidth()/250.0, itemBitmap.getHeight()/250.0);
                     Bitmap bmp = Bitmap.createScaledBitmap(itemBitmap, (int)(itemBitmap.getWidth()/scaleFactor),(int)(itemBitmap.getHeight()/scaleFactor), false);
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                    byte[] byteArray = stream.toByteArray();
-                    String thumbnail = Base64.encodeToString(byteArray, Base64.NO_WRAP);
-                    */
-
-                    // just convert to base 64, no scale
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    itemBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
                     byte[] byteArray = stream.toByteArray();
                     String thumbnail = Base64.encodeToString(byteArray, Base64.NO_WRAP);
 
@@ -452,7 +497,7 @@ public class ItemDetailActivity extends AppCompatActivity {
         protected void onPostExecute(Integer result) {
             if(result == SUCCESS) {
                 Toast.makeText(mParent, "Item bought!", Toast.LENGTH_SHORT).show();
-                new ApproveItemTask(mParent, false).execute();
+                showProgress(false);
             }
             else
                 Toast.makeText(mParent, "Item purchase failed :(", Toast.LENGTH_SHORT).show();

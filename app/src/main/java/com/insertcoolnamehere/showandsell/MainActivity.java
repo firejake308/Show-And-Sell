@@ -205,22 +205,16 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
         Button donateBtn = (Button) findViewById(R.id.donate_btn);
         if(description.length() == 0) {
             descriptionEntry.setError("Please enter a description");
-            donateBtn.setEnabled(false);
             return;
         } else if(deets.length() == 0) {
             detailsEntry.setError("Please provide details");
-            donateBtn.setEnabled(false);
             return;
         } else if(price.length() == 0) {
             priceEntry.setError("Please enter a price");
-            donateBtn.setEnabled(false);
             return;
         } else if(!imageTakenYet || itemPic == null) {
             Toast.makeText(this, "Please provide a picture", Toast.LENGTH_SHORT).show();
-            donateBtn.setEnabled(false);
             return;
-        } else {
-            donateBtn.setEnabled(true);
         }
 
         // clear EditTexts
@@ -303,6 +297,10 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
         }
     }
 
+    /**
+     * Asynchronous task that uploads a donated item to the server on a separate thread, so that it
+     * won't block the UI thread with networking work.
+     */
     public class UploadItemTask extends AsyncTask<Bitmap, Void, Boolean> {
 
         private static final String LOG_TAG = "UploadItemTask";
@@ -369,8 +367,6 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
                     String condition = mCondition;
                     String description = mDescription;
 
-
-                    /*
                     // scale down image and convert to base64
                     Log.d(LOG_TAG, "is mBitmap null: "+(mBitmap == null));
                     double scaleFactor = Math.max(mBitmap.getWidth()/250.0, mBitmap.getHeight()/250.0);
@@ -379,13 +375,6 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
                     bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
                     byte[] byteArray = stream.toByteArray();
                     String thumbnail = Base64.encodeToString(byteArray,Base64.NO_WRAP);
-                    */
-
-                    // just convert to base64, no scaling
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    mBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                    byte[] byteArray = stream.toByteArray();
-                    String thumbnail = Base64.encodeToString(byteArray, Base64.NO_WRAP);
 
                     // convert item to JSON
                     String body = "";
