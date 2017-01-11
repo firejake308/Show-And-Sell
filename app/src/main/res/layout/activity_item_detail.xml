@@ -70,18 +70,31 @@
             android:layout_height="match_parent"
             android:id="@+id/item_comments"
             android:divider="@null"
-            android:layout_below="@+id/enter_comment" />
+            android:layout_below="@+id/comment_box" />
 
-        <EditText
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:ems="10"
-            android:id="@+id/enter_comment"
-            android:hint="Add a comment"
-            android:layout_below="@+id/item_detail_description"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentEnd="true" />
+            android:orientation="horizontal"
+            android:layout_below="@id/item_detail_description"
+            android:id="@+id/comment_box">
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:ems="10"
+                android:layout_weight="9"
+                android:id="@+id/enter_comment"
+                android:hint="Add a comment" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/btn_send_message"
+                android:layout_weight="1"
+                android:background="@color/colorAccent"
+                android:text="->"/>
+        </LinearLayout>
 
         <android.support.design.widget.FloatingActionButton
             android:layout_width="wrap_content"

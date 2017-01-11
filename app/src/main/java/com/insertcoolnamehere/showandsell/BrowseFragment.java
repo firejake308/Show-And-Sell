@@ -255,6 +255,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 .appendPath("showandsell")
                 .appendPath("api")
                 .appendPath("items")
+                .appendPath("approved")
                 .appendQueryParameter("groupId", id)
                 .build();
         return new URL(builder.toString());
@@ -272,6 +273,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
         private String mGroupId;
 
         private final String LOG_TAG = FetchItemsTask.class.getSimpleName();
+        private final int NO_ITEMS = 3;
         private final int NO_INERNET = 2;
         private final int SUCCESS = 1;
         private final int OTHER_FAILURE = 0;
@@ -318,6 +320,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                     // obtain status code
                     responseCode = urlConnection.getResponseCode();
+                    Log.d(LOG_TAG, "response code="+responseCode);
                     if(responseCode == 200) {
                         // read response to get user data from server
                         reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
@@ -351,6 +354,8 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                         }
 
                         return SUCCESS;
+                    } else if (responseCode == 404) {
+                        return NO_ITEMS;
                     } else {
                         return OTHER_FAILURE;
                     }
@@ -389,7 +394,10 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 }
                 */
                 mFetchItemsTask = null;
-            } else {
+            } else if (result == NO_ITEMS) {
+                showProgress(false);
+                mFetchItemsTask = null;
+            } else if (result == OTHER_FAILURE){
                 Log.e(LOG_TAG, "It appears that the task failed :(");
                 showProgress(false);
                 mFetchItemsTask = null;

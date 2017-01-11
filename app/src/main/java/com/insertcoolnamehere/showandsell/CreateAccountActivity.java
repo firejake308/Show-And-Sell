@@ -158,6 +158,7 @@ public class CreateAccountActivity extends AppCompatActivity {
                     .appendPath("showandsell")
                     .appendPath("api")
                     .appendPath("users")
+                    .appendPath("create")
                     .build().toString();
             ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo info = manager.getActiveNetworkInfo();
@@ -205,7 +206,7 @@ public class CreateAccountActivity extends AppCompatActivity {
                     int responseCode = connection.getResponseCode();
                     Log.d(LOG_TAG, "Response Code from Cloud Server: "+responseCode);
 
-                    if(responseCode == 201) {
+                    if(responseCode == 200) {
                         return true;
                     } else if(responseCode == 449) {
                         return false;

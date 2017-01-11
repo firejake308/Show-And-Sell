@@ -210,6 +210,11 @@ public class LoginActivity extends AppCompatActivity {
     public class UserLoginTask extends AsyncTask<Void, Void, Integer> {
         private final String LOG_TAG = UserLoginTask.class.getSimpleName();
 
+        private final int SUCCESS = 0;
+        private final int NO_INTERNET = 1;
+        private final int BAD_PASSWORD = 2;
+        private final int OTHER_FAILURE = 3;
+
         private final Activity mParent;
         private final String mUsername;
         private final String mPassword;
@@ -245,7 +250,7 @@ public class LoginActivity extends AppCompatActivity {
                         Log.d(LOG_TAG, "No connection available");
                     }
                 });
-                return 2;
+                return NO_INTERNET;
             } else {
                 try {
                     // construct the URL to fetch a user
@@ -255,6 +260,7 @@ public class LoginActivity extends AppCompatActivity {
                             .appendPath("showandsell")
                             .appendPath("api")
                             .appendPath("users")
+                            .appendPath("userbyusername")
                             .appendQueryParameter("username", mUsername)
                             .appendQueryParameter("password", mPassword)
                             .build();
@@ -268,6 +274,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     // obtain status code
                     responseCode = urlConnection.getResponseCode();
+                    Log.d(LOG_TAG, "response code="+responseCode);
                     if(responseCode == 200) {
                         // read response to get user data from server
                         reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
@@ -278,15 +285,16 @@ public class LoginActivity extends AppCompatActivity {
                         }
 
                         // parse response as JSON
-                        JSONArray array = new JSONArray(responseBody);
-                        JSONObject user = array.getJSONObject(0);
+                        JSONObject user = new JSONObject(responseBody);
                         firstName = user.getString("firstName");
                         lastName = user.getString("lastName");
                         userId = user.getString("ssUserId");
 
-                        return 1;
+                        return SUCCESS;
+                    } else if (responseCode == 401) {
+                        return BAD_PASSWORD;
                     } else {
-                        return 0;
+                        return OTHER_FAILURE;
                     }
                 } catch (IOException e) {
                     Log.e(LOG_TAG, "Error getting response from server", e);
@@ -308,7 +316,7 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             // if anything goes wrong, don't let them log in and act like the password was wrong
-            return 0;
+            return OTHER_FAILURE;
         }
 
         @Override
@@ -316,7 +324,7 @@ public class LoginActivity extends AppCompatActivity {
             mAuthTask = null;
             showProgress(false);
 
-            if (success == 1) {
+            if (success == SUCCESS) {
                 // store data for later use
                 SharedPreferences savedData = mParent.getSharedPreferences(getString(R.string.saved_data_file_key),
                         Context.MODE_PRIVATE);
@@ -326,7 +334,7 @@ public class LoginActivity extends AppCompatActivity {
                 editor.putString(getString(R.string.prompt_first_name), firstName);
                 editor.putString(getString(R.string.prompt_last_name), lastName);
                 editor.putString(getString(R.string.userId), userId);
-                editor.commit();
+                editor.apply();
 
                 // clear text boxes so they're empty when user logs out
                 mUsernameView.setText("");
@@ -336,13 +344,13 @@ public class LoginActivity extends AppCompatActivity {
                 Intent intent = new Intent(mParent, MainActivity.class);
                 startActivity(intent);
                 finish();
-            } else if (success == 0){
+            } else if (success == BAD_PASSWORD){
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
-            } else if (success == 2) {
-                // this means there was no internet connection, so we will just
-                // wait for the user to turn on internet again
+            } else if (success == OTHER_FAILURE) {
+                Toast.makeText(mParent, "Strange things did happen in the UserLoginTask", Toast.LENGTH_SHORT).show();
             }
+            // if there was NO_INTERNET, just wait for the user to turn on internet
         }
 
         @Override

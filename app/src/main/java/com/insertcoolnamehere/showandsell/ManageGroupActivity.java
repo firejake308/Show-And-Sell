@@ -144,6 +144,7 @@ public class ManageGroupActivity extends AppCompatActivity implements SwipeRefre
                 .appendPath("showandsell")
                 .appendPath("api")
                 .appendPath("items")
+                .appendPath("items")
                 .appendQueryParameter("groupId", id)
                 .build();
         return new URL(builder.toString());
@@ -203,7 +204,8 @@ public class ManageGroupActivity extends AppCompatActivity implements SwipeRefre
                             .appendPath("showandsell")
                             .appendPath("api")
                             .appendPath("groups")
-                            .appendQueryParameter("ownerId", userId)
+                            .appendPath("groupwithadmin")
+                            .appendQueryParameter("adminId", userId)
                             .build().toString());
                     urlConnection = (HttpURLConnection) url.openConnection();
                     urlConnection.setReadTimeout(10000);
@@ -211,22 +213,22 @@ public class ManageGroupActivity extends AppCompatActivity implements SwipeRefre
                     urlConnection.setRequestMethod("GET");
                     urlConnection.connect();
 
-                    reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                    responseCode = urlConnection.getResponseCode();
+
+                    String groupId="";
                     String line = "";
                     String responseBody = "";
-                    while((line = reader.readLine()) != null) {
-                        responseBody += line + '\n';
-                    }
+                    if (responseCode == 200) {
+                        // parse response as JSON
+                        reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                        while ((line = reader.readLine()) != null) {
+                            responseBody += line + '\n';
+                        }
 
-                    Log.d(LOG_TAG, "Server responded to manage group");
-                    // parse response as JSON
-                    String groupId;
-                    try {
-                        JSONArray response = new JSONArray(responseBody);
-                        JSONObject group = response.getJSONObject(0);
+                        JSONObject group = new JSONObject(responseBody);
                         groupId = group.getString("ssGroupId");
                         Log.d(LOG_TAG, "This guy owns group: " + groupId);
-                    } catch (JSONException e) {
+                    } else if (responseCode == 404) {
                         return NOT_GROUP_OWNER;
                     }
 

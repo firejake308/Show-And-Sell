@@ -124,6 +124,7 @@ public class ChooseGroupActivity extends AppCompatActivity {
                 .appendPath("showandsell")
                 .appendPath("api")
                 .appendPath("groups")
+                .appendPath("allgroups")
                 .build();
         return new URL(builder.toString());
     }

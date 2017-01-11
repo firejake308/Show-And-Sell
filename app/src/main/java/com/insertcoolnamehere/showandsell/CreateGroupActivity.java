@@ -97,9 +97,14 @@ public class CreateGroupActivity extends AppCompatActivity {
         }
     }
 
-    public class CreateGroupTask extends AsyncTask<Void, Void, Boolean> {
+    public class CreateGroupTask extends AsyncTask<Void, Void, Integer> {
 
         private final String LOG_TAG = CreateGroupActivity.class.getSimpleName();
+
+        private final int SUCCESS = 0;
+        private final int NO_INTERNET = 1;
+        private final int GROUP_NAME_TAKEN = 2;
+        private final int OTHER_FAILURE = 4;
 
         private Activity mParent;
 
@@ -115,12 +120,13 @@ public class CreateGroupActivity extends AppCompatActivity {
             this.extraLocationData = eld;
         }
 
-        protected Boolean doInBackground(Void... Params) {
+        protected Integer doInBackground(Void... Params) {
             String uri = new Uri.Builder().scheme("http")
                     .encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
                     .appendPath("showandsell")
                     .appendPath("api")
                     .appendPath("groups")
+                    .appendPath("create")
                     .build().toString();
             ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo info = manager.getActiveNetworkInfo();
@@ -133,6 +139,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                         Log.d(LOG_TAG, "No connection available");
                     }
                 });
+                return NO_INTERNET;
             } else {
                 HttpURLConnection connection = null;
                 BufferedWriter out = null;
@@ -154,15 +161,14 @@ public class CreateGroupActivity extends AppCompatActivity {
                     String GUID = savedData.getString(getString(R.string.userId), "");
                     String password = savedData.getString(getString(R.string.prompt_password), "");
 
-                    // TODO check this formally with Brayden when API finished
                     // format group input as JSON
                     String body = "";
                     JSONObject groupData = new JSONObject();
                     JSONObject group = new JSONObject();
                     group.put("name", groupName);
-                    group.put("admin", GUID);
-                    //group.put("location", locationName);
-                    //group.put("extra_location_data", extraLocationData);
+                    group.put("adminId", GUID);
+                    group.put("location", locationName);
+                    group.put("locationDetail", extraLocationData);
                     groupData.put("group", group);
                     groupData.put("password", password);
                     body = String.valueOf(groupData);
@@ -177,9 +183,11 @@ public class CreateGroupActivity extends AppCompatActivity {
                     Log.d(LOG_TAG, "Response Code from Cloud Server: "+responseCode);
 
                     if(responseCode == 200) {
-                        return true;
-                    } else if(responseCode == 449) {
-                        return false;
+                        return SUCCESS;
+                    } else if (responseCode == 400){
+                        return GROUP_NAME_TAKEN;
+                    }else if(responseCode == 449) {
+                        return OTHER_FAILURE;
                     } else {
                         Log.e(LOG_TAG, "response Code = "+responseCode);
                     }
@@ -202,19 +210,22 @@ public class CreateGroupActivity extends AppCompatActivity {
                 }
             }
 
-            return false;
+            return OTHER_FAILURE;
         }
 
         @Override
-        protected void onPostExecute(Boolean success) {
-            if(success) {
+        protected void onPostExecute(Integer result) {
+            if(result == SUCCESS) {
                 // launch main activity so user can begin browsing
                 Intent intent = new Intent(mParent, MainActivity.class);
                 startActivity(intent);
-            } else {
+            } else if (result == GROUP_NAME_TAKEN){
                 // alert user that they had a duplicate username or email
                 groupNameEntry.setError(getString(R.string.error_un_group_name_duplicate));
                 groupNameEntry.requestFocus();
+            } else if (result == OTHER_FAILURE) {
+                Toast.makeText(mParent, "Congratulations! You found a bug! " +
+                        "Please report it to the devs", Toast.LENGTH_SHORT).show();
             }
         }
     }

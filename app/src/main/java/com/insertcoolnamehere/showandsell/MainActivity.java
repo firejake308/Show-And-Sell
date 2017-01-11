@@ -345,7 +345,8 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
                             .scheme("http")
                             .appendPath("showandsell")
                             .appendPath("api")
-                            .appendPath("items").build().toString();
+                            .appendPath("items")
+                            .appendPath("create").build().toString();
                     URL url = new URL(uri);
 
                     // form connection
@@ -398,11 +399,11 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
                     int responseCode = conn.getResponseCode();
                     Log.d(LOG_TAG, "Response Code from Cloud Server: "+responseCode);
 
-                    if(responseCode == 201) {
+                    if(responseCode == 200) {
                         Log.d(LOG_TAG, "Post was success");
                         return true;
                     } else if(responseCode == 449) {
-                        Log.d(LOG_TAG, "Post failure");
+                        Log.d(LOG_TAG, "Group may have been deleted, Post failure");
                         return false;
                     } else {
                         Log.e(LOG_TAG, "response Code = "+responseCode);

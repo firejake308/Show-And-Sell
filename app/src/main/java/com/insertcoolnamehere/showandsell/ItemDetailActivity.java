@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -27,17 +28,20 @@ import android.widget.Toast;
 import com.insertcoolnamehere.showandsell.dummy.DummyContent;
 import com.insertcoolnamehere.showandsell.logic.Item;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 
@@ -50,6 +54,10 @@ public class ItemDetailActivity extends AppCompatActivity {
      * This is the particular Item object whose data are displayed in this activity
      */
     private Item mItem;
+
+    private ArrayList<String> mComments = new ArrayList<>();
+    private CommentAdapter<String> mAdapter;
+    private AsyncTask mFetchCommentsTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,14 +112,22 @@ public class ItemDetailActivity extends AppCompatActivity {
 
         // set up comments list view
         ListView listView = (ListView) findViewById(R.id.item_comments);
-        ArrayList<String> list = new ArrayList<>();
-        ListIterator<DummyContent.DummyItem> iter = DummyContent.ITEMS.listIterator();
-        while(iter.hasNext()) {
-            DummyContent.DummyItem item = iter.next();
-            list.add(item.content);
+        mAdapter = new CommentAdapter<>(this, R.layout.text_view_comment_right, mComments);
+        listView.setAdapter(mAdapter);
+        if (mFetchCommentsTask == null) {
+            new FetchCommentsTask(this).execute();
         }
-        CommentAdapter<String> adapter = new CommentAdapter<>(this, R.layout.text_view_comment_right, list);
-        listView.setAdapter(adapter);
+
+        // set up post comment button
+        final Button postComment = (Button) findViewById(R.id.btn_send_message);
+        final EditText commentEntry = (EditText) findViewById(R.id.enter_comment);
+        postComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                commentEntry.setText("");
+                attemptPostComment(commentEntry.getText().toString());
+            }
+        });
 
         // set up buy button
         Button buyButton = (Button) findViewById(R.id.item_detail_buy);
@@ -124,8 +140,7 @@ public class ItemDetailActivity extends AppCompatActivity {
     }
 
     private void initiatePurchase() {
-        // TODO get client token for online purchasing
-        new ApproveItemTask(this, false).execute();
+        new PurchaseItemTask(this).execute();
     }
 
     /**
@@ -135,6 +150,8 @@ public class ItemDetailActivity extends AppCompatActivity {
     private void attemptPostBookmark() {
         new PostBookmarkTask(this).execute();
     }
+
+    private void attemptPostComment(String messageBody) {new PostMessageTask(this, messageBody).execute();}
 
     /**
      * Turns the progress spinner on/off
@@ -297,8 +314,9 @@ public class ItemDetailActivity extends AppCompatActivity {
                             .appendPath("showandsell")
                             .appendPath("api")
                             .appendPath("items")
-                            .appendEncodedPath(mItem.getGuid())
-                            .appendQueryParameter("groupOwnerPassword", pw).build().toString();
+                            .appendPath("update")
+                            .appendQueryParameter("id", mItem.getGuid())
+                            .appendQueryParameter("adminPassword", pw).build().toString();
                     URL url = new URL(uri);
 
                     // form connection
@@ -349,7 +367,7 @@ public class ItemDetailActivity extends AppCompatActivity {
                     if(responseCode == 200) {
                         Log.d(LOG_TAG, "Post was success");
                         return SUCCESS;
-                    } else if(responseCode == 449) {
+                    } else if(responseCode == 449 || responseCode == 401) {
                         Log.d(LOG_TAG, "Post failure");
                         return OTHER_FAILURE;
                     } else {
@@ -385,6 +403,12 @@ public class ItemDetailActivity extends AppCompatActivity {
                 // return to previous activity
                 Intent goHomeIntent = new Intent(mParent, MainActivity.class);
                 startActivity(goHomeIntent);
+            } else if (result == OTHER_FAILURE) {
+                showProgress(false);
+
+                // alert user that something has gone horribly wrong
+                Toast.makeText(mParent, "Congratulations! You found a bug! " +
+                        "Please report it to the devs", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -420,11 +444,10 @@ public class ItemDetailActivity extends AppCompatActivity {
             } else {
                 // declare resources to close in finally clause
                 HttpURLConnection conn = null;
-                BufferedOutputStream out = null;
                 try {
                     // get group owner password
                     SharedPreferences savedData = mParent.getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
-                    String un = savedData.getString(getString(R.string.prompt_username), "");
+                    String un = savedData.getString(getString(R.string.userId), "");
 
                     // form a URL to connect to
                     Uri.Builder builder = new Uri.Builder();
@@ -432,33 +455,21 @@ public class ItemDetailActivity extends AppCompatActivity {
                             .scheme("http")
                             .appendPath("showandsell")
                             .appendPath("api")
-                            .appendPath("bookmarks").build().toString();
+                            .appendPath("bookmarks")
+                            .appendPath("create")
+                            .appendQueryParameter("userId", un)
+                            .appendQueryParameter("itemId", mItem.getGuid()).build().toString();
                     URL url = new URL(uri);
 
                     // form connection
                     conn = (HttpURLConnection) url.openConnection();
-                    conn.setDoOutput(true);
+                    conn.setDoOutput(false);
                     conn.setRequestMethod("POST");
                     conn.setConnectTimeout(10000);
                     conn.setReadTimeout(15000);
                     conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                     conn.setChunkedStreamingMode(0);
                     conn.connect();
-
-                    // get values for item
-                    String itemId = mItem.getGuid();
-
-                    // convert item to JSON
-                    JSONObject bookmark = new JSONObject();
-                    bookmark.put("userId", un);
-                    bookmark.put("itemId", itemId);
-                    String body = bookmark.toString();
-                    Log.d(LOG_TAG, body);
-
-                    // write to output stream
-                    out = new BufferedOutputStream(conn.getOutputStream());
-                    out.write(body.getBytes());
-                    out.flush();
 
                     // see if post was a success
                     int responseCode = conn.getResponseCode();
@@ -478,15 +489,8 @@ public class ItemDetailActivity extends AppCompatActivity {
                     Log.e(LOG_TAG, "Bad URL", e);
                 } catch (IOException e) {
                     Log.e(LOG_TAG, "Error opening URL connection (probably?)", e);
-                } catch (JSONException e) {
-                    Log.e(LOG_TAG, "Error forming JSON", e);
                 } finally {
                     conn.disconnect();
-                    try {
-                        out.close();
-                    } catch(Exception e) {
-                        Log.e(LOG_TAG, "Error closing output stream", e);
-                    }
                 }
             }
 
@@ -496,11 +500,11 @@ public class ItemDetailActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Integer result) {
             if(result == SUCCESS) {
-                Toast.makeText(mParent, "Item bought!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mParent, "Added bookmark!", Toast.LENGTH_SHORT).show();
                 showProgress(false);
             }
             else
-                Toast.makeText(mParent, "Item purchase failed :(", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mParent, "Bookmark failed :(", Toast.LENGTH_SHORT).show();
                 showProgress(false);
         }
     }
@@ -549,8 +553,9 @@ public class ItemDetailActivity extends AppCompatActivity {
                             .appendPath("showandsell")
                             .appendPath("api")
                             .appendPath("items")
-                            .appendEncodedPath(mItem.getGuid())
-                            .appendQueryParameter("ownerPassword", pw).build().toString();
+                            .appendPath("delete")
+                            .appendQueryParameter("id", mItem.getGuid())
+                            .appendQueryParameter("password", pw).build().toString();
                     URL url = new URL(uri);
 
                     // form connection
@@ -605,6 +610,348 @@ public class ItemDetailActivity extends AppCompatActivity {
                 // return to previous activity
                 Intent goHomeIntent = new Intent(mParent, MainActivity.class);
                 startActivity(goHomeIntent);
+            }
+        }
+    }
+
+    private class PurchaseItemTask extends AsyncTask<Void, Void, Integer> {
+        private static final int SUCCESS = 0;
+        private static final int NO_INTERNET = 1;
+        private static final int OTHER_FAILURE = 2;
+        private final String LOG_TAG = PurchaseItemTask.class.getSimpleName();
+
+        private final Activity mParent;
+
+        PurchaseItemTask(Activity parent) {
+            mParent = parent;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            // check if we have an Internet connection
+            ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo info = manager.getActiveNetworkInfo();
+
+            if(info == null || !info.isConnected()) {
+                // if there is no network, inform user through a toast
+                mParent.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                        Log.d(LOG_TAG, "No connection available");
+                    }
+                });
+                return NO_INTERNET;
+            } else {
+                // declare resources to close in finally clause
+                HttpURLConnection conn = null;
+                try {
+                    // get group owner password
+                    SharedPreferences savedData = mParent.getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+                    String un = savedData.getString(getString(R.string.userId), "");
+                    String pw = savedData.getString(getString(R.string.prompt_password), "");
+
+                    // form a URL to connect to
+                    Uri.Builder builder = new Uri.Builder();
+                    String uri = builder.encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
+                            .scheme("http")
+                            .appendPath("showandsell")
+                            .appendPath("api")
+                            .appendPath("items")
+                            .appendPath("buyitem")
+                            .appendQueryParameter("userId", un)
+                            .appendQueryParameter("id", mItem.getGuid())
+                            .appendQueryParameter("password", pw).build().toString();
+                    URL url = new URL(uri);
+
+                    // form connection
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setDoOutput(false);
+                    conn.setRequestMethod("POST");
+                    conn.setConnectTimeout(10000);
+                    conn.setReadTimeout(15000);
+                    conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    conn.setChunkedStreamingMode(0);
+                    conn.connect();
+
+                    // see if post was a success
+                    int responseCode = conn.getResponseCode();
+                    Log.d(LOG_TAG, "Response Code from Cloud Server: "+responseCode);
+
+                    if(responseCode == 200) {
+                        Log.d(LOG_TAG, "Post was success");
+                        return SUCCESS;
+                    } else if(responseCode == 404) {
+                        Log.d(LOG_TAG, "Post failure");
+                        return OTHER_FAILURE;
+                    } else {
+                        Log.e(LOG_TAG, "response Code = "+responseCode);
+                        return OTHER_FAILURE;
+                    }
+                } catch (MalformedURLException e) {
+                    Log.e(LOG_TAG, "Bad URL", e);
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "Error opening URL connection (probably?)", e);
+                } finally {
+                    conn.disconnect();
+                }
+            }
+
+            // in case of failure
+            return OTHER_FAILURE;
+        }
+        @Override
+        protected void onPostExecute(Integer result) {
+            if(result == SUCCESS) {
+                Toast.makeText(mParent, "Item bought!", Toast.LENGTH_SHORT).show();
+                showProgress(false);
+            }
+            else
+                Toast.makeText(mParent, "Purchase failed :(", Toast.LENGTH_SHORT).show();
+            showProgress(false);
+        }
+    }
+
+    private class PostMessageTask extends AsyncTask<Void, Void, Integer> {
+        private static final int SUCCESS = 0;
+        private static final int NO_INTERNET = 1;
+        private static final int OTHER_FAILURE = 2;
+        private final String LOG_TAG = PostMessageTask.class.getSimpleName();
+
+        private final Activity mParent;
+        private String mMessage;
+
+        PostMessageTask(Activity parent, String messageBody) {
+            mParent = parent;
+            mMessage = messageBody;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            // check if we have an Internet connection
+            ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo info = manager.getActiveNetworkInfo();
+
+            if(info == null || !info.isConnected()) {
+                // if there is no network, inform user through a toast
+                mParent.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                        Log.d(LOG_TAG, "No connection available");
+                    }
+                });
+                return NO_INTERNET;
+            } else {
+                // declare resources to close in finally clause
+                HttpURLConnection conn = null;
+                BufferedOutputStream out = null;
+                try {
+                    // get group owner password
+                    SharedPreferences savedData = mParent.getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+                    String un = savedData.getString(getString(R.string.userId), "");
+                    String pw = savedData.getString(getString(R.string.prompt_password), "");
+
+                    // form a URL to connect to
+                    Uri.Builder builder = new Uri.Builder();
+                    String uri = builder.encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
+                            .scheme("http")
+                            .appendPath("showandsell")
+                            .appendPath("api")
+                            .appendPath("chat")
+                            .appendPath("create")
+                            .appendQueryParameter("posterId", un)
+                            .appendQueryParameter("password", pw).build().toString();
+                    URL url = new URL(uri);
+
+                    // form connection
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setDoOutput(false);
+                    conn.setRequestMethod("POST");
+                    conn.setConnectTimeout(10000);
+                    conn.setReadTimeout(15000);
+                    conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    conn.setChunkedStreamingMode(0);
+                    conn.connect();
+
+                    // form JSON
+                    JSONObject message = new JSONObject();
+                    message.put("itemId", mItem.getGuid());
+                    message.put("body", mMessage);
+                    Log.d(LOG_TAG, message.toString());
+
+                    out = new BufferedOutputStream(conn.getOutputStream());
+                    out.write(message.toString().getBytes());
+                    out.flush();
+
+                    // see if post was a success
+                    int responseCode = conn.getResponseCode();
+                    Log.d(LOG_TAG, "Response Code from Cloud Server: "+responseCode);
+
+                    if(responseCode == 200) {
+                        Log.d(LOG_TAG, "Post was success");
+
+                        return SUCCESS;
+                    } else if(responseCode == 404) {
+                        Log.d(LOG_TAG, "Post failure");
+                        return OTHER_FAILURE;
+                    } else {
+                        Log.e(LOG_TAG, "response Code = "+responseCode);
+                        return OTHER_FAILURE;
+                    }
+                } catch (MalformedURLException e) {
+                    Log.e(LOG_TAG, "Bad URL", e);
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "Error opening URL connection (probably?)", e);
+                } catch (JSONException e){
+                    Log.e(LOG_TAG, "Error formatting JSON");
+                } finally {
+                    conn.disconnect();
+                }
+            }
+
+            // in case of failure
+            return OTHER_FAILURE;
+        }
+        @Override
+        protected void onPostExecute(Integer result) {
+            if(result == SUCCESS) {
+                new FetchCommentsTask(mParent).execute();
+                showProgress(false);
+            }
+            else {
+                showProgress(false);
+            }
+        }
+    }
+
+    private class FetchCommentsTask extends AsyncTask<Void, Void, Integer> {
+        /**
+         * The Activity within which this AsyncTask runs
+         */
+        private Activity mParent;
+
+        private final String LOG_TAG = FetchCommentsTask.class.getSimpleName();
+        private final int NO_COMMENTS = 3;
+        private final int NO_INERNET = 2;
+        private final int SUCCESS = 1;
+        private final int OTHER_FAILURE = 0;
+
+        FetchCommentsTask(Activity parent) {
+            mParent = parent;
+        }
+
+        protected Integer doInBackground(Void... urls) {
+            // im gonna copy paste the networking code from Login here
+            // variables that we will have to close in try loop
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+
+            // the unparsed JSON response from the server
+            int responseCode = -1;
+
+            // check for internet connection
+            ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo info = manager.getActiveNetworkInfo();
+
+            if(info == null || !info.isConnected()) {
+                // if there is no network, inform user through a toast
+                mParent.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                        Log.d(LOG_TAG, "No connection available");
+                    }
+                });
+                return NO_INERNET;
+            } else {
+                try {
+                    // connect to the URL and open the reader
+                    Uri.Builder  builder = new Uri.Builder();
+                    builder.scheme("http")
+                            .encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
+                            .appendPath("showandsell")
+                            .appendPath("api")
+                            .appendPath("chat")
+                            .appendPath("messages")
+                            .appendQueryParameter("itemId", mItem.getGuid())
+                            .build();
+                    URL url = new URL(builder.toString());
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setReadTimeout(10000);
+                    urlConnection.setConnectTimeout(15000);
+                    urlConnection.setRequestMethod("GET");
+                    urlConnection.connect();
+
+                    // obtain status code
+                    responseCode = urlConnection.getResponseCode();
+                    Log.d(LOG_TAG, "response code="+responseCode);
+                    if(responseCode == 200) {
+                        // read response to get user data from server
+                        reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                        String line = "";
+                        String responseBody = "";
+                        while((line = reader.readLine()) != null) {
+                            responseBody += line + '\n';
+                        }
+
+                        // parse response as JSON
+                        JSONArray items = new JSONArray(responseBody);
+
+                        for (int i = 0; i < items.length(); i++) {
+                            JSONObject itemJson = items.getJSONObject(i);
+
+                            // TODO Add user detection
+                            mComments.add(itemJson.getString("body"));
+                        }
+
+                        return SUCCESS;
+                    } else if (responseCode == 404) {
+                        return NO_COMMENTS;
+                    } else {
+                        return OTHER_FAILURE;
+                    }
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "Error getting response from server", e);
+                } catch (JSONException e) {
+                    Log.e(LOG_TAG, "Error parsing JSON", e);
+                } finally {
+                    // release system resources
+                    if(urlConnection != null) {
+                        urlConnection.disconnect();
+                    }
+                    if(reader != null) {
+                        try {
+                            reader.close();
+                        } catch(IOException e) {
+                            Log.e(LOG_TAG, "Error closing input stream", e);
+                        }
+                    }
+                }
+            }
+
+            // if anything goes wrong, return the other failure code
+            return OTHER_FAILURE;
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            if(result == SUCCESS) {
+                mAdapter.notifyDataSetChanged();
+                showProgress(false);
+
+                // old debug code
+                for(String comment: mComments) {
+                    Log.d(LOG_TAG, comment);
+                }
+                mFetchCommentsTask = null;
+            } else if (result == NO_COMMENTS) {
+                showProgress(false);
+                mFetchCommentsTask = null;
+            } else if (result == OTHER_FAILURE){
+                Log.e(LOG_TAG, "It appears that the task failed :(");
+                showProgress(false);
+                mFetchCommentsTask = null;
             }
         }
     }
