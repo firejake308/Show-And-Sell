@@ -195,6 +195,7 @@ public class CreateAccountActivity extends AppCompatActivity {
                     user.put("firstName", firstName);
                     user.put("lastName", lastName);
                     user.put("email", email);
+                    user.put("groupId", "");
                     body = String.valueOf(user);
 
                     // send JSON to Cloud Server

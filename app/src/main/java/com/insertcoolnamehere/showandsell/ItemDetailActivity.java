@@ -55,8 +55,8 @@ public class ItemDetailActivity extends AppCompatActivity {
      */
     private Item mItem;
 
-    private ArrayList<String> mComments = new ArrayList<>();
-    private CommentAdapter<String> mAdapter;
+    private ArrayList<Message> mComments = new ArrayList<>();
+    private CommentAdapter<Message> mAdapter;
     private AsyncTask mFetchCommentsTask;
 
     @Override
@@ -124,8 +124,8 @@ public class ItemDetailActivity extends AppCompatActivity {
         postComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                commentEntry.setText("");
                 attemptPostComment(commentEntry.getText().toString());
+                commentEntry.setText("");
             }
         });
 
@@ -151,7 +151,14 @@ public class ItemDetailActivity extends AppCompatActivity {
         new PostBookmarkTask(this).execute();
     }
 
-    private void attemptPostComment(String messageBody) {new PostMessageTask(this, messageBody).execute();}
+    private void attemptPostComment(String messageBody) {
+        // add comment to comment list for now
+        new PostMessageTask(this, messageBody).execute();
+        SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+        String displayName = savedData.getString(getString(R.string.prompt_first_name),"")+" "+savedData.getString(getString(R.string.prompt_last_name), "");
+        String id = savedData.getString(getString(R.string.userId), "NULL");
+        mComments.add(new Message(displayName, id, messageBody));
+    }
 
     /**
      * Turns the progress spinner on/off
@@ -179,7 +186,7 @@ public class ItemDetailActivity extends AppCompatActivity {
      * Serves as the bridge between the comment data and the comment list view
      * @param <T>
      */
-    private class CommentAdapter<T extends String> extends ArrayAdapter<String> {
+    private class CommentAdapter<T extends Message> extends ArrayAdapter{
         /**
          * Indicates that a comment will be displayed on the left side of the screen, where
          * messages from the seller and/or group owner will appear.
@@ -194,7 +201,7 @@ public class ItemDetailActivity extends AppCompatActivity {
         /**
          * ArrayList representing all comments to show in this screen
          */
-        private ArrayList<String> mList;
+        private ArrayList<Message> mList;
 
         /**
          * Creates an adapter that fills the comment area of the screen with the comments
@@ -203,7 +210,7 @@ public class ItemDetailActivity extends AppCompatActivity {
          * @param layout effectively ignored
          * @param list the list of comments to display
          */
-        private CommentAdapter(Context context, int layout, ArrayList<String> list) {
+        private CommentAdapter(Context context, int layout, ArrayList<Message> list) {
             super(context, layout, list);
 
             mList = list;
@@ -222,9 +229,12 @@ public class ItemDetailActivity extends AppCompatActivity {
          */
         @Override
         public int getItemViewType(int position) {
-            // currently, sides alternate between left and right
-            // TODO actually check which comments were posted by which users
-            return position % 2;
+            SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+            String userId = savedData.getString(getString(R.string.userId), "NULL");
+            if (userId.equals(mList.get(position).getUserId()))
+                return RIGHT_COMMENT;
+            else
+                return LEFT_COMMENT;
         }
 
         @Override
@@ -234,26 +244,38 @@ public class ItemDetailActivity extends AppCompatActivity {
                 if(getItemViewType(position) == LEFT_COMMENT) {
                     // inflate the layout of the left-side comment
                     View rootView = getLayoutInflater().inflate(R.layout.text_view_comment_left, parent, false);
-                    // identify the TextView of interest
+                    // identify the TextViews of interest
                     TextView comment = (TextView) rootView.findViewById(R.id.textView_comment_left);
-                    // Get the comment from the list and set the text of the TextView
-                    comment.setText(mList.get(position));
+                    TextView poster = (TextView) rootView.findViewById(R.id.textView_poster_name);
+                    // Get the comment from the list and set the text of the TextViews
+                    comment.setText(mList.get(position).getBody());
+                    poster.setText(mList.get(position).getUserName());
+                    Log.d("CommentAdapter", "list: "+mList.get(position).getUserName());
+                    Log.d("CommentAdapter", "view: "+poster.getText().toString());
                     // return the inflated layout
                     return rootView;
                 } else {
                     View rootView = getLayoutInflater().inflate(R.layout.text_view_comment_right, parent, false);
                     TextView comment = (TextView) rootView.findViewById(R.id.textView_comment_right);
-                    comment.setText(mList.get(position));
+                    TextView poster = (TextView) rootView.findViewById(R.id.textView_poster_name);
+                    comment.setText(mList.get(position).getBody());
+                    poster.setText(mList.get(position).getUserName());
                     return rootView;
                 }
             } else {
                 if(getItemViewType(position) == LEFT_COMMENT) {
                     TextView comment = (TextView) convertView.findViewById(R.id.textView_comment_left);
-                    comment.setText(mList.get(position));
+                    comment.setText(mList.get(position).getBody());
+
+                    TextView poster = (TextView) convertView.findViewById(R.id.textView_poster_name);
+                    poster.setText(mList.get(position).getUserName());
                     return convertView;
                 } else {
                     TextView comment = (TextView) convertView.findViewById(R.id.textView_comment_right);
-                    comment.setText(mList.get(position));
+                    comment.setText(mList.get(position).getBody());
+
+                    TextView poster = (TextView) convertView.findViewById(R.id.textView_poster_name);
+                    poster.setText(mList.get(position).getUserName());
                     return convertView;
                 }
             }
@@ -837,6 +859,8 @@ public class ItemDetailActivity extends AppCompatActivity {
         private final int SUCCESS = 1;
         private final int OTHER_FAILURE = 0;
 
+        private ArrayList<Message> mServerComments = new ArrayList<>();
+
         FetchCommentsTask(Activity parent) {
             mParent = parent;
         }
@@ -901,8 +925,14 @@ public class ItemDetailActivity extends AppCompatActivity {
                         for (int i = 0; i < items.length(); i++) {
                             JSONObject itemJson = items.getJSONObject(i);
 
-                            // TODO Add user detection
-                            mComments.add(itemJson.getString("body"));
+                            Message msg = new Message(itemJson.getString("posterName"), itemJson.getString("posterId"), itemJson.getString("body"));
+                            mServerComments.add(msg);
+                        }
+
+                        for (int i = 0; i < mServerComments.size()-1; i++) {
+                            for (int j = i+1; j < mServerComments.size(); i++) {
+                                if(mServerComments.get(i))
+                            }
                         }
 
                         return SUCCESS;
@@ -937,13 +967,10 @@ public class ItemDetailActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Integer result) {
             if(result == SUCCESS) {
+                mComments.clear();
+                mComments.addAll(mServerComments);
                 mAdapter.notifyDataSetChanged();
                 showProgress(false);
-
-                // old debug code
-                for(String comment: mComments) {
-                    Log.d(LOG_TAG, comment);
-                }
                 mFetchCommentsTask = null;
             } else if (result == NO_COMMENTS) {
                 showProgress(false);
@@ -953,6 +980,37 @@ public class ItemDetailActivity extends AppCompatActivity {
                 showProgress(false);
                 mFetchCommentsTask = null;
             }
+        }
+    }
+
+    /**
+     * Represents a message in comments
+     */
+    private class Message implements Comparable<Message>{
+        private String userName;
+        private String userId;
+        private String body;
+
+        Message(String userName, String userId, String body) {
+            this.userName = userName;
+            this.userId = userId;
+            this.body = body;
+        }
+
+        public String getUserName() {
+            return userName;
+        }
+
+        public String getBody() {
+            return body;
+        }
+
+        public String getUserId() {
+            return userId;
+        }
+
+        public int compareTo(Message other) {
+            return -1;
         }
     }
 }

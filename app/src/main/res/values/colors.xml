@@ -6,5 +6,6 @@
     <color name="commentText">#FFFFFF</color>
     <color name="secondaryText">#8A000000</color>
     <color name="hintOrDisabledText">#61000000</color>
+    <color name="posterNameColor">#9FFFFFFF</color>
     <color name="unapprovedItem">#80000000</color>
 </resources>

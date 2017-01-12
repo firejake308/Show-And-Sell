@@ -184,7 +184,6 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
             } catch (NullPointerException e) {
                 Log.d(LOG_TAG, "The user didn't actually take a picture");
                 Button donateBtn = (Button) findViewById(R.id.donate_btn);
-                donateBtn.setEnabled(false);
                 imageTakenYet = false;
             }
         }
