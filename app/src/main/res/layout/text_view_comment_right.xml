@@ -10,6 +10,7 @@
         android:textColor="@color/secondaryText"
         android:paddingLeft="@dimen/text_margin"
         android:layout_alignLeft="@+id/textView_comment_right"
+        android:lines = "1"
         android:text="Poster"/>
     <TextView
         android:id="@+id/textView_comment_right"

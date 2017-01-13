@@ -3,6 +3,7 @@ package com.insertcoolnamehere.showandsell;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -42,6 +43,14 @@ public class CreateAccountActivity extends AppCompatActivity {
     private EditText passwordEntry;
     private EditText confirmPwEntry;
     private Button createAccountButton;
+
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String username;
+    private String password1;
+    private String password2;
+    private String userId;
 
     // reference to AsyncTask
     private CreateAccountTask mAuthTask;
@@ -87,12 +96,12 @@ public class CreateAccountActivity extends AppCompatActivity {
         View focusView = null;
 
         // fetch values from EditTexts
-        String firstName = firstNameEntry.getText().toString();
-        String lastName = lastNameEntry.getText().toString();
-        String email = emailEntry.getText().toString();
-        String username = usernameEntry.getText().toString();
-        String password1 = passwordEntry.getText().toString();
-        String password2 = confirmPwEntry.getText().toString();
+        firstName = firstNameEntry.getText().toString();
+        lastName = lastNameEntry.getText().toString();
+        email = emailEntry.getText().toString();
+        username = usernameEntry.getText().toString();
+        password1 = passwordEntry.getText().toString();
+        password2 = confirmPwEntry.getText().toString();
 
         // first, validate the email
         if(!email.contains("@") || !email.contains(".")) {
@@ -208,6 +217,8 @@ public class CreateAccountActivity extends AppCompatActivity {
                     Log.d(LOG_TAG, "Response Code from Cloud Server: "+responseCode);
 
                     if(responseCode == 200) {
+                        JSONObject userObj = new JSONObject(connection.getResponseMessage());
+                        userId = userObj.getString("ssUserId");
                         return true;
                     } else if(responseCode == 449) {
                         return false;
@@ -239,6 +250,17 @@ public class CreateAccountActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean success) {
             if(success) {
+                // store data for later use
+                SharedPreferences savedData = mParent.getSharedPreferences(getString(R.string.saved_data_file_key),
+                        Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = savedData.edit();
+                editor.putString(getString(R.string.prompt_username), username);
+                editor.putString(getString(R.string.prompt_password), password);
+                editor.putString(getString(R.string.prompt_first_name), firstName);
+                editor.putString(getString(R.string.prompt_last_name), lastName);
+                editor.putString(getString(R.string.userId), userId);
+                editor.apply();
+
                 // launch main activity so user can begin browsing
                 Intent intent = new Intent(mParent, MainActivity.class);
                 startActivity(intent);

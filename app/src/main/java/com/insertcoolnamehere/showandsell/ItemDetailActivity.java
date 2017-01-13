@@ -157,7 +157,7 @@ public class ItemDetailActivity extends AppCompatActivity {
         SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
         String displayName = savedData.getString(getString(R.string.prompt_first_name),"")+" "+savedData.getString(getString(R.string.prompt_last_name), "");
         String id = savedData.getString(getString(R.string.userId), "NULL");
-        mComments.add(new Message(displayName, id, messageBody));
+        mComments.add(new Message(displayName, id, messageBody, "9/99/99/9999 9:99:99 PM"));
     }
 
     /**
@@ -773,6 +773,7 @@ public class ItemDetailActivity extends AppCompatActivity {
                     SharedPreferences savedData = mParent.getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
                     String un = savedData.getString(getString(R.string.userId), "");
                     String pw = savedData.getString(getString(R.string.prompt_password), "");
+                    Log.d(LOG_TAG, "posting user: "+un);
 
                     // form a URL to connect to
                     Uri.Builder builder = new Uri.Builder();
@@ -925,14 +926,33 @@ public class ItemDetailActivity extends AppCompatActivity {
                         for (int i = 0; i < items.length(); i++) {
                             JSONObject itemJson = items.getJSONObject(i);
 
-                            Message msg = new Message(itemJson.getString("posterName"), itemJson.getString("posterId"), itemJson.getString("body"));
+                            Log.d(LOG_TAG, itemJson.toString());
+                            Message msg = new Message(itemJson.getString("posterName"), itemJson.getString("posterId"), itemJson.getString("body"), itemJson.getString("datePosted"));
                             mServerComments.add(msg);
                         }
 
-                        for (int i = 0; i < mServerComments.size()-1; i++) {
-                            for (int j = i+1; j < mServerComments.size(); i++) {
-                                if(mServerComments.get(i))
+                        Log.d(LOG_TAG, "Before");
+                        for(Message m: mServerComments) {
+                            Log.d(LOG_TAG, m.time);
+                        }
+
+                        // bubble sort comments
+                        for (int bigkey = 1; bigkey < mServerComments.size(); bigkey++) {
+                            int smallkey = bigkey;
+                            while(mServerComments.get(smallkey-1).compareTo(mServerComments.get(smallkey)) < 0) {
+                                // swap element at key with element to its left
+                                Message keyEl = mServerComments.get(smallkey);
+                                mServerComments.set(smallkey, mServerComments.get(smallkey - 1));
+                                mServerComments.set(smallkey - 1, keyEl);
+                                smallkey--;
+                                if(smallkey == 0)
+                                    break;
                             }
+                        }
+
+                        Log.d(LOG_TAG, "After");
+                        for(Message m: mServerComments) {
+                            Log.d(LOG_TAG, m.time);
                         }
 
                         return SUCCESS;
@@ -990,11 +1010,13 @@ public class ItemDetailActivity extends AppCompatActivity {
         private String userName;
         private String userId;
         private String body;
+        private String time;
 
-        Message(String userName, String userId, String body) {
+        Message(String userName, String userId, String body, String time) {
             this.userName = userName;
             this.userId = userId;
             this.body = body;
+            this.time = time;
         }
 
         public String getUserName() {
@@ -1010,7 +1032,41 @@ public class ItemDetailActivity extends AppCompatActivity {
         }
 
         public int compareTo(Message other) {
-            return -1;
+            String[] myTime = time.split("[ \\/:]");
+            String[] theirTime = other.time.split("[ \\/:]");
+            
+            int myMonth = Integer.parseInt(myTime[0]);
+            int myDay = Integer.parseInt(myTime[1]);
+            int myYear = Integer.parseInt(myTime[2]);
+            int myHour = Integer.parseInt(myTime[3]);
+            int myMinute = Integer.parseInt(myTime[4]);
+            int mySecond = Integer.parseInt(myTime[5]);
+            String myM = myTime[6];
+
+            int theirMonth = Integer.parseInt(theirTime[0]);
+            int theirDay = Integer.parseInt(theirTime[1]);
+            int theirYear = Integer.parseInt(theirTime[2]);
+            int theirHour = Integer.parseInt(theirTime[3]);
+            int theirMinute = Integer.parseInt(theirTime[4]);
+            int theirSecond = Integer.parseInt(theirTime[5]);
+            String theirM = theirTime[6];
+            
+            if(myYear != theirYear)
+                return myYear-theirYear;
+            else if(myMonth != theirMonth)
+                return myMonth-theirMonth;
+            else if(myDay != theirDay)
+                return myDay-theirDay;
+            else if (!myM.equals(theirM))
+                return myM.compareTo(theirM);
+            else if(myHour != theirHour)
+                return myHour-theirHour;
+            else if(myMinute != theirMinute)
+                return myMinute-theirMinute;
+            else if(mySecond != theirSecond)
+                return mySecond-theirSecond;
+            else
+                return 0;
         }
     }
 }
