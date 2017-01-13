@@ -58,6 +58,7 @@
 
         <Button
             android:text="@string/action_buy"
+            android:textColor="#FFFFFF"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignTop="@id/item_detail_name"
@@ -87,13 +88,13 @@
                 android:id="@+id/enter_comment"
                 android:hint="Add a comment" />
 
-            <Button
+            <ImageButton
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:id="@+id/btn_send_message"
                 android:layout_weight="1"
                 android:background="@color/colorAccent"
-                android:text="->"/>
+                android:src="@drawable/ic_send"/>
         </LinearLayout>
 
         <android.support.design.widget.FloatingActionButton

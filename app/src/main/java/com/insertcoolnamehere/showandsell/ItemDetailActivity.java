@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -119,7 +120,7 @@ public class ItemDetailActivity extends AppCompatActivity {
         }
 
         // set up post comment button
-        final Button postComment = (Button) findViewById(R.id.btn_send_message);
+        final ImageButton postComment = (ImageButton) findViewById(R.id.btn_send_message);
         final EditText commentEntry = (EditText) findViewById(R.id.enter_comment);
         postComment.setOnClickListener(new View.OnClickListener() {
             @Override

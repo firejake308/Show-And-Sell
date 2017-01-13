@@ -185,7 +185,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
             if(isBookmark())
                 adapter = new FullItemRecyclerViewAdapter(Item.bookmarkedItems, mListener);
             else
-                adapter = new SummaryItemRecyclerViewAdapter(Item.browseGroupItems, mListener);
+                adapter = new FullItemRecyclerViewAdapter(Item.browseGroupItems, mListener);
             mRecyclerView.setAdapter(adapter);
         }
         return view;

@@ -64,6 +64,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/prompt_image_upload"
+                android:textColor="#FFFFFF"
                 android:id="@+id/upload_img_btn"
                 android:background="@color/colorAccent"/>
 
@@ -71,6 +72,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/action_donate"
+                android:textColor="#FFFFFF"
                 android:id="@+id/donate_btn"
                 android:background="@color/colorAccent"
                 android:layout_marginTop="5dp"/>

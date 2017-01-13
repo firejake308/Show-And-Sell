@@ -268,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
                     return new DonateFragment();
                 case 1:
                     // browse tab
-                    return BrowseFragment.newInstance(3);
+                    return BrowseFragment.newInstance(1);
                 case 2:
                     // bookmarks tab
                     return new BookmarksFragment();
