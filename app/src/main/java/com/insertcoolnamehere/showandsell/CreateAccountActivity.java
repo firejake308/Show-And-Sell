@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.location.Geocoder;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedOutputStream;
@@ -201,6 +202,7 @@ public class CreateAccountActivity extends AppCompatActivity {
             } else {
                 HttpURLConnection connection = null;
                 BufferedWriter out = null;
+                BufferedReader reader = null;
                 try {
                     URL url = new URL(uri);
 
@@ -235,7 +237,16 @@ public class CreateAccountActivity extends AppCompatActivity {
                     Log.d(LOG_TAG, "Response Code from Cloud Server: "+responseCode);
 
                     if(responseCode == 200) {
-                        JSONObject userObj = new JSONObject(connection.getResponseMessage());
+                        // read response to get user data from server
+                        reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                        String line = "";
+                        String responseBody = "";
+                        while((line = reader.readLine()) != null) {
+                            responseBody += line + '\n';
+                        }
+
+                        JSONObject userObj = new JSONObject(responseBody);
+                        Log.d(LOG_TAG, userObj.toString());
                         userId = userObj.getString("ssUserId");
                         return true;
                     } else if(responseCode == 449) {
@@ -254,8 +265,9 @@ public class CreateAccountActivity extends AppCompatActivity {
                     if (out != null) {
                         try {
                             out.close();
+                            reader.close();
                         } catch(IOException e) {
-                            Log.e(LOG_TAG, "Couldn't close out stream", e);
+                            Log.e(LOG_TAG, "Couldn't close out or reader stream", e);
                         }
 
                     }
