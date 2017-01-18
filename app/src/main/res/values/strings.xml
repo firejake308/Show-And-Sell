@@ -26,6 +26,7 @@
     <string name="prompt_confirm_password">Confirm Password</string>
     <string name="error_password_match">Passwords must match</string>
     <string name="error_un_email_duplicate">Username or email already in use</string>
+    <string name="prompt_enter_location">Address</string>
 
     <!-- MainActivity -->
     <string name="action_logout">Logout</string>
