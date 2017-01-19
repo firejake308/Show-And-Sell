@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -27,6 +29,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 /**
  * Created by Patrick on 02/01/2017.
@@ -37,7 +40,7 @@ public class CreateGroupActivity extends AppCompatActivity {
 
     // references to UI views
     private EditText groupNameEntry;
-    private EditText locationNameEntry;
+    private EditText addressEntry;
     private EditText extraLocationDataEntry;
     private Button   createGroupButton;
 
@@ -51,7 +54,7 @@ public class CreateGroupActivity extends AppCompatActivity {
 
         // find all the views
         groupNameEntry = (EditText) findViewById(R.id.group_name_entry);
-        locationNameEntry = (EditText) findViewById(R.id.location_name_entry);
+        addressEntry = (EditText) findViewById(R.id.location_name_entry);
         extraLocationDataEntry = (EditText) findViewById(R.id.extra_location_data_entry);
         createGroupButton = (Button) findViewById(R.id.create_group_btn);
 
@@ -72,8 +75,9 @@ public class CreateGroupActivity extends AppCompatActivity {
 
         // fetch values from EditTexts
         String groupName = groupNameEntry.getText().toString();
-        String locationName = locationNameEntry.getText().toString();
+        String locationName = addressEntry.getText().toString();
         String extraLocationData = extraLocationDataEntry.getText().toString();
+        String address = "";
 
         // verify that the group name is long enough
         if(groupName.length() < 4) {
@@ -84,15 +88,15 @@ public class CreateGroupActivity extends AppCompatActivity {
         // verify that the location is long enough
         else if(locationName.length() < 4) {
             cancel = true;
-            locationNameEntry.setError("Location must be at least 4 characters");
-            focusView = locationNameEntry;
+            addressEntry.setError("Incorrect Address");
+            focusView = addressEntry;
         }
 
         if(cancel) {
             // cancel and inform user of any errors
             focusView.requestFocus();
         } else {
-            mAuthTask = new CreateGroupTask(this, groupName, locationName, extraLocationData);
+            mAuthTask = new CreateGroupTask(this, groupName, address, extraLocationData);
             mAuthTask.execute();
         }
     }
@@ -112,11 +116,11 @@ public class CreateGroupActivity extends AppCompatActivity {
         private String locationName;
         private String extraLocationData;
 
-        CreateGroupTask(Activity parent, String gn, String ln, String eld) {
+        CreateGroupTask(Activity parent, String gn, String ad, String eld) {
             this.mParent = parent;
 
             this.groupName = gn;
-            this.locationName = ln;
+            this.locationName = ad;
             this.extraLocationData = eld;
         }
 

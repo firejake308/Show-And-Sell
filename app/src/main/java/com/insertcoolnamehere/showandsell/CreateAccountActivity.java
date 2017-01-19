@@ -19,7 +19,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.location.Geocoder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -56,9 +55,6 @@ public class CreateAccountActivity extends AppCompatActivity {
     private String password1;
     private String password2;
     private String userId;
-    private String location;
-
-    private Geocoder coder;
 
     // reference to AsyncTask
     private CreateAccountTask mAuthTask;
@@ -75,7 +71,6 @@ public class CreateAccountActivity extends AppCompatActivity {
         usernameEntry = (EditText) findViewById(R.id.username_entry);
         passwordEntry = (EditText) findViewById(R.id.password_entry);
         confirmPwEntry = (EditText) findViewById(R.id.confirm_password);
-        locationEntry = (EditText) findViewById(R.id.enter_location);
         createAccountButton = (Button) findViewById(R.id.create_account_btn);
 
         // hook up action listeners
@@ -104,8 +99,6 @@ public class CreateAccountActivity extends AppCompatActivity {
         boolean cancel = false;
         View focusView = null;
 
-        coder = new Geocoder(this);
-
         // fetch values from EditTexts
         firstName = firstNameEntry.getText().toString();
         lastName = lastNameEntry.getText().toString();
@@ -113,12 +106,6 @@ public class CreateAccountActivity extends AppCompatActivity {
         username = usernameEntry.getText().toString();
         password1 = passwordEntry.getText().toString();
         password2 = confirmPwEntry.getText().toString();
-        location = locationEntry.getText().toString();
-
-        try {
-            List<Address> address = coder.getFromLocationName(location, 1);
-            location = address.get(0).getLatitude() + "^" + address.get(0).getLongitude();
-        } catch(Exception e) {return;}
 
         // first, validate the email
         if(!email.contains("@") || !email.contains(".")) {
@@ -151,7 +138,7 @@ public class CreateAccountActivity extends AppCompatActivity {
             // cancel and inform user of any errors
             focusView.requestFocus();
         } else {
-            mAuthTask = new CreateAccountTask(this, firstName, lastName, email, username, password1, location);
+            mAuthTask = new CreateAccountTask(this, firstName, lastName, email, username, password1);
             mAuthTask.execute();
         }
     }
@@ -167,9 +154,8 @@ public class CreateAccountActivity extends AppCompatActivity {
         private String email;
         private String username;
         private String password;
-        private String location;
 
-        CreateAccountTask(Activity parent, String fn, String ln, String email, String un, String pw, String loc) {
+        CreateAccountTask(Activity parent, String fn, String ln, String email, String un, String pw) {
             this.mParent = parent;
 
             this.firstName = fn;
@@ -177,7 +163,6 @@ public class CreateAccountActivity extends AppCompatActivity {
             this.email = email;
             this.username = un;
             this.password = pw;
-            this.location = loc;
         }
 
         protected Boolean doInBackground(Void... Params) {
