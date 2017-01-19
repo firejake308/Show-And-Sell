@@ -431,8 +431,8 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
         protected void onPostExecute(Boolean result) {
             // update text of button
             Button takePicBtn = (Button) findViewById(R.id.upload_img_btn);
-            takePicBtn.setText(getString(R.string.prompt_image_upload));
+            if (takePicBtn != null)
+                takePicBtn.setText(getString(R.string.prompt_image_upload));
         }
     }
 }
-

@@ -28,7 +28,7 @@
                 android:singleLine="true"/>
 
             <EditText
-                android:id="@+id/enter_location"
+                android:id="@+id/location_name_entry"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/prompt_enter_location"

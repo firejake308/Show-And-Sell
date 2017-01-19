@@ -11,7 +11,8 @@
     <string name="action_sign_up">Create Account</string>
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">Username or password is incorrect</string>
+    <string name="error_incorrect_username">No such user exists</string>
+    <string name="error_incorrect_password">Password is incorrect</string>
     <string name="error_field_required">This field is required</string>
     <string name="title_activity_item_detail">ItemDetailActivity</string>
     <string name="action_settings">Settings</string>
@@ -152,7 +153,7 @@
 
     <!-- CreateGroupActivity -->
     <string name="prompt_group_name">Group Name</string>
-    <string name="prompt_enter_location">Address</string>
+    <string name="prompt_enter_location">Pickup Address</string>
     <string name="prompt_extra_location_data">Extra Location Information</string>
     <string name="prompt_group_password">Account Password</string>
     <string name="error_un_group_name_duplicate">Group name already in use</string>

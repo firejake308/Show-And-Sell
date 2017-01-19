@@ -213,7 +213,8 @@ public class LoginActivity extends AppCompatActivity {
         private final int SUCCESS = 0;
         private final int NO_INTERNET = 1;
         private final int BAD_PASSWORD = 2;
-        private final int OTHER_FAILURE = 3;
+        private final int BAD_USERNAME = 3;
+        private final int OTHER_FAILURE = 4;
 
         private final Activity mParent;
         private final String mUsername;
@@ -293,6 +294,8 @@ public class LoginActivity extends AppCompatActivity {
                         return SUCCESS;
                     } else if (responseCode == 401) {
                         return BAD_PASSWORD;
+                    } else if (responseCode == 404) {
+                        return BAD_USERNAME;
                     } else {
                         return OTHER_FAILURE;
                     }
@@ -347,6 +350,9 @@ public class LoginActivity extends AppCompatActivity {
             } else if (success == BAD_PASSWORD){
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
+            } else if (success == BAD_USERNAME) {
+                mUsernameView.setError(getString(R.string.error_incorrect_username));
+                mUsernameView.requestFocus();
             } else if (success == OTHER_FAILURE) {
                 Toast.makeText(mParent, "Strange things did happen in the UserLoginTask", Toast.LENGTH_SHORT).show();
             }
