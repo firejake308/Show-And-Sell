@@ -89,6 +89,9 @@ public class ManageGroupActivity extends AppCompatActivity implements SwipeRefre
                 // show progress spinner
                 showProgress(true);
 
+                // clear managed group items
+                Item.clearManagedItems();
+
                 // fetch all items in the group that this user owns
                 mFetchItemsTask = new FetchItemsTask(this).execute();
             }

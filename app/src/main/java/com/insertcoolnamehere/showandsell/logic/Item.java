@@ -76,6 +76,10 @@ public class Item implements Serializable {
         bookmarkedItems.clear();
     }
 
+    public static void clearManagedItems() {
+        managedGroupItems.clear();
+    }
+
     private String name;
     private String description;
     private int number;
@@ -100,16 +104,8 @@ public class Item implements Serializable {
             // don't add this item to browse feed unless and until it is approved
         } else if(itemType == MANAGE) {
             // update managedGroupItems with new item
-            if (managedGroupItems.contains(this)) {
-                // remove old and insert new
-                int i = managedGroupItems.indexOf(this);
-                Log.d("Item", "Old item#" + i + " was " + managedGroupItems.get(i).isApproved());
-                managedGroupItems.remove(i);
-                managedGroupItems.add(i, this);
-            } else {
-                Log.d("Item", "new item going in");
-                managedGroupItems.add(this);
-            }
+            Log.d("Item", "new item going into manage group items");
+            managedGroupItems.add(this);
         }
     }
 
