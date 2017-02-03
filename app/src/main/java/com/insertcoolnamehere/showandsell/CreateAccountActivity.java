@@ -51,7 +51,6 @@ public class CreateAccountActivity extends AppCompatActivity {
     private String firstName;
     private String lastName;
     private String email;
-    private String username;
     private String password1;
     private String password2;
     private String userId;
@@ -68,7 +67,6 @@ public class CreateAccountActivity extends AppCompatActivity {
         firstNameEntry = (EditText) findViewById(R.id.first_name_entry);
         lastNameEntry = (EditText) findViewById(R.id.last_name_entry);
         emailEntry = (EditText) findViewById(R.id.email_entry);
-        usernameEntry = (EditText) findViewById(R.id.username_entry);
         passwordEntry = (EditText) findViewById(R.id.password_entry);
         confirmPwEntry = (EditText) findViewById(R.id.confirm_password);
         createAccountButton = (Button) findViewById(R.id.create_account_btn);
@@ -103,7 +101,6 @@ public class CreateAccountActivity extends AppCompatActivity {
         firstName = firstNameEntry.getText().toString();
         lastName = lastNameEntry.getText().toString();
         email = emailEntry.getText().toString();
-        username = usernameEntry.getText().toString();
         password1 = passwordEntry.getText().toString();
         password2 = confirmPwEntry.getText().toString();
 
@@ -112,12 +109,6 @@ public class CreateAccountActivity extends AppCompatActivity {
             cancel = true;
             emailEntry.setError("Invalid email");
             focusView = emailEntry;
-        }
-        // verify that the username is long enough
-        else if(username.length() < 4) {
-            cancel = true;
-            usernameEntry.setError("Username must be at least 4 characters");
-            focusView = usernameEntry;
         }
         // verify that the password is long enough
         else if(password1.length() < 4) {
@@ -138,7 +129,7 @@ public class CreateAccountActivity extends AppCompatActivity {
             // cancel and inform user of any errors
             focusView.requestFocus();
         } else {
-            mAuthTask = new CreateAccountTask(this, firstName, lastName, email, username, password1);
+            mAuthTask = new CreateAccountTask(this, firstName, lastName, email, password1);
             mAuthTask.execute();
         }
     }
@@ -152,16 +143,14 @@ public class CreateAccountActivity extends AppCompatActivity {
         private String firstName;
         private String lastName;
         private String email;
-        private String username;
         private String password;
 
-        CreateAccountTask(Activity parent, String fn, String ln, String email, String un, String pw) {
+        CreateAccountTask(Activity parent, String fn, String ln, String email, String pw) {
             this.mParent = parent;
 
             this.firstName = fn;
             this.lastName = ln;
             this.email = email;
-            this.username = un;
             this.password = pw;
         }
 
@@ -204,7 +193,6 @@ public class CreateAccountActivity extends AppCompatActivity {
                     // format user input as JSON
                     String body = "";
                     JSONObject user = new JSONObject();
-                    user.put("username", username);
                     user.put("password", password);
                     user.put("firstName", firstName);
                     user.put("lastName", lastName);
@@ -251,7 +239,7 @@ public class CreateAccountActivity extends AppCompatActivity {
                         try {
                             out.close();
                             reader.close();
-                        } catch(IOException e) {
+                        } catch(Exception e) {
                             Log.e(LOG_TAG, "Couldn't close out or reader stream", e);
                         }
 
@@ -269,7 +257,7 @@ public class CreateAccountActivity extends AppCompatActivity {
                 SharedPreferences savedData = mParent.getSharedPreferences(getString(R.string.saved_data_file_key),
                         Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = savedData.edit();
-                editor.putString(getString(R.string.prompt_username), username);
+                editor.putString(getString(R.string.prompt_email), email);
                 editor.putString(getString(R.string.prompt_password), password);
                 editor.putString(getString(R.string.prompt_first_name), firstName);
                 editor.putString(getString(R.string.prompt_last_name), lastName);

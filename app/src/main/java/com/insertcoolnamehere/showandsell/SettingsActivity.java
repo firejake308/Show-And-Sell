@@ -102,7 +102,7 @@ public class SettingsActivity extends AppCompatActivity {
         SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key),
                 Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = savedData.edit();
-        editor.remove(getString(R.string.prompt_username));
+        editor.remove(getString(R.string.prompt_email));
         editor.remove(getString(R.string.prompt_password));
         editor.remove(getString(R.string.prompt_first_name));
         editor.remove(getString(R.string.prompt_last_name));

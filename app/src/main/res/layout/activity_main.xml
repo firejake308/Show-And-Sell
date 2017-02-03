@@ -38,4 +38,15 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        app:srcCompat="@android:drawable/ic_input_add"
+        android:id="@+id/openDonateBtn"
+        app:layout_anchorGravity="bottom|right"
+        app:layout_anchor="@id/container"
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="16dp"/>
+
 </android.support.design.widget.CoordinatorLayout>

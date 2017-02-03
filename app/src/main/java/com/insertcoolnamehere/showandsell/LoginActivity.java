@@ -22,19 +22,16 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -64,7 +61,7 @@ public class LoginActivity extends AppCompatActivity {
         // if user is already logged in, go straight to main activity
         SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key),
                 Context.MODE_PRIVATE);
-        if(savedData.contains(getString(R.string.prompt_username))) {
+        if(savedData.contains(getString(R.string.prompt_email))) {
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
             finish();
@@ -72,7 +69,7 @@ public class LoginActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_login);
         // Set up the login form.
-        mUsernameView = (EditText) findViewById(R.id.username);
+        mUsernameView = (EditText) findViewById(R.id.email);
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -213,19 +210,19 @@ public class LoginActivity extends AppCompatActivity {
         private final int SUCCESS = 0;
         private final int NO_INTERNET = 1;
         private final int BAD_PASSWORD = 2;
-        private final int BAD_USERNAME = 3;
+        private final int BAD_EMAIL = 3;
         private final int OTHER_FAILURE = 4;
 
         private final Activity mParent;
-        private final String mUsername;
+        private final String mEmail;
         private final String mPassword;
         private String firstName;
         private String lastName;
         private String userId;
 
-        UserLoginTask(Activity parent, String username, String password) {
+        UserLoginTask(Activity parent, String email, String password) {
             mParent = parent;
-            mUsername = username;
+            mEmail = email;
             mPassword = password;
         }
 
@@ -261,8 +258,8 @@ public class LoginActivity extends AppCompatActivity {
                             .appendPath("showandsell")
                             .appendPath("api")
                             .appendPath("users")
-                            .appendPath("userbyusername")
-                            .appendQueryParameter("username", mUsername)
+                            .appendPath("userbyemail")
+                            .appendQueryParameter("email", mEmail)
                             .appendQueryParameter("password", mPassword)
                             .build();
                     URL url = new URL(builder.toString());
@@ -295,7 +292,7 @@ public class LoginActivity extends AppCompatActivity {
                     } else if (responseCode == 401) {
                         return BAD_PASSWORD;
                     } else if (responseCode == 404) {
-                        return BAD_USERNAME;
+                        return BAD_EMAIL;
                     } else {
                         return OTHER_FAILURE;
                     }
@@ -332,7 +329,7 @@ public class LoginActivity extends AppCompatActivity {
                 SharedPreferences savedData = mParent.getSharedPreferences(getString(R.string.saved_data_file_key),
                         Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = savedData.edit();
-                editor.putString(getString(R.string.prompt_username), mUsername);
+                editor.putString(getString(R.string.prompt_email), mEmail);
                 editor.putString(getString(R.string.prompt_password), mPassword);
                 editor.putString(getString(R.string.prompt_first_name), firstName);
                 editor.putString(getString(R.string.prompt_last_name), lastName);
@@ -350,7 +347,7 @@ public class LoginActivity extends AppCompatActivity {
             } else if (success == BAD_PASSWORD){
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
-            } else if (success == BAD_USERNAME) {
+            } else if (success == BAD_EMAIL) {
                 mUsernameView.setError(getString(R.string.error_incorrect_username));
                 mUsernameView.requestFocus();
             } else if (success == OTHER_FAILURE) {
