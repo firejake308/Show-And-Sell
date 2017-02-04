@@ -42,10 +42,8 @@ public class CreateAccountActivity extends AppCompatActivity {
     private EditText firstNameEntry;
     private EditText lastNameEntry;
     private EditText emailEntry;
-    private EditText usernameEntry;
     private EditText passwordEntry;
     private EditText confirmPwEntry;
-    private EditText locationEntry;
     private Button createAccountButton;
 
     private String firstName;
@@ -268,9 +266,9 @@ public class CreateAccountActivity extends AppCompatActivity {
                 Intent intent = new Intent(mParent, MainActivity.class);
                 startActivity(intent);
             } else {
-                // alert user that they had a duplicate username or email
-                usernameEntry.setError(getString(R.string.error_un_email_duplicate));
-                usernameEntry.requestFocus();
+                // alert user that they had a duplicate email
+                emailEntry.setError(getString(R.string.error_email_duplicate));
+                emailEntry.requestFocus();
             }
         }
     }

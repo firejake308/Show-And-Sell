@@ -98,7 +98,7 @@ public class SettingsActivity extends AppCompatActivity {
     * Log out the current user and return to the login screen
     */
     private void logout() {
-        // erase username from saved data
+        // erase this user's data from saved data
         SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key),
                 Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = savedData.edit();

@@ -9,8 +9,8 @@
     <string name="action_sign_in_short">Login</string>
     <string name="action_sign_up">Create Account</string>
     <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_username">No such user exists</string>
+    <string name="error_invalid_password">Must be 4+ characters</string>
+    <string name="error_incorrect_email">No such user exists</string>
     <string name="error_incorrect_password">Password is incorrect</string>
     <string name="error_field_required">This field is required</string>
     <string name="title_activity_item_detail">ItemDetailActivity</string>
@@ -25,7 +25,7 @@
     <string name="prompt_email">Email</string>
     <string name="prompt_confirm_password">Confirm Password</string>
     <string name="error_password_match">Passwords must match</string>
-    <string name="error_un_email_duplicate">Username or email already in use</string>
+    <string name="error_email_duplicate">Email already in use</string>
 
     <!-- MainActivity -->
     <string name="action_logout">Logout</string>

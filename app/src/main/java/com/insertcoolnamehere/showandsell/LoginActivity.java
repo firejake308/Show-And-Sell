@@ -49,7 +49,7 @@ public class LoginActivity extends AppCompatActivity {
     private UserLoginTask mAuthTask = null;
 
     // UI references.
-    private EditText mUsernameView;
+    private EditText mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
@@ -69,7 +69,7 @@ public class LoginActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_login);
         // Set up the login form.
-        mUsernameView = (EditText) findViewById(R.id.email);
+        mEmailView = (EditText) findViewById(R.id.email);
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -116,20 +116,20 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         // Reset errors.
-        mUsernameView.setError(null);
+        mEmailView.setError(null);
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String username = mUsernameView.getText().toString();
+        String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
 
-        // Check for a valid username.
-        if (TextUtils.isEmpty(username)) {
-            mUsernameView.setError(getString(R.string.error_field_required));
-            focusView = mUsernameView;
+        // Check for a valid email
+        if (TextUtils.isEmpty(email)) {
+            mEmailView.setError(getString(R.string.error_field_required));
+            focusView = mEmailView;
             cancel = true;
         }
 
@@ -155,7 +155,7 @@ public class LoginActivity extends AppCompatActivity {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(this, username, password);
+            mAuthTask = new UserLoginTask(this, email, password);
             mAuthTask.execute((Void) null);
         }
     }
@@ -337,7 +337,7 @@ public class LoginActivity extends AppCompatActivity {
                 editor.apply();
 
                 // clear text boxes so they're empty when user logs out
-                mUsernameView.setText("");
+                mEmailView.setText("");
                 mPasswordView.setText("");
 
                 // launch main activity so user can begin browsing
@@ -348,8 +348,8 @@ public class LoginActivity extends AppCompatActivity {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
             } else if (success == BAD_EMAIL) {
-                mUsernameView.setError(getString(R.string.error_incorrect_username));
-                mUsernameView.requestFocus();
+                mEmailView.setError(getString(R.string.error_incorrect_email));
+                mEmailView.requestFocus();
             } else if (success == OTHER_FAILURE) {
                 Toast.makeText(mParent, "Strange things did happen in the UserLoginTask", Toast.LENGTH_SHORT).show();
             }

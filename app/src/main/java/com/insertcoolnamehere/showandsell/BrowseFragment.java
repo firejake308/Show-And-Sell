@@ -386,22 +386,13 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
         protected void onPostExecute(Integer result) {
             if(result == SUCCESS) {
                 adapter.notifyDataSetChanged();
-                showProgress(false);
-
-                // old debug code
-                /*for(Item item: Item.browseGroupItems) {
-                    Log.d(LOG_TAG, item.toString()+item.isApproved());
-                }
-                */
-                mFetchItemsTask = null;
-            } else if (result == NO_ITEMS) {
-                showProgress(false);
-                mFetchItemsTask = null;
             } else if (result == OTHER_FAILURE){
                 Log.e(LOG_TAG, "It appears that the task failed :(");
-                showProgress(false);
-                mFetchItemsTask = null;
             }
+
+            // no matter what happens, show user that we're done trying here
+            showProgress(false);
+            mFetchItemsTask = null;
         }
     }
 }

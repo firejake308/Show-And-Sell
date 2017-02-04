@@ -224,7 +224,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                 Intent intent = new Intent(mParent, MainActivity.class);
                 startActivity(intent);
             } else if (result == GROUP_NAME_TAKEN){
-                // alert user that they had a duplicate username or email
+                // alert user that they had a duplicate email
                 groupNameEntry.setError(getString(R.string.error_un_group_name_duplicate));
                 groupNameEntry.requestFocus();
             } else if (result == OTHER_FAILURE) {
