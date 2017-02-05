@@ -65,7 +65,8 @@
 
         <activity
             android:name=".ManageGroupActivity"
-            android:parentActivityName=".SettingsActivity"/>
+            android:parentActivityName=".SettingsActivity" />
+        <activity android:name=".DonateActivity"></activity>
     </application>
 
 </manifest>

@@ -185,7 +185,7 @@ public class ItemDetailActivity extends AppCompatActivity {
 
     /**
      * Serves as the bridge between the comment data and the comment list view
-     * @param <T>
+     * @param <T> Message or a subclass of it
      */
     private class CommentAdapter<T extends Message> extends ArrayAdapter{
         /**

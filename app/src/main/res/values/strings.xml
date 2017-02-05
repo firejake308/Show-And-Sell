@@ -43,6 +43,11 @@
     <string name="prompt_image_upload">Take a Picture</string>
     <string name="prompt_picture_taken">Picture Taken!</string>
     <string name="action_donate">Donate</string>
+    <string name="step_take_pic_label"><b>Show</b> me what you want to sell</string>
+    <string name="step_title_label">What is this?</string>
+    <string name="step_details_label"><b>Tell</b> me more</string>
+    <string name="step_price_label">How much is it worth?</string>
+    <string name="step_condition_label">Is it new or used?</string>
 
     <!-- Item detail -->
     <string name="item_description">Description</string>
