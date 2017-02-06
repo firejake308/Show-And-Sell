@@ -29,18 +29,6 @@ public class DonateActivity extends AppCompatActivity {
         mListView = (ListView) findViewById(R.id.steps_listview);
         BaseAdapter adapter = new StepAdapter();
         mListView.setAdapter(adapter);
-        mListView.setRecyclerListener(new AbsListView.RecyclerListener() {
-            @Override
-            public void onMovedToScrapHeap(View view) {
-                if (view.hasFocus()) {
-                    view.clearFocus();
-                    if ( view instanceof EditText) {
-                        InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                    }
-                }
-            }
-        });
     }
 
     private class StepAdapter extends BaseAdapter {
@@ -99,11 +87,13 @@ public class DonateActivity extends AppCompatActivity {
 
             // activate button for active step
             if(getItemViewType(position) == STEP_ACTIVE) {
-                Button nextStepBtn = (Button) finalProduct.findViewById(R.id.btn_next_step);
+                final Button nextStepBtn = (Button) finalProduct.findViewById(R.id.btn_next_step);
                 nextStepBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         mCurrentStep++;
+                        View editText = findViewById(R.id.step_text_entry);
+                        editText.getParent().clearChildFocus(editText);
                         mListView.invalidateViews();
                     }
                 });
