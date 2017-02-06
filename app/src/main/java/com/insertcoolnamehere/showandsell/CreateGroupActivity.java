@@ -75,9 +75,8 @@ public class CreateGroupActivity extends AppCompatActivity {
 
         // fetch values from EditTexts
         String groupName = groupNameEntry.getText().toString();
-        String locationName = addressEntry.getText().toString();
+        String address = addressEntry.getText().toString();
         String extraLocationData = extraLocationDataEntry.getText().toString();
-        String address = "";
 
         // verify that the group name is long enough
         if(groupName.length() < 4) {
@@ -86,7 +85,7 @@ public class CreateGroupActivity extends AppCompatActivity {
             focusView = groupNameEntry;
         }
         // verify that the location is long enough
-        else if(locationName.length() < 4) {
+        else if(address.length() < 4) {
             cancel = true;
             addressEntry.setError("Incorrect Address");
             focusView = addressEntry;
@@ -176,6 +175,7 @@ public class CreateGroupActivity extends AppCompatActivity {
                     groupData.put("group", group);
                     groupData.put("password", password);
                     body = String.valueOf(groupData);
+                    Log.d(LOG_TAG, body);
 
                     // send JSON to Cloud Server
                     out = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream(), "UTF-8"));

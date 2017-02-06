@@ -31,21 +31,20 @@
         android:id="@+id/primary_step_label" />
 
     <View
-        android:layout_width="24dp"
-        android:layout_height="3dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="1dp"
+        android:layout_height="152dp"
+        android:layout_marginStart="12dp"
         android:layout_alignStart="@+id/step_number_view"
         android:layout_below="@+id/step_number_view"
         android:id="@+id/step_connector"
-        android:background="@drawable/connector_line"
-        android:rotation="90"/>
+        android:background="@color/hintOrDisabledText"/>
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/primary_step_label"
-        android:layout_below="@+id/primary_step_label">
+        android:layout_below="@+id/primary_step_label"
+        android:id="@+id/textInputLayout">
         <android.support.design.widget.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -56,5 +55,17 @@
             android:maxLength="20"
             android:inputType="textAutoCorrect" />
     </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:text="@string/next_step_btn_label"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_below="@+id/textInputLayout"
+        android:layout_alignStart="@+id/textInputLayout"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="48dp"
+        android:textColor="#FFFFFF"
+        android:id="@+id/btn_next_step"
+        android:background="@color/colorPrimary" />
 
 </RelativeLayout>

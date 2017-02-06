@@ -48,6 +48,7 @@
     <string name="step_details_label"><b>Tell</b> me more</string>
     <string name="step_price_label">How much is it worth?</string>
     <string name="step_condition_label">Is it new or used?</string>
+    <string name="next_step_btn_label">Continue</string>
 
     <!-- Item detail -->
     <string name="item_description">Description</string>

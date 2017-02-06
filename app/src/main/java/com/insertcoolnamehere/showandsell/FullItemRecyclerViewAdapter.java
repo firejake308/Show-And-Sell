@@ -25,7 +25,7 @@ public class FullItemRecyclerViewAdapter extends RecyclerView.Adapter<FullItemRe
 
     private ViewGroup mParent;
 
-    public FullItemRecyclerViewAdapter(List<Item> items, OnListFragmentInteractionListener listener) {
+    FullItemRecyclerViewAdapter(List<Item> items, OnListFragmentInteractionListener listener) {
         mItems = items;
         mListener = listener;
     }
