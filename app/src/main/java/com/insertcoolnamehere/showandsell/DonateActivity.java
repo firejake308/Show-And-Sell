@@ -3,12 +3,15 @@ package com.insertcoolnamehere.showandsell;
 import android.content.Context;
 import android.content.res.XmlResourceParser;
 import android.database.DataSetObserver;
+import android.graphics.Color;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -95,8 +98,9 @@ public class DonateActivity extends AppCompatActivity {
                     break;
             }
 
-            // activate button for active step
+            // configure active step
             if(getItemViewType(position) == STEP_ACTIVE) {
+                // activate button
                 final Button nextStepBtn = (Button) finalProduct.findViewById(R.id.btn_next_step);
                 nextStepBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -109,6 +113,30 @@ public class DonateActivity extends AppCompatActivity {
                     }
                 });
 
+                // change text to finished for last step
+                if (position == STEP_COUNT -1 ) {
+                    nextStepBtn.setText(getString(R.string.action_donate));
+                } else {
+                    nextStepBtn.setText(getString(R.string.next_step_btn_label));
+                }
+
+                // configure previous step button
+                final Button prevStepBtn = (Button) finalProduct.findViewById(R.id.prev_step_btn);
+                prevStepBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mCurrentStep--;
+                        View editText = findViewById(R.id.item_description_entry);
+                        if (editText != null)
+                            editText.getParent().clearChildFocus(editText);
+                        mListView.invalidateViews();
+                    }
+                });
+
+                // hide previous step button for first step
+                if (mCurrentStep == 0)
+                    prevStepBtn.setVisibility(View.GONE);
+
                 // configure input view
                 LinearLayout flex = (LinearLayout) finalProduct.findViewById(R.id.step_input_parent);
                 switch(mCurrentStep) {
@@ -118,15 +146,17 @@ public class DonateActivity extends AppCompatActivity {
 
                         // create the explanatory textview
                         TextView instructions = new TextView(getApplicationContext());
-                        instructions.setText(R.string.prompt_confirm_password);
+                        instructions.setText(R.string.prompt_image_upload);
                         instructions.setTextColor(getColor(R.color.hintOrDisabledText));
 
                         flex.addView(instructions);
                         flex.addView(uploadImg);
 
-                        // TODO update connector length
-                        //View connector = finalProduct.findViewById(R.id.step_connector);
-                        //connector.setMinimumHeight(184);
+                        // update connector length
+                        View connector = finalProduct.findViewById(R.id.step_connector);
+                        ViewGroup.LayoutParams params = connector.getLayoutParams();
+                        params.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 190, getResources().getDisplayMetrics());
+                        connector.setLayoutParams(params);
                         break;
                     case 1:
                         // inflate EditText for title entry
@@ -148,6 +178,18 @@ public class DonateActivity extends AppCompatActivity {
                                 R.array.possible_conditions, android.R.layout.simple_spinner_item);
                         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         conditionEntry.setAdapter(adapter);
+                        conditionEntry.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                TextView display = (TextView) parent.getChildAt(0);
+                                display.setTextColor(Color.BLACK);
+                            }
+
+                            @Override
+                            public void onNothingSelected(AdapterView<?> parent) {
+
+                            }
+                        });
                         flex.addView(conditionCustom);
                         break;
                 }

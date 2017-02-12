@@ -32,7 +32,7 @@
 
     <View
         android:layout_width="1dp"
-        android:layout_height="152dp"
+        android:layout_height="172dp"
         android:layout_marginStart="12dp"
         android:layout_alignStart="@+id/step_number_view"
         android:layout_below="@+id/step_number_view"
@@ -46,15 +46,7 @@
         android:layout_below="@+id/primary_step_label"
         android:id="@+id/step_input_parent"
         android:orientation="vertical">
-        <!--android.support.design.widget.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/step_text_entry"
-            android:hint="@string/prompt_item_description"
-            android:enabled="true"
-            android:maxLines="1"
-            android:maxLength="20"
-            android:inputType="textAutoCorrect" /-->
+        <!-- Step input content will be added here at run time -->
     </LinearLayout>
 
     <Button
@@ -68,5 +60,16 @@
         android:textColor="#FFFFFF"
         android:id="@+id/btn_next_step"
         android:background="@color/colorPrimary" />
+
+    <Button
+        android:text="@string/prev_step_btn_label"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:id="@+id/prev_step_btn"
+        android:layout_alignBaseline="@+id/btn_next_step"
+        android:layout_alignBottom="@+id/btn_next_step"
+        android:layout_toEndOf="@+id/btn_next_step"
+        android:layout_marginStart="8dp"
+        style="?attr/borderlessButtonStyle"/>
 
 </RelativeLayout>
