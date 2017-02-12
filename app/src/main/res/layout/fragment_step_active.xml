@@ -39,13 +39,14 @@
         android:id="@+id/step_connector"
         android:background="@color/hintOrDisabledText"/>
 
-    <android.support.design.widget.TextInputLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/primary_step_label"
         android:layout_below="@+id/primary_step_label"
-        android:id="@+id/textInputLayout">
-        <android.support.design.widget.TextInputEditText
+        android:id="@+id/step_input_parent"
+        android:orientation="vertical">
+        <!--android.support.design.widget.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/step_text_entry"
@@ -53,15 +54,15 @@
             android:enabled="true"
             android:maxLines="1"
             android:maxLength="20"
-            android:inputType="textAutoCorrect" />
-    </android.support.design.widget.TextInputLayout>
+            android:inputType="textAutoCorrect" /-->
+    </LinearLayout>
 
     <Button
         android:text="@string/next_step_btn_label"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
-        android:layout_below="@+id/textInputLayout"
-        android:layout_alignStart="@+id/textInputLayout"
+        android:layout_below="@+id/step_input_parent"
+        android:layout_alignStart="@+id/step_input_parent"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="48dp"
         android:textColor="#FFFFFF"

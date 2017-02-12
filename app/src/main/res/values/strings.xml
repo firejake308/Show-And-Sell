@@ -40,7 +40,9 @@
         <item>Used</item>
         <item>New</item>
     </string-array>
-    <string name="prompt_image_upload">Take a Picture</string>
+    <string name="condition_new">New</string>
+    <string name="condition_used">Used</string>
+    <string name="prompt_image_upload">Tap the icon to take a picture</string>
     <string name="prompt_picture_taken">Picture Taken!</string>
     <string name="action_donate">Donate</string>
     <string name="step_take_pic_label"><b>Show</b> me what you want to sell</string>
