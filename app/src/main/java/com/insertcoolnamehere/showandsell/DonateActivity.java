@@ -1,9 +1,22 @@
 package com.insertcoolnamehere.showandsell;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.XmlResourceParser;
 import android.database.DataSetObserver;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.Image;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +24,8 @@ import android.support.v7.widget.GridLayoutManager;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Base64;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,10 +44,37 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class DonateActivity extends AppCompatActivity {
 
+    private static final int REQUEST_TAKE_PHOTO = 13;
+    private static final String LOG_TAG = DonateActivity.class.getSimpleName();
+
     private ListView mListView;
+    private StepAdapter mAdapter;
+
+    private String mDescription;
+    private String mDetails;
+    private String mPrice;
+    private String mCondition;
+    private Bitmap mImage;
+
+    private String mCurrentPhotoPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +82,103 @@ public class DonateActivity extends AppCompatActivity {
         setContentView(R.layout.activity_donate);
 
         mListView = (ListView) findViewById(R.id.steps_listview);
-        BaseAdapter adapter = new StepAdapter();
-        mListView.setAdapter(adapter);
+        mAdapter = new StepAdapter();
+        mListView.setAdapter(mAdapter);
+    }
+
+    private void donate() {
+        // make sure the user has actually given us all the fields we asked for
+        if(mDescription.length() == 0) {
+            mAdapter.openItem(1);
+            EditText descriptionEntry = (EditText) findViewById(R.id.item_description_entry);
+            descriptionEntry.setError("Please enter a description");
+            return;
+        } else if(mDetails.length() == 0) {
+            mAdapter.openItem(2);
+            EditText detailsEntry = (EditText) findViewById(R.id.item_details_entry);
+            detailsEntry.setError("Please provide details");
+            return;
+        } else if(mPrice.length() == 0) {
+            mAdapter.openItem(3);
+            EditText priceEntry = (EditText) findViewById(R.id.item_price_entry);
+            priceEntry.setError("Please enter a price");
+            return;
+        } else if(mImage == null) {
+            mAdapter.openItem(0);
+            Toast.makeText(this, "Please provide a picture", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Log.d(LOG_TAG, "Making progress");
+        new UploadItemTask(this, mDescription, mPrice, mCondition, mDetails, mImage).execute();
+    }
+
+    private void attemptTakePic() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // make sure that a camera exists to catch this intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // create file to hold image
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Failed to create image file", e);
+            }
+
+            // continue if file creation was successful
+            if (photoFile != null) {
+                Uri photoUri = FileProvider.getUriForFile(this, "com.insertcoolnamehere.android.fileprovider", photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_TAKE_PHOTO) {
+            // Get the dimensions of the View
+            ImageView mImageView = (ImageView) findViewById(R.id.upload_img_btn);
+            int targetW = mImageView.getWidth();
+            int targetH = mImageView.getHeight();
+
+            // Get the dimensions of the bitmap
+            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+            bmOptions.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+            int photoW = bmOptions.outWidth;
+            int photoH = bmOptions.outHeight;
+
+            // Determine how much to scale down the image
+            int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+
+            // Decode the image file into a Bitmap sized to fill the View
+            bmOptions.inJustDecodeBounds = false;
+            bmOptions.inSampleSize = scaleFactor;
+            bmOptions.inPurgeable = true;
+
+            Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+            mImageView.setImageBitmap(bitmap);
+
+            bmOptions.inSampleSize = 1;
+            mImage = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        }
+    }
+
+    /**
+     * Helper method that creates an image file where we can write full-size camera images
+     * @return file where JPEG image will be stored
+     * @throws IOException
+     */
+    private File createImageFile() throws IOException {
+        String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+        String filename = "SANDS_ITEM_"+timestamp;
+        //File storageDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        File storageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        Log.d(LOG_TAG, storageDirectory.getAbsolutePath());
+        File imgFile = File.createTempFile(filename, ".jpg", storageDirectory);
+        mCurrentPhotoPath = imgFile.getAbsolutePath();
+        return  imgFile;
     }
 
     private class StepAdapter extends BaseAdapter {
@@ -79,6 +216,13 @@ public class DonateActivity extends AppCompatActivity {
             TextView stepNumberView = (TextView) finalProduct.findViewById(R.id.step_number_view);
             stepNumberView.setText(""+(position+1));
 
+            if (position < mCurrentStep) {
+                // highlight comleted steps green
+                View stepCircle = finalProduct.findViewById(R.id.step_number_view);
+                ImageView stepCircleNew = (ImageView) finalProduct.findViewById(R.id.step_completed_view);
+                stepCircleNew.setVisibility(View.VISIBLE);
+            }
+
             TextView stepLabel = (TextView) finalProduct.findViewById(R.id.primary_step_label);
             switch(position) {
                 case 0:
@@ -105,10 +249,19 @@ public class DonateActivity extends AppCompatActivity {
                 nextStepBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mCurrentStep++;
-                        View editText = findViewById(R.id.item_description_entry);
-                        if (editText != null)
+                        EditText editText = (EditText) findViewById(R.id.item_description_entry);
+                        if (editText != null) {
                             editText.getParent().clearChildFocus(editText);
+
+                            // get input from edit text
+                            if (mCurrentStep == 1)
+                                mDescription = editText.getText().toString();
+                            else if (mCurrentStep == 2)
+                                mDetails = editText.getText().toString();
+                            else if (mCurrentStep == 3)
+                                mPrice = String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(editText.getText().toString()));
+                        }
+                        mCurrentStep++;
                         mListView.invalidateViews();
                     }
                 });
@@ -116,6 +269,14 @@ public class DonateActivity extends AppCompatActivity {
                 // change text to finished for last step
                 if (position == STEP_COUNT -1 ) {
                     nextStepBtn.setText(getString(R.string.action_donate));
+
+                    // also give it donate functionality
+                    nextStepBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            donate();
+                        }
+                    });
                 } else {
                     nextStepBtn.setText(getString(R.string.next_step_btn_label));
                 }
@@ -143,6 +304,34 @@ public class DonateActivity extends AppCompatActivity {
                     case 0:
                         // create an imageview
                         ImageView uploadImg = (ImageView) getLayoutInflater().inflate(R.layout.upload_img_view, flex, false);
+                        uploadImg.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                attemptTakePic();
+                            }
+                        });
+                        // set image to picture if already taken
+                        if (mImage != null) {
+                            // Get the dimensions of the View
+                            int targetW = getDrawable(R.drawable.ic_upload_img).getMinimumWidth();
+                            int targetH = getDrawable(R.drawable.ic_upload_img).getMinimumHeight();
+
+                            // Get the dimensions of the bitmap
+                            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+                            int photoW = mImage.getWidth();
+                            int photoH = mImage.getHeight();
+
+                            // Determine how much to scale down the image
+                            int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+
+                            // Decode the image file into a Bitmap sized to fill the View
+                            bmOptions.inJustDecodeBounds = false;
+                            bmOptions.inSampleSize = scaleFactor;
+                            bmOptions.inPurgeable = true;
+
+                            Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+                            uploadImg.setImageBitmap(bitmap);
+                        }
 
                         // create the explanatory textview
                         TextView instructions = new TextView(getApplicationContext());
@@ -183,6 +372,7 @@ public class DonateActivity extends AppCompatActivity {
                             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                                 TextView display = (TextView) parent.getChildAt(0);
                                 display.setTextColor(Color.BLACK);
+                                mCondition = parent.getItemAtPosition(position).toString();
                             }
 
                             @Override
@@ -214,5 +404,152 @@ public class DonateActivity extends AppCompatActivity {
 
         public Object getItem(int position) {return position;}
 
+        /**
+         * Opens the step at the specified position
+         * @param position index of the step to be opened
+         */
+        public void openItem(int position) {
+            mCurrentStep = position;
+            mListView.invalidateViews();
+        }
+
+    }
+
+    /**
+     * Asynchronous task that uploads a donated item to the server on a separate thread, so that it
+     * won't block the UI thread with networking work.
+     */
+    public class UploadItemTask extends AsyncTask<Bitmap, Void, Boolean> {
+
+        private static final String LOG_TAG = "UploadItemTask";
+
+        private Activity mParent;
+        private String mName;
+        private String mPrice;
+        private String mCondition;
+        private String mDescription;
+        private Bitmap mBitmap;
+
+        UploadItemTask(Activity parent, String name, String price, String condition, String description, Bitmap bitmap) {
+            mParent = parent;
+            mName = name;
+            mPrice = price;
+            mCondition = condition;
+            mDescription = description;
+            mBitmap = bitmap;
+        }
+
+        @Override
+        protected Boolean doInBackground(Bitmap... bmpData) {
+            ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo info = manager.getActiveNetworkInfo();
+            if(info == null || !info.isConnected()) {
+                // if there is no network, inform user through a toast
+                mParent.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                        Log.d(LOG_TAG, "No connection available");
+                    }
+                });
+            } else {
+                // declare resources to close in finally clause
+                HttpURLConnection conn = null;
+                BufferedOutputStream out = null;
+                try {
+                    // form a URL to connect to
+                    Uri.Builder builder = new Uri.Builder();
+                    String uri = builder.encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
+                            .scheme("http")
+                            .appendPath("showandsell")
+                            .appendPath("api")
+                            .appendPath("items")
+                            .appendPath("create").build().toString();
+                    URL url = new URL(uri);
+
+                    // form connection
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setDoOutput(true);
+                    conn.setRequestMethod("POST");
+                    conn.setConnectTimeout(10000);
+                    conn.setReadTimeout(15000);
+                    conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    conn.setChunkedStreamingMode(0);
+                    conn.connect();
+
+                    // get values for item
+                    SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+                    String groupId = savedData.getString(getString(R.string.saved_group_id), "d57f3c49-907d-4e6f-ab2c-2e76969b3447");
+                    String userId = savedData.getString(getString(R.string.userId), "");
+                    String name = mName;
+                    String price = mPrice;
+                    String condition = mCondition;
+                    String description = mDescription;
+
+                    // scale down image and convert to base64
+                    Log.d(LOG_TAG, "is mBitmap null: "+(mBitmap == null));
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    mImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    byte[] byteArray = stream.toByteArray();
+                    String thumbnail = Base64.encodeToString(byteArray,Base64.NO_WRAP);
+
+                    // convert item to JSON
+                    String body = "";
+                    JSONObject item = new JSONObject();
+                    item.put("groupId", groupId);
+                    item.put("ownerId", userId);
+                    item.put("name", name);
+                    item.put("price", price);
+                    item.put("condition", condition);
+                    item.put("description", description);
+                    item.put("thumbnail", thumbnail);
+                    body = item.toString();
+                    Log.d(LOG_TAG, body);
+
+                    // write to output stream
+                    out = new BufferedOutputStream(conn.getOutputStream());
+                    out.write(body.getBytes());
+                    out.flush();
+
+                    // see if post was a success
+                    int responseCode = conn.getResponseCode();
+                    Log.d(LOG_TAG, "Response Code from Cloud Server: "+responseCode);
+
+                    if(responseCode == 200) {
+                        Log.d(LOG_TAG, "Post was success");
+                        return true;
+                    } else if(responseCode == 449) {
+                        Log.d(LOG_TAG, "Group may have been deleted, Post failure");
+                        return false;
+                    } else {
+                        Log.e(LOG_TAG, "response Code = "+responseCode);
+                    }
+                } catch (MalformedURLException e) {
+                    Log.e(LOG_TAG, "Bad URL", e);
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "Error opening URL connection (probably?)", e);
+                } catch (JSONException e) {
+                    Log.e(LOG_TAG, "Error forming JSON", e);
+                } finally {
+                    conn.disconnect();
+                    try {
+                        out.close();
+                    } catch(Exception e) {
+                        Log.e(LOG_TAG, "Error closing output stream", e);
+                    }
+                }
+            }
+
+            // in case of failure
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            // update text of button
+            Button takePicBtn = (Button) findViewById(R.id.upload_img_btn);
+            if (takePicBtn != null)
+                takePicBtn.setText(getString(R.string.prompt_image_upload));
+        }
     }
 }
