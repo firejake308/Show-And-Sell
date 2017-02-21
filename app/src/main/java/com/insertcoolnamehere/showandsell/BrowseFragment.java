@@ -255,8 +255,10 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 .appendPath("showandsell")
                 .appendPath("api")
                 .appendPath("items")
-                .appendPath("approved")
+                .appendPath("approvedinrange")
                 .appendQueryParameter("groupId", id)
+                .appendQueryParameter("start", ""+0)
+                .appendQueryParameter("end", ""+5)
                 .build();
         return new URL(builder.toString());
     }

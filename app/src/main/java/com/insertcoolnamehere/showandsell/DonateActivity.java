@@ -87,6 +87,7 @@ public class DonateActivity extends AppCompatActivity {
     }
 
     private void donate() {
+        Log.d(LOG_TAG, "Beginning to donate item");
         // make sure the user has actually given us all the fields we asked for
         if(mDescription.length() == 0) {
             mAdapter.openItem(1);
@@ -260,6 +261,10 @@ public class DonateActivity extends AppCompatActivity {
                                 mDetails = editText.getText().toString();
                             else if (mCurrentStep == 3)
                                 mPrice = String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(editText.getText().toString()));
+                            else if (mCurrentStep == 4) {
+                                donate();
+                                return;
+                            }
                         }
                         mCurrentStep++;
                         mListView.invalidateViews();
@@ -269,14 +274,6 @@ public class DonateActivity extends AppCompatActivity {
                 // change text to finished for last step
                 if (position == STEP_COUNT -1 ) {
                     nextStepBtn.setText(getString(R.string.action_donate));
-
-                    // also give it donate functionality
-                    nextStepBtn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            donate();
-                        }
-                    });
                 } else {
                     nextStepBtn.setText(getString(R.string.next_step_btn_label));
                 }

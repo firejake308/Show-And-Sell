@@ -21,6 +21,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.location.Geocoder;
+
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.location.LocationServices;
@@ -46,7 +48,7 @@ import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class CreateAccountActivity extends AppCompatActivity {
+public class CreateAccountActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, OnConnectionFailedListener{
 
     // references to UI views
     private EditText firstNameEntry;
@@ -64,6 +66,7 @@ public class CreateAccountActivity extends AppCompatActivity {
     private String userId;
 
     private Geocoder coder;
+    private GoogleApiClient mGoogleApiClient;
 
     // reference to AsyncTask
     private CreateAccountTask mAuthTask;
@@ -106,21 +109,13 @@ public class CreateAccountActivity extends AppCompatActivity {
         //mAuthTask2 = new DataLongOperationAsyncTask();
         //mAuthTask2.execute();
 
-        Geocoder coder = new Geocoder(this, Locale.getDefault());
-        List<Address> address;
         try {
-            GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    //.addConnectionCallbacks(this)
-                    //.addOnConnectionFailedListener(this)
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
-            mGoogleApiClient.connect(GoogleApiClient.SIGN_IN_MODE_OPTIONAL);
-            if (mGoogleApiClient.isConnected()) {
-                address = coder.getFromLocationName("1600 Amphitheatre Parkway, Mountain View, CA", 1);
-                Address location = address.get(0);
-                //Log.d("Lat", ""+location.getLatitude());
-                Log.d("Lon", "kl");//+location.getLongitude());
-            }
+            mGoogleApiClient.connect();
         }catch(Exception e){Log.d("ERROR", "GEO");}
         /*
         // for reporting errors
@@ -162,6 +157,35 @@ public class CreateAccountActivity extends AppCompatActivity {
             mAuthTask = new CreateAccountTask(this, firstName, lastName, email, password1);
             mAuthTask.execute();
         }*/
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        Log.d("CreateAccountActivity", "I'm connected!");
+        List<Address> address;
+        if (mGoogleApiClient.isConnected()) {
+            try {
+                coder = new Geocoder(this, Locale.getDefault());
+                address = coder.getFromLocationName("1600 Amphitheatre Parkway, Mountain View, CA", 1);
+                Address location = address.get(0);
+                //Log.d("Lat", ""+location.getLatitude());
+                Log.d("Lon", "kl");//+location.getLongitude());
+            } catch (IOException e) {
+                Log.e("CreateAccountActivity", "Error geocoding address", e);
+            }
+        } else {
+            Log.e("CreateAccountActivity", "Not conencted to Google API");
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int cause) {
+        // do literally nothing
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        Log.e("CreateAccountActivity", "I'm a failure at life and i should kill myslef");
     }
 
     public class CreateAccountTask extends AsyncTask<Void, Void, Boolean> {
