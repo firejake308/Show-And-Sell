@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,7 +20,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.location.Geocoder;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -35,6 +42,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.Locale;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class CreateAccountActivity extends AppCompatActivity {
 
@@ -53,8 +63,11 @@ public class CreateAccountActivity extends AppCompatActivity {
     private String password2;
     private String userId;
 
+    private Geocoder coder;
+
     // reference to AsyncTask
     private CreateAccountTask mAuthTask;
+    private DataLongOperationAsyncTask mAuthTask2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +103,26 @@ public class CreateAccountActivity extends AppCompatActivity {
 
     private void attemptCreateAccount() {
         // if the AsyncTask has already been created, then don't restart it
+        //mAuthTask2 = new DataLongOperationAsyncTask();
+        //mAuthTask2.execute();
 
+        Geocoder coder = new Geocoder(this, Locale.getDefault());
+        List<Address> address;
+        try {
+            GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    //.addConnectionCallbacks(this)
+                    //.addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+            mGoogleApiClient.connect(GoogleApiClient.SIGN_IN_MODE_OPTIONAL);
+            if (mGoogleApiClient.isConnected()) {
+                address = coder.getFromLocationName("1600 Amphitheatre Parkway, Mountain View, CA", 1);
+                Address location = address.get(0);
+                //Log.d("Lat", ""+location.getLatitude());
+                Log.d("Lon", "kl");//+location.getLongitude());
+            }
+        }catch(Exception e){Log.d("ERROR", "GEO");}
+        /*
         // for reporting errors
         boolean cancel = false;
         View focusView = null;
@@ -129,7 +161,7 @@ public class CreateAccountActivity extends AppCompatActivity {
         } else {
             mAuthTask = new CreateAccountTask(this, firstName, lastName, email, password1);
             mAuthTask.execute();
-        }
+        }*/
     }
 
     public class CreateAccountTask extends AsyncTask<Void, Void, Boolean> {
@@ -271,5 +303,74 @@ public class CreateAccountActivity extends AppCompatActivity {
                 emailEntry.requestFocus();
             }
         }
+    }
+
+    private class DataLongOperationAsyncTask extends AsyncTask<String, Void, String[]> {
+        private String address = "8116 Island Park Court";
+
+        @Override
+        protected String[] doInBackground(String... params) {
+            String response;
+            try {
+                response = getLatLongByURL("http://maps.google.com/maps/api/geocode/json?address="+address+"&sensor=false");
+                Log.d("response",""+response);
+                return new String[]{response};
+            } catch (Exception e) {
+                return new String[]{"error"};
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String... result) {
+            try {
+                JSONObject jsonObject = new JSONObject(result[0]);
+
+                double lng = ((JSONArray)jsonObject.get("results")).getJSONObject(0)
+                        .getJSONObject("geometry").getJSONObject("location")
+                        .getDouble("lng");
+
+                double lat = ((JSONArray)jsonObject.get("results")).getJSONObject(0)
+                        .getJSONObject("geometry").getJSONObject("location")
+                        .getDouble("lat");
+
+                Log.d("latitude", "" + lat);
+                Log.d("longitude", "" + lng);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    public String getLatLongByURL(String requestURL) {
+        URL url;
+        String response = "";
+        try {
+            url = new URL(requestURL);
+
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(15000);
+            conn.setConnectTimeout(15000);
+            conn.setRequestMethod("GET");
+            conn.setDoInput(true);
+            conn.setRequestProperty("Content-Type",
+                    "application/x-www-form-urlencoded");
+            conn.setDoOutput(true);
+            int responseCode = conn.getResponseCode();
+
+            if (responseCode == HttpsURLConnection.HTTP_OK) {
+                String line;
+                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                while ((line = br.readLine()) != null) {
+                    response += line;
+                }
+            } else {
+                response = "";
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response;
     }
 }
