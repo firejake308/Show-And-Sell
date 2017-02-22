@@ -168,7 +168,7 @@ public class CreateAccountActivity extends AppCompatActivity implements GoogleAp
                 coder = new Geocoder(this, Locale.getDefault());
                 address = coder.getFromLocationName("1600 Amphitheatre Parkway, Mountain View, CA", 1);
                 Address location = address.get(0);
-                //Log.d("Lat", ""+location.getLatitude());
+                Log.d("Lat", ""+location.getLatitude());
                 Log.d("Lon", "kl");//+location.getLongitude());
             } catch (IOException e) {
                 Log.e("CreateAccountActivity", "Error geocoding address", e);

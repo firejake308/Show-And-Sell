@@ -56,6 +56,8 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     private String lastGroupId;
 
+    private int lastItemLoaded = 0;
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -110,6 +112,8 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 // show progress bar
                 showProgress(true);
 
+                // before clearing items list, record last item index
+                lastItemLoaded = Item.browseGroupItems.size();
                 // clear items list
                 Item.browseGroupItems.clear();
 
@@ -185,7 +189,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
             if(isBookmark())
                 adapter = new FullItemRecyclerViewAdapter(Item.bookmarkedItems, mListener);
             else
-                adapter = new FullItemRecyclerViewAdapter(Item.browseGroupItems, mListener);
+                adapter = new SummaryItemRecyclerViewAdapter(Item.browseGroupItems, mListener);
             mRecyclerView.setAdapter(adapter);
         }
         return view;
@@ -257,9 +261,10 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 .appendPath("items")
                 .appendPath("approvedinrange")
                 .appendQueryParameter("groupId", id)
-                .appendQueryParameter("start", ""+0)
-                .appendQueryParameter("end", ""+5)
+                .appendQueryParameter("start", ""+lastItemLoaded)
+                .appendQueryParameter("end", ""+(lastItemLoaded+5))
                 .build();
+        Log.d("BrowseFragment", builder.toString());
         return new URL(builder.toString());
     }
 

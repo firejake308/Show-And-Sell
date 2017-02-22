@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
@@ -259,12 +260,13 @@ public class DonateActivity extends AppCompatActivity {
                                 mDescription = editText.getText().toString();
                             else if (mCurrentStep == 2)
                                 mDetails = editText.getText().toString();
-                            else if (mCurrentStep == 3)
-                                mPrice = String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(editText.getText().toString()));
-                            else if (mCurrentStep == 4) {
-                                donate();
-                                return;
+                            else if (mCurrentStep == 3) {
+                                if (!TextUtils.isEmpty(editText.getText()))
+                                    mPrice = String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(editText.getText().toString()));
                             }
+                        } else if (mCurrentStep == 4) {
+                            donate();
+                            return;
                         }
                         mCurrentStep++;
                         mListView.invalidateViews();

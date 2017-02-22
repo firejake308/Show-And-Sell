@@ -39,7 +39,6 @@ public class SummaryItemRecyclerViewAdapter extends RecyclerView.Adapter<Summary
         holder.mItem = mItems.get(position);
         holder.mPriceView.setText(String.format(Locale.ENGLISH, "$%.2f", mItems.get(position).getPrice()));
         holder.mThumbnailView.setImageBitmap(mItems.get(position).getPic());
-        holder.mThumbnailView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
