@@ -57,8 +57,12 @@ public class CreateGroupActivity extends AppCompatActivity implements GoogleApiC
     private GoogleApiClient mGoogleApiClient;
 
     private String streetAddress = "";
+    private String mGroupName = "";
+    private String mExtraLocationData = "";
     private double latitude = 0;
     private double longitude = 0;
+
+    private final Object dataLock = new Object();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,21 +93,23 @@ public class CreateGroupActivity extends AppCompatActivity implements GoogleApiC
         View focusView = null;
 
         // fetch values from EditTexts
-        String groupName = groupNameEntry.getText().toString();
+        mGroupName = groupNameEntry.getText().toString();
         streetAddress = addressEntry.getText().toString() + ", " + cityEntry.getText().toString() + ", " + stateEntry.getText().toString();
-        String extraLocationData = extraLocationDataEntry.getText().toString();
+        mExtraLocationData = extraLocationDataEntry.getText().toString();
 
         try {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-            mGoogleApiClient.connect();
+            synchronized (dataLock) {
+                mGoogleApiClient = new GoogleApiClient.Builder(this)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .addApi(LocationServices.API)
+                        .build();
+                mGoogleApiClient.connect();
+            }
         }catch(Exception e){Log.d("ERROR", "GEO");}
 
         // verify that the group name is long enough
-        if(groupName.length() < 4) {
+        if(mGroupName.length() < 4) {
             cancel = true;
             groupNameEntry.setError("Group name must be at least 4 characters");
             focusView = groupNameEntry;
@@ -114,39 +120,40 @@ public class CreateGroupActivity extends AppCompatActivity implements GoogleApiC
             addressEntry.setError("Incorrect Address");
             focusView = addressEntry;
         }
-        // verify geocoder connected
-        else if (!mGoogleApiClient.isConnected()) {
-            cancel = true;
-            addressEntry.setError("Not connected to Google API");
-            focusView = addressEntry;
-        }
 
         if(cancel) {
             // cancel and inform user of any errors
             focusView.requestFocus();
-        } else {
-            mAuthTask = new CreateGroupTask(this, groupName, latitude, longitude, extraLocationData);
-            mAuthTask.execute();
         }
     }
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        Log.d("CreateGroupActivity", "I'm connected!");
-        List<Address> address;
-        if (mGoogleApiClient.isConnected()) {
-            try {
-                coder = new Geocoder(this, Locale.getDefault());
-                address = coder.getFromLocationName(streetAddress, 1);
-                Address location = address.get(0);
-                latitude  = location.getLatitude();
-                longitude = location.getLongitude();
-            } catch (IOException e) {
-                Log.e("CreateGroupActivity", "Error geocoding address", e);
+        final Activity cxtReference = this;
+        new Thread() {
+            public void run() {
+                Log.d("CreateGroupActivity", "I'm connected!");
+                List<Address> address;
+                if (mGoogleApiClient.isConnected()) {
+                    try {
+                        coder = new Geocoder(cxtReference, Locale.getDefault());
+
+                        address = coder.getFromLocationName(streetAddress, 1);
+                        Address location = address.get(0);
+                        latitude = location.getLatitude();
+                        longitude = location.getLongitude();
+                        Log.d("CreateGroupActivity", "lat=" + latitude);
+                        Log.d("CreateGroupActivity", "lon=" + longitude);
+                    } catch (IOException e) {
+                        Log.e("CreateGroupActivity", "Error geocoding address", e);
+                    }
+                } else {
+                    Log.e("CreateGroupActivit9y", "Not connected to Google API");
+                }
+                mAuthTask = new CreateGroupTask(cxtReference, mGroupName, latitude, longitude, mExtraLocationData);
+                mAuthTask.execute();
             }
-        } else {
-            Log.e("CreateGroupActivity", "Not conencted to Google API");
-        }
+        }.start();
     }
 
     @Override
@@ -156,7 +163,9 @@ public class CreateGroupActivity extends AppCompatActivity implements GoogleApiC
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
-        Log.e("CreateGroupActivity", "I'm a failure at life and i should kill myslef");
+        addressEntry.setError("Not connected to Google API");
+        addressEntry.requestFocus();
+        Log.e("CreateGroupActivity", "I'm a failure at life and i should kill myself");
     }
 
     public class CreateGroupTask extends AsyncTask<Void, Void, Integer> {
@@ -231,8 +240,10 @@ public class CreateGroupActivity extends AppCompatActivity implements GoogleApiC
                     JSONObject group = new JSONObject();
                     group.put("name", groupName);
                     group.put("adminId", GUID);
-                    group.put("latitude", latitude);
-                    group.put("longitude", longitude);
+                    synchronized (dataLock) {
+                        group.put("latitude", latitude);
+                        group.put("longitude", longitude);
+                    }
                     group.put("locationDetail", extraLocationData);
                     groupData.put("group", group);
                     groupData.put("password", password);

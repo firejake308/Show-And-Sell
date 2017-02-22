@@ -45,6 +45,7 @@ public class FullItemRecyclerViewAdapter extends RecyclerView.Adapter<FullItemRe
         holder.mPriceView.setText(String.format(Locale.ENGLISH, "$%.2f", mItems.get(position).getPrice()));
         holder.mConditionView.setText(mItems.get(position).getCondition());
         holder.mThumbnailView.setImageBitmap(mItems.get(position).getPic());
+        holder.mThumbnailView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
