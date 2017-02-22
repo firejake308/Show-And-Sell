@@ -37,6 +37,24 @@
                 android:singleLine="true"/>
 
             <EditText
+                android:id="@+id/city_name_entry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_enter_city"
+                android:inputType="text"
+                android:maxLines="1"
+                android:singleLine="true"/>
+
+            <EditText
+                android:id="@+id/state_name_entry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_enter_state"
+                android:inputType="text"
+                android:maxLines="1"
+                android:singleLine="true"/>
+
+            <EditText
                 android:id="@+id/extra_location_data_entry"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -48,7 +48,7 @@ import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class CreateAccountActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, OnConnectionFailedListener{
+public class CreateAccountActivity extends AppCompatActivity {
 
     // references to UI views
     private EditText firstNameEntry;
@@ -65,12 +65,8 @@ public class CreateAccountActivity extends AppCompatActivity implements GoogleAp
     private String password2;
     private String userId;
 
-    private Geocoder coder;
-    private GoogleApiClient mGoogleApiClient;
-
     // reference to AsyncTask
     private CreateAccountTask mAuthTask;
-    private DataLongOperationAsyncTask mAuthTask2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,18 +102,7 @@ public class CreateAccountActivity extends AppCompatActivity implements GoogleAp
 
     private void attemptCreateAccount() {
         // if the AsyncTask has already been created, then don't restart it
-        //mAuthTask2 = new DataLongOperationAsyncTask();
-        //mAuthTask2.execute();
 
-        try {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-            mGoogleApiClient.connect();
-        }catch(Exception e){Log.d("ERROR", "GEO");}
-        /*
         // for reporting errors
         boolean cancel = false;
         View focusView = null;
@@ -156,36 +141,7 @@ public class CreateAccountActivity extends AppCompatActivity implements GoogleAp
         } else {
             mAuthTask = new CreateAccountTask(this, firstName, lastName, email, password1);
             mAuthTask.execute();
-        }*/
-    }
-
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        Log.d("CreateAccountActivity", "I'm connected!");
-        List<Address> address;
-        if (mGoogleApiClient.isConnected()) {
-            try {
-                coder = new Geocoder(this, Locale.getDefault());
-                address = coder.getFromLocationName("1600 Amphitheatre Parkway, Mountain View, CA", 1);
-                Address location = address.get(0);
-                //Log.d("Lat", ""+location.getLatitude());
-                Log.d("Lon", "kl");//+location.getLongitude());
-            } catch (IOException e) {
-                Log.e("CreateAccountActivity", "Error geocoding address", e);
-            }
-        } else {
-            Log.e("CreateAccountActivity", "Not conencted to Google API");
         }
-    }
-
-    @Override
-    public void onConnectionSuspended(int cause) {
-        // do literally nothing
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        Log.e("CreateAccountActivity", "I'm a failure at life and i should kill myslef");
     }
 
     public class CreateAccountTask extends AsyncTask<Void, Void, Boolean> {

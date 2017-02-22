@@ -21,6 +21,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+
 import org.json.JSONObject;
 
 import java.io.BufferedWriter;
@@ -30,22 +34,31 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Patrick on 02/01/2017.
  * This activity will allow an account holder to create a group
  */
 
-public class CreateGroupActivity extends AppCompatActivity {
+public class CreateGroupActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     // references to UI views
     private EditText groupNameEntry;
     private EditText addressEntry;
+    private EditText cityEntry;
+    private EditText stateEntry;
     private EditText extraLocationDataEntry;
     private Button   createGroupButton;
 
     // reference to ASyncTask
     private CreateGroupTask mAuthTask;
+    private Geocoder coder;
+    private GoogleApiClient mGoogleApiClient;
+
+    private String streetAddress = "";
+    private double latitude = 0;
+    private double longitude = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +68,8 @@ public class CreateGroupActivity extends AppCompatActivity {
         // find all the views
         groupNameEntry = (EditText) findViewById(R.id.group_name_entry);
         addressEntry = (EditText) findViewById(R.id.location_name_entry);
+        cityEntry = (EditText) findViewById(R.id.city_name_entry);
+        stateEntry = (EditText) findViewById(R.id.state_name_entry);
         extraLocationDataEntry = (EditText) findViewById(R.id.extra_location_data_entry);
         createGroupButton = (Button) findViewById(R.id.create_group_btn);
 
@@ -75,8 +90,17 @@ public class CreateGroupActivity extends AppCompatActivity {
 
         // fetch values from EditTexts
         String groupName = groupNameEntry.getText().toString();
-        String address = addressEntry.getText().toString();
+        streetAddress = addressEntry.getText().toString() + ", " + cityEntry.getText().toString() + ", " + stateEntry.getText().toString();
         String extraLocationData = extraLocationDataEntry.getText().toString();
+
+        try {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+            mGoogleApiClient.connect();
+        }catch(Exception e){Log.d("ERROR", "GEO");}
 
         // verify that the group name is long enough
         if(groupName.length() < 4) {
@@ -85,9 +109,15 @@ public class CreateGroupActivity extends AppCompatActivity {
             focusView = groupNameEntry;
         }
         // verify that the location is long enough
-        else if(address.length() < 4) {
+        else if(streetAddress.length() < 4) {
             cancel = true;
             addressEntry.setError("Incorrect Address");
+            focusView = addressEntry;
+        }
+        // verify geocoder connected
+        else if (!mGoogleApiClient.isConnected()) {
+            cancel = true;
+            addressEntry.setError("Not connected to Google API");
             focusView = addressEntry;
         }
 
@@ -95,9 +125,38 @@ public class CreateGroupActivity extends AppCompatActivity {
             // cancel and inform user of any errors
             focusView.requestFocus();
         } else {
-            mAuthTask = new CreateGroupTask(this, groupName, address, extraLocationData);
+            mAuthTask = new CreateGroupTask(this, groupName, latitude, longitude, extraLocationData);
             mAuthTask.execute();
         }
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        Log.d("CreateGroupActivity", "I'm connected!");
+        List<Address> address;
+        if (mGoogleApiClient.isConnected()) {
+            try {
+                coder = new Geocoder(this, Locale.getDefault());
+                address = coder.getFromLocationName(streetAddress, 1);
+                Address location = address.get(0);
+                latitude  = location.getLatitude();
+                longitude = location.getLongitude();
+            } catch (IOException e) {
+                Log.e("CreateGroupActivity", "Error geocoding address", e);
+            }
+        } else {
+            Log.e("CreateGroupActivity", "Not conencted to Google API");
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int cause) {
+        // do literally nothing
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        Log.e("CreateGroupActivity", "I'm a failure at life and i should kill myslef");
     }
 
     public class CreateGroupTask extends AsyncTask<Void, Void, Integer> {
@@ -112,14 +171,16 @@ public class CreateGroupActivity extends AppCompatActivity {
         private Activity mParent;
 
         private String groupName;
-        private String locationName;
+        private double latitude;
+        private double longitude;
         private String extraLocationData;
 
-        CreateGroupTask(Activity parent, String gn, String ad, String eld) {
+        CreateGroupTask(Activity parent, String gn, double lat, double lon, String eld) {
             this.mParent = parent;
 
             this.groupName = gn;
-            this.locationName = ad;
+            this.latitude = lat;
+            this.longitude = lon;
             this.extraLocationData = eld;
         }
 
@@ -170,7 +231,8 @@ public class CreateGroupActivity extends AppCompatActivity {
                     JSONObject group = new JSONObject();
                     group.put("name", groupName);
                     group.put("adminId", GUID);
-                    group.put("location", locationName);
+                    group.put("latitude", latitude);
+                    group.put("longitude", longitude);
                     group.put("locationDetail", extraLocationData);
                     groupData.put("group", group);
                     groupData.put("password", password);
