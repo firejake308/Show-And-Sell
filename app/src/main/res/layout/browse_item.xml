@@ -15,5 +15,6 @@
         android:layout_alignBottom="@id/item_picture"
         android:id="@+id/item_price"
         android:textColor="#FFFFFF"
-        android:background="@color/colorAccent"/>
+        android:background="@color/colorAccent"
+        android:padding="5dp"/>
 </RelativeLayout>

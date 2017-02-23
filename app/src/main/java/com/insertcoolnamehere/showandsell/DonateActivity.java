@@ -162,7 +162,7 @@ public class DonateActivity extends AppCompatActivity {
             Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
             mImageView.setImageBitmap(bitmap);
 
-            bmOptions.inSampleSize = 1;
+            bmOptions.inSampleSize = 16;
             mImage = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
         }
     }
@@ -478,7 +478,7 @@ public class DonateActivity extends AppCompatActivity {
 
                     // get values for item
                     SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
-                    String groupId = savedData.getString(getString(R.string.saved_group_id), "d57f3c49-907d-4e6f-ab2c-2e76969b3447");
+                    String groupId = savedData.getString(getString(R.string.saved_group_id), "");
                     String userId = savedData.getString(getString(R.string.userId), "");
                     String name = mName;
                     String price = mPrice;
@@ -488,7 +488,7 @@ public class DonateActivity extends AppCompatActivity {
                     // scale down image and convert to base64
                     Log.d(LOG_TAG, "is mBitmap null: "+(mBitmap == null));
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    mImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    mImage.compress(Bitmap.CompressFormat.PNG, 50, stream);
                     byte[] byteArray = stream.toByteArray();
                     String thumbnail = Base64.encodeToString(byteArray,Base64.NO_WRAP);
 

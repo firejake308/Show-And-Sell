@@ -39,6 +39,8 @@ public class ManageGroupActivity extends AppCompatActivity implements SwipeRefre
     private FullItemRecyclerViewAdapter adapter;
     private AsyncTask mFetchItemsTask;
 
+    private int mLastItemLoaded;
+
     private RecyclerView mRecyclerView;
 
     @Override
@@ -89,11 +91,14 @@ public class ManageGroupActivity extends AppCompatActivity implements SwipeRefre
                 // show progress spinner
                 showProgress(true);
 
+                // record index of last item loaded
+                mLastItemLoaded = Item.managedGroupItems.size();
+
                 // clear managed group items
                 Item.clearManagedItems();
 
                 // fetch all items in the group that this user owns
-                mFetchItemsTask = new FetchItemsTask(this).execute();
+                mFetchItemsTask = new FetchManagedItemsTask(this).execute();
             }
         }
     }
@@ -148,24 +153,28 @@ public class ManageGroupActivity extends AppCompatActivity implements SwipeRefre
                 .appendPath("api")
                 .appendPath("items")
                 .appendPath("items")
+                //.appendPath("itemsinrange")
                 .appendQueryParameter("groupId", id)
+                //.appendQueryParameter("start", ""+mLastItemLoaded)
+                //.appendQueryParameter("end", ""+(mLastItemLoaded+5))
                 .build();
+        Log.d(LOG_TAG, "Manage group fetch items request: "+builder.toString());
         return new URL(builder.toString());
     }
 
-    private class FetchItemsTask extends AsyncTask<Void, Integer, Integer> {
+    private class FetchManagedItemsTask extends AsyncTask<Void, Integer, Integer> {
         /**
          * The Activity within which this AsyncTask runs
          */
         private Activity mParent;
 
-        private final String LOG_TAG = FetchItemsTask.class.getSimpleName();
+        private final String LOG_TAG = FetchManagedItemsTask.class.getSimpleName();
         private final int NOT_GROUP_OWNER = 3;
         private final int NO_INERNET = 2;
         private final int SUCCESS = 1;
         private final int OTHER_FAILURE = 0;
 
-        FetchItemsTask(Activity parent) {
+        FetchManagedItemsTask(Activity parent) {
             mParent = parent;
         }
 

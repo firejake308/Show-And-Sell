@@ -110,7 +110,7 @@ public class ChooseGroupActivity extends AppCompatActivity {
         editor.putString(getString(R.string.saved_group_id), currentGroupId);
         editor.putString(getString(R.string.saved_group_name), currentGroupName);
         // also, user may or may not be the owner of this group, so we'll set that to false and let
-        // the FetchItemsTask figure it out
+        // the FetchManagedItemsTask figure it out
         editor.putBoolean(getString(R.string.group_owner_boolean), false);
         editor.commit();
     }
