@@ -74,6 +74,7 @@ public class DonateActivity extends AppCompatActivity {
     private String mPrice;
     private String mCondition;
     private Bitmap mImage;
+    private Bitmap mThumbnail;
 
     private String mCurrentPhotoPath;
 
@@ -143,6 +144,7 @@ public class DonateActivity extends AppCompatActivity {
             ImageView mImageView = (ImageView) findViewById(R.id.upload_img_btn);
             int targetW = mImageView.getWidth();
             int targetH = mImageView.getHeight();
+            Log.d(LOG_TAG, "onResult targetW: "+targetW);
 
             // Get the dimensions of the bitmap
             BitmapFactory.Options bmOptions = new BitmapFactory.Options();
@@ -150,17 +152,21 @@ public class DonateActivity extends AppCompatActivity {
             BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
             int photoW = bmOptions.outWidth;
             int photoH = bmOptions.outHeight;
+            if(bmOptions.outHeight <= 0)
+                return;
 
             // Determine how much to scale down the image
-            int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+            int scaleFactor = Math.max(photoW/targetW, photoH/targetH);
+            Log.d(LOG_TAG, "onResult photoW: "+photoW);
+            Log.d(LOG_TAG, "onResult SF: "+scaleFactor);
 
             // Decode the image file into a Bitmap sized to fill the View
             bmOptions.inJustDecodeBounds = false;
             bmOptions.inSampleSize = scaleFactor;
             bmOptions.inPurgeable = true;
 
-            Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-            mImageView.setImageBitmap(bitmap);
+            mThumbnail = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+            mImageView.setImageBitmap(mThumbnail);
 
             bmOptions.inSampleSize = 16;
             mImage = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
@@ -173,7 +179,7 @@ public class DonateActivity extends AppCompatActivity {
      * @throws IOException
      */
     private File createImageFile() throws IOException {
-        String timestamp = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
+        String timestamp = new SimpleDateFormat("yyyyMMddHHmmss", Locale.ENGLISH).format(new Date());
         String filename = "SANDS_ITEM_"+timestamp;
         //File storageDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         File storageDirectory = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
@@ -310,26 +316,8 @@ public class DonateActivity extends AppCompatActivity {
                             }
                         });
                         // set image to picture if already taken
-                        if (mImage != null) {
-                            // Get the dimensions of the View
-                            int targetW = getDrawable(R.drawable.ic_upload_img).getMinimumWidth();
-                            int targetH = getDrawable(R.drawable.ic_upload_img).getMinimumHeight();
-
-                            // Get the dimensions of the bitmap
-                            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-                            int photoW = mImage.getWidth();
-                            int photoH = mImage.getHeight();
-
-                            // Determine how much to scale down the image
-                            int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
-
-                            // Decode the image file into a Bitmap sized to fill the View
-                            bmOptions.inJustDecodeBounds = false;
-                            bmOptions.inSampleSize = scaleFactor;
-                            bmOptions.inPurgeable = true;
-
-                            Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-                            uploadImg.setImageBitmap(bitmap);
+                        if (mThumbnail != null) {
+                            uploadImg.setImageBitmap(mThumbnail);
                         }
 
                         // create the explanatory textview
@@ -349,14 +337,20 @@ public class DonateActivity extends AppCompatActivity {
                     case 1:
                         // inflate EditText for title entry
                         View titleEntry = getLayoutInflater().inflate(R.layout.item_title_entry, flex, false);
+                        EditText editText = (EditText) titleEntry.findViewById(R.id.item_description_entry);
+                        editText.setText(mDescription);
                         flex.addView(titleEntry);
                         break;
                     case 2:
                         View detailsCustom = getLayoutInflater().inflate(R.layout.item_details_entry, flex, false);
+                        editText = (EditText) detailsCustom.findViewById(R.id.item_description_entry);
+                        editText.setText(mDetails);
                         flex.addView(detailsCustom);
                         break;
                     case 3:
                         View priceCustom = getLayoutInflater().inflate(R.layout.item_price_entry, flex, false);
+                        editText = (EditText) priceCustom.findViewById(R.id.item_description_entry);
+                        editText.setText(mDetails);
                         flex.addView(priceCustom);
                         break;
                     case 4:

@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-        mViewPager.setCurrentItem(1);
+        mViewPager.setCurrentItem(0);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
@@ -240,12 +240,9 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
             // getItem is called to instantiate the fragment for the given page.
             switch(position) {
                 case 0:
-                    // donate tab
-                    return new DonateFragment();
-                case 1:
                     // browse tab
                     return BrowseFragment.newInstance(2);
-                case 2:
+                case 1:
                     // bookmarks tab
                     return new BookmarksFragment();
             }
@@ -255,17 +252,15 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 3;
+            return 2;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "DONATE";
-                case 1:
                     return "BROWSE";
-                case 2:
+                case 1:
                     return "BOOKMARKS";
             }
             return null;
