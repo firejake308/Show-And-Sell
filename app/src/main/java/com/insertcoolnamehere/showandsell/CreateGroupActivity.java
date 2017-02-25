@@ -144,6 +144,10 @@ public class CreateGroupActivity extends AppCompatActivity implements GoogleApiC
                         longitude = location.getLongitude();
                         Log.d("CreateGroupActivity", "lat=" + latitude);
                         Log.d("CreateGroupActivity", "lon=" + longitude);
+
+                        if (latitude == 0 && longitude == 0) {
+                            return;
+                        }
                     } catch (IOException e) {
                         Log.e("CreateGroupActivity", "Error geocoding address", e);
                     }

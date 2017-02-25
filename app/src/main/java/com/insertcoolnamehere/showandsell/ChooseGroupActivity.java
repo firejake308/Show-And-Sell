@@ -3,6 +3,9 @@ package com.insertcoolnamehere.showandsell;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -17,6 +20,10 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiActivity;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.insertcoolnamehere.showandsell.logic.Item;
 
 import org.json.JSONArray;
@@ -31,20 +38,29 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Patrick on 11/20/2016.
  * This activity allows the user to choose and switch groups
  */
 
-public class ChooseGroupActivity extends AppCompatActivity {
+public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     // data for activity
     private String groupName = "";
     private List<String> groupTexts = new ArrayList<>();
     private List<String> groupIds   = new ArrayList<>();
     private Button currentGroup;
-    private AsyncTask mFetchGroupsTask;
     private ArrayAdapter<String> mAdapter;
+
+    private double latitude = 0;
+    private double longitude = 0;
+
+    private GoogleApiClient mGoogleApiClient;
+    private final Object dataLock = new Object();
+
+    private Location location;
+    private FetchGroupsTask mAuthTask;
 
     // creates the choose group activity
     @Override
@@ -83,8 +99,16 @@ public class ChooseGroupActivity extends AppCompatActivity {
      * 11/23/2016
      */
     private void updateGroups() {
-        // update group texts and ids for the list
-        mFetchGroupsTask = new FetchGroupsTask(this).execute();
+        try {
+            synchronized (dataLock) {
+                mGoogleApiClient = new GoogleApiClient.Builder(this)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .addApi(LocationServices.API)
+                        .build();
+                mGoogleApiClient.connect();
+            }
+        }catch(Exception e){Log.d("ERROR", "GEO");}
     }
 
     /**
@@ -129,20 +153,64 @@ public class ChooseGroupActivity extends AppCompatActivity {
         return new URL(builder.toString());
     }
 
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        final Activity cxtReference = this;
+        new Thread() {
+            public void run() {
+                Log.d("CreateGroupActivity", "I'm connected!");
+                List<Address> address;
+                if (mGoogleApiClient.isConnected()) {
+                    try {
+                        location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                        latitude = location.getLatitude();
+                        longitude = location.getLongitude();
+                        Log.d("CreateGroupActivity", "lat=" + latitude);
+                        Log.d("CreateGroupActivity", "lon=" + longitude);
+
+                        if (latitude == 0 && longitude == 0) {
+                            return;
+                        }
+                    } catch (SecurityException se) {
+                        Log.e("ChooseGroupActivity", "Security Error");
+                    }
+                } else {
+                    Log.e("CreateGroupActivit9y", "Not connected to Google API");
+                }
+                mAuthTask = new ChooseGroupActivity.FetchGroupsTask(cxtReference, latitude, longitude);
+                mAuthTask.execute();
+            }
+        }.start();
+    }
+
+    @Override
+    public void onConnectionSuspended(int cause) {
+        // do literally nothing
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        Log.e("CreateGroupActivity", "I'm a failure at life and i should kill myself");
+    }
+
     // insert an AsyncTask here, using the ones in LoginActivity or DonateFragment or BrowseFragment as a reference
     private class FetchGroupsTask extends AsyncTask<Void, Integer, Integer> {
         /**
          * The Activity within which this AsyncTask runs
          */
         private Activity mParent;
+        private double lat;
+        private double lon;
 
         private final String LOG_TAG = ChooseGroupActivity.FetchGroupsTask.class.getSimpleName();
         private final int NO_INTERNET = 2;
         private final int SUCCESS = 1;
         private final int OTHER_FAILURE = 0;
 
-        FetchGroupsTask(Activity parent) {
+        FetchGroupsTask(Activity parent, double latitude, double longitude) {
             mParent = parent;
+            lat = latitude;
+            lon = longitude;
         }
 
         protected Integer doInBackground(Void... urls) {
