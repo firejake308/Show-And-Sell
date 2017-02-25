@@ -9,11 +9,14 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -75,10 +78,12 @@ public class ItemDetailActivity extends AppCompatActivity {
         ImageView itemImage = (ImageView) findViewById(R.id.item_detail_image);
         itemImage.setImageBitmap(mItem.getPic());
 
-        TextView itemName = (TextView) findViewById(R.id.item_detail_name);
-        itemName.setText(mItem.getName());
+        // alternative item title
+        CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbarLayout);
+        toolbarLayout.setTitle(mItem.getName());
+
         TextView itemPrice = (TextView) findViewById(R.id.item_detail_price);
-        itemPrice.setText(String.format(Locale.ENGLISH, "$%.2f", mItem.getPrice()));
+        itemPrice.setText(String.format(Locale.ENGLISH, "%.2f", mItem.getPrice()));
         TextView itemCondition = (TextView) findViewById(R.id.item_detail_condition);
         itemCondition.setText(mItem.getCondition());
         TextView itemDescription = (TextView) findViewById(R.id.item_detail_description);
@@ -131,13 +136,28 @@ public class ItemDetailActivity extends AppCompatActivity {
         });
 
         // set up buy button
-        Button buyButton = (Button) findViewById(R.id.item_detail_buy);
+        FloatingActionButton buyButton = (FloatingActionButton) findViewById(R.id.item_detail_buy);
         buyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 initiatePurchase();
             }
         });
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        if (menuItem.getItemId() == android.R.id.home) {
+            Intent goHomeIntent = new Intent(this, MainActivity.class);
+            startActivity(goHomeIntent);
+            return true;
+        } else {
+            return super.onOptionsItemSelected(menuItem);
+        }
     }
 
     private void initiatePurchase() {
@@ -159,6 +179,21 @@ public class ItemDetailActivity extends AppCompatActivity {
         String displayName = savedData.getString(getString(R.string.prompt_first_name),"")+" "+savedData.getString(getString(R.string.prompt_last_name), "");
         String id = savedData.getString(getString(R.string.userId), "NULL");
         mComments.add(new Message(displayName, id, messageBody, "9/99/99/9999 9:99:99 PM"));
+    }
+
+    private void adjustListViewSize() {
+        ListView listView = (ListView) findViewById(R.id.item_comments);
+        int lvHeight = 0;
+        for (int i = 0; i < mComments.size(); i++) {
+            View item = mAdapter.getView(i, null, listView);
+            item.measure(0, 0);
+            lvHeight += item.getMeasuredHeight();
+        }
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = lvHeight;
+        listView.setLayoutParams(params);
+        listView.requestLayout();
     }
 
     /**
@@ -218,6 +253,11 @@ public class ItemDetailActivity extends AppCompatActivity {
         }
 
         @Override
+        public int getCount() {
+            return mList.size();
+        }
+
+        @Override
         public int getViewTypeCount() {
             return 2;
         }
@@ -244,15 +284,28 @@ public class ItemDetailActivity extends AppCompatActivity {
             if(convertView == null) {
                 if(getItemViewType(position) == LEFT_COMMENT) {
                     // inflate the layout of the left-side comment
-                    View rootView = getLayoutInflater().inflate(R.layout.text_view_comment_left, parent, false);
+                    // make owner's comments golden
+                    View rootView;
+                    if(mItem.getOwnerId().equals(mList.get(position).getUserId())) {
+                        Log.d("CommentAdapter", "found an owner comment");
+                        rootView = getLayoutInflater().inflate(R.layout.text_view_comment_owner, parent, false);
+                    } else {
+                        rootView = getLayoutInflater().inflate(R.layout.text_view_comment_left, parent, false);
+                    }
+                    Log.d("CommentAdapter", "owner id: "+mItem.getOwnerId());
+                    Log.d("CommentAdapter", "poster id: "+mList.get(position).getUserId());
+
+
                     // identify the TextViews of interest
                     TextView comment = (TextView) rootView.findViewById(R.id.textView_comment_left);
                     TextView poster = (TextView) rootView.findViewById(R.id.textView_poster_name);
+
                     // Get the comment from the list and set the text of the TextViews
                     comment.setText(mList.get(position).getBody());
                     poster.setText(mList.get(position).getUserName());
                     Log.d("CommentAdapter", "list: "+mList.get(position).getUserName());
                     Log.d("CommentAdapter", "view: "+poster.getText().toString());
+
                     // return the inflated layout
                     return rootView;
                 } else {
@@ -270,6 +323,12 @@ public class ItemDetailActivity extends AppCompatActivity {
 
                     TextView poster = (TextView) convertView.findViewById(R.id.textView_poster_name);
                     poster.setText(mList.get(position).getUserName());
+
+                    // make owner's comments golden
+                    if(mItem.getOwnerId().equals(mComments.get(position).getUserId())) {
+                        comment.setBackground(getDrawable(R.drawable.owner_comment_left));
+                        Log.d("CommentAdapter", "found an owner comment");
+                    }
                     return convertView;
                 } else {
                     TextView comment = (TextView) convertView.findViewById(R.id.textView_comment_right);
@@ -991,6 +1050,7 @@ public class ItemDetailActivity extends AppCompatActivity {
                 mComments.clear();
                 mComments.addAll(mServerComments);
                 mAdapter.notifyDataSetChanged();
+                adjustListViewSize();
                 showProgress(false);
                 mFetchCommentsTask = null;
             } else if (result == NO_COMMENTS) {

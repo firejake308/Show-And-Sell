@@ -168,7 +168,7 @@ public class DonateActivity extends AppCompatActivity {
             mThumbnail = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
             mImageView.setImageBitmap(mThumbnail);
 
-            bmOptions.inSampleSize = 16;
+            bmOptions.inSampleSize = scaleFactor/2;
             mImage = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
         }
     }

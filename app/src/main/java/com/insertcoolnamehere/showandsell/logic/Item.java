@@ -89,6 +89,7 @@ public class Item implements Serializable {
     private Bitmap pic;
     private boolean approved;
     private int mItemType;
+    private String ownerId;
 
     public Item(String guid, int itemType) {
         this.guid = guid;
@@ -175,6 +176,14 @@ public class Item implements Serializable {
         } else if(!approved && browseGroupItems.contains(this)) {
             browseGroupItems.remove(this);
         }
+    }
+
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
     }
 
     @Override
