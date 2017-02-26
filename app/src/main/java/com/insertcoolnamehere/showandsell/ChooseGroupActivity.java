@@ -140,15 +140,30 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
     }
 
     // get URL for groups
-    protected URL getAPICall() throws MalformedURLException {
-        // construct the URL to fetch a user
-        Uri.Builder  builder = new Uri.Builder();
+    protected URL getAPICall(double lat, double lon) throws MalformedURLException {
+        // construct the URL to fetch groups, all if no location data
+        if (lat == 0 && lon == 0) {
+            Uri.Builder builder = new Uri.Builder();
+            builder.scheme("http")
+                    .encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
+                    .appendPath("showandsell")
+                    .appendPath("api")
+                    .appendPath("groups")
+                    .appendPath("allgroups")
+                    .build();
+            return new URL(builder.toString());
+        }
+        // construct URL to fetch groups in a 20 mile radius if location input
+        Uri.Builder builder = new Uri.Builder();
         builder.scheme("http")
                 .encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
                 .appendPath("showandsell")
                 .appendPath("api")
                 .appendPath("groups")
-                .appendPath("allgroups")
+                .appendPath("groupsinradius")
+                .appendQueryParameter("radius", "20.0")
+                .appendQueryParameter("latitude", ""+lat)
+                .appendQueryParameter("longitude", ""+lon)
                 .build();
         return new URL(builder.toString());
     }
@@ -158,24 +173,25 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
         final Activity cxtReference = this;
         new Thread() {
             public void run() {
-                Log.d("CreateGroupActivity", "I'm connected!");
-                List<Address> address;
+                Log.d("ChooseGroupActivity", "I'm connected!");
                 if (mGoogleApiClient.isConnected()) {
                     try {
                         location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                         latitude = location.getLatitude();
                         longitude = location.getLongitude();
-                        Log.d("CreateGroupActivity", "lat=" + latitude);
-                        Log.d("CreateGroupActivity", "lon=" + longitude);
+                        Log.d("ChooseGroupActivity", "lat=" + latitude);
+                        Log.d("ChooseGroupActivity", "lon=" + longitude);
 
                         if (latitude == 0 && longitude == 0) {
                             return;
                         }
                     } catch (SecurityException se) {
                         Log.e("ChooseGroupActivity", "Security Error");
+                    } catch (NullPointerException n) {
+                        Log.e("ChooseGroupActivity", "No location found");
                     }
                 } else {
-                    Log.e("CreateGroupActivit9y", "Not connected to Google API");
+                    Log.e("ChooseGroupActivity", "Not connected to Google API");
                 }
                 mAuthTask = new ChooseGroupActivity.FetchGroupsTask(cxtReference, latitude, longitude);
                 mAuthTask.execute();
@@ -190,7 +206,8 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
-        Log.e("CreateGroupActivity", "I'm a failure at life and i should kill myself");
+        Log.e("ChooseGroupActivity", "I'm a failure at life and i should kill myself");
+        mAuthTask = new ChooseGroupActivity.FetchGroupsTask(this, latitude, longitude);
     }
 
     // insert an AsyncTask here, using the ones in LoginActivity or DonateFragment or BrowseFragment as a reference
@@ -240,7 +257,7 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
             } else {
                 try {
                     // connect to the URL and open the reader
-                    urlConnection = (HttpURLConnection) getAPICall().openConnection();
+                    urlConnection = (HttpURLConnection) getAPICall(lat, lon).openConnection();
                     urlConnection.setReadTimeout(10000);
                     urlConnection.setConnectTimeout(15000);
                     urlConnection.setRequestMethod("GET");
