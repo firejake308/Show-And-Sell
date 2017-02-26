@@ -86,13 +86,15 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+        tabLayout.getTabAt(0).setIcon(R.drawable.ic_browse);
+        tabLayout.getTabAt(1).setIcon(R.drawable.ic_bookmarks);
 
         FloatingActionButton openDonateBtn = (FloatingActionButton) findViewById(R.id.openDonateBtn);
         final Context cxt = this;
         openDonateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent goToDonate = new Intent(cxt, DonateActivity.class);
+                Intent goToDonate = new Intent(cxt, DonateActivity.class); // TODO reset
                 startActivity(goToDonate);
             }
         });
@@ -253,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
         public int getCount() {
             // Show 3 total pages.
             return 2;
-        }
+        }/*
 
         @Override
         public CharSequence getPageTitle(int position) {
@@ -264,6 +266,6 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
                     return "BOOKMARKS";
             }
             return null;
-        }
+        }*/
     }
 }

@@ -77,6 +77,22 @@
     <string name="error_not_group_owner">It looks like you haven\'t created a group yet. If
         you\'d like to start your own yard sale, tap here and we\'ll help you out.</string>
 
+    <!--Tutorial-->
+    <string name="tutorial_1">Welcome to Show &amp; Sell! To start off, why don\'t you join a group?</string>
+    <string name="tutorial_2">The groups closest to you will show up here. Pick the one for your school or organization.</string>
+    <string name="tutorial_3">Once you\'ve selected a group, the items for that group will appear in
+        your <b>Browse Feed</b>. Tap an item to learn more.</string>
+    <string name="tutorial_4">Here, you can see an item\'s price, condition, and other details. If you have questions,
+        feel free to ask in the comments section. Once you\'re ready, you can buy the item right here, and then
+        show the confirmation email at the Pickup Station to get your item.</string>
+    <string name="tutorial_5">Back on your Browse Feed, you can tap the <b>+</b> icon to donate your own item
+        to the yard sale.</string>
+    <string name="tutorial_6">Just enter the info about the item, submit it, and then take the item to the
+        pickup station for the group manager to approve it. Ta-da!</string>
+    <string name="tutorial_7">Advisors can create their own groups from Settings &gt; My Group. Simply enter the
+        information for your school. Under \"Extra Location Info,\" provide directions about where on campus
+        buyers can pick up their items.</string>
+
     <!-- Strings related to Settings -->
     <string name="current_group">CURRENT GROUP</string>
     <string name="groups">AVAILABLE GROUPS</string>
@@ -86,6 +102,7 @@
     <string name="choose_group">Choose Primary Group</string>
     <string name="options">OPTIONS</string>
     <string name="actions">ACTIONS</string>
+    <string name="help">HELP</string>
 
     <!-- Saved data -->
     <string name="group_owner_boolean">isGroupOwner</string>
@@ -169,6 +186,14 @@
     <string name="prompt_group_password">Account Password</string>
     <string name="error_un_group_name_duplicate">Group name already in use</string>
     <string name="action_create_group">Create Group</string>
+    <string name="title_activity_nav_bar">NavBarActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="title_activity_tutorial">TutorialActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 
 
 </resources>

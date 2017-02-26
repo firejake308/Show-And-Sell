@@ -274,8 +274,8 @@ public class CreateAccountActivity extends AppCompatActivity {
                 editor.putString(getString(R.string.userId), userId);
                 editor.apply();
 
-                // launch main activity so user can begin browsing
-                Intent intent = new Intent(mParent, MainActivity.class);
+                // launch tutorial activity so user can figure out how app works
+                Intent intent = new Intent(mParent, TutorialActivity.class);
                 startActivity(intent);
             } else {
                 // alert user that they had a duplicate email

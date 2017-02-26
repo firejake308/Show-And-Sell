@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -71,8 +72,18 @@ public class ItemDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_item_detail);
 
         // get item data from intent
-        mItem = Item.getItem(getIntent().getStringExtra(ITEM_ID));
-        boolean giveOwnerPowers = getIntent().getBooleanExtra(OWNER_POWERS, false);
+        Intent startingIntent = getIntent();
+        Uri data = startingIntent.getData();
+        boolean giveOwnerPowers;
+        if (data == null) {
+            // open from app
+            mItem = Item.getItem(startingIntent.getStringExtra(ITEM_ID));
+            giveOwnerPowers = startingIntent.getBooleanExtra(OWNER_POWERS, false);
+        } else {
+            giveOwnerPowers = false;
+            mItem = Item.getItem(data.toString().split("://")[1]);
+            Log.d("ItemDetailActivity", "uri="+data);
+        }
 
         // set text and images for the activity view
         ImageView itemImage = (ImageView) findViewById(R.id.item_detail_image);
@@ -94,7 +105,7 @@ public class ItemDetailActivity extends AppCompatActivity {
         if(giveOwnerPowers) {
             // show reject button if group owner
             FloatingActionButton rejectButton = (FloatingActionButton) findViewById(R.id.btn_reject);
-            rejectButton.setVisibility(View.VISIBLE);
+            //rejectButton.setVisibility(View.VISIBLE);
             rejectButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -105,7 +116,7 @@ public class ItemDetailActivity extends AppCompatActivity {
 
             // show approve button if user is group owner and item needs approval
             if (!mItem.isApproved()) {
-                approveBtn.setVisibility(View.VISIBLE);
+                //approveBtn.setVisibility(View.VISIBLE);
                 approveBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -152,8 +163,7 @@ public class ItemDetailActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         if (menuItem.getItemId() == android.R.id.home) {
-            Intent goHomeIntent = new Intent(this, MainActivity.class);
-            startActivity(goHomeIntent);
+            NavUtils.navigateUpFromSameTask(this);
             return true;
         } else {
             return super.onOptionsItemSelected(menuItem);

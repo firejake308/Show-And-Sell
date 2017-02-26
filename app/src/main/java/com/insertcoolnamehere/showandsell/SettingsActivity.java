@@ -74,6 +74,14 @@ public class SettingsActivity extends AppCompatActivity {
                 openManageGroup();
             }
         });
+
+        Button openHelp = (Button) findViewById(R.id.settings_help);
+        openHelp.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openHelp();
+            }
+        });
     }
 
     /**
@@ -91,6 +99,15 @@ public class SettingsActivity extends AppCompatActivity {
     private void openManageGroup() {
         //go to manage group activity
         Intent intent = new Intent(this, ManageGroupActivity.class);
+        startActivity(intent);
+    }
+
+    /**
+     * Exit settings activity and open tutorial activity
+     */
+    private void openHelp() {
+        // go to tutorial activity
+        Intent intent = new Intent(this, TutorialActivity.class);
         startActivity(intent);
     }
 

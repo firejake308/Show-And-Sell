@@ -31,11 +31,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -165,17 +168,20 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
                         location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                         latitude = location.getLatitude();
                         longitude = location.getLongitude();
-                        Log.d("CreateGroupActivity", "lat=" + latitude);
-                        Log.d("CreateGroupActivity", "lon=" + longitude);
+                        Log.d("ChooseGroupActivity", "lat=" + latitude);
+                        Log.d("ChooseGroupActivity", "lon=" + longitude);
 
                         if (latitude == 0 && longitude == 0) {
                             return;
                         }
                     } catch (SecurityException se) {
                         Log.e("ChooseGroupActivity", "Security Error");
+                    } catch (NullPointerException e) {
+                        latitude = 0;
+                        longitude = 0;
                     }
                 } else {
-                    Log.e("CreateGroupActivit9y", "Not connected to Google API");
+                    Log.e("CreateGroupActivity", "Not connected to Google API");
                 }
                 mAuthTask = new ChooseGroupActivity.FetchGroupsTask(cxtReference, latitude, longitude);
                 mAuthTask.execute();
@@ -285,6 +291,140 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
                     if(reader != null) {
                         try {
                             reader.close();
+                        } catch(IOException e) {
+                            Log.e(LOG_TAG, "Error closing input stream", e);
+                        }
+                    }
+                }
+            }
+
+            // if anything goes wrong, return the other failure code
+            return OTHER_FAILURE;
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            // update list view
+            mAdapter.notifyDataSetChanged();
+            Log.d(LOG_TAG, "data set changed");
+        }
+    }
+
+    private class UpdateDefaultGroupTask extends AsyncTask<Void, Integer, Integer> {
+        /**
+         * The Activity within which this AsyncTask runs
+         */
+        private Activity mParent;
+
+        private final String LOG_TAG = ChooseGroupActivity.UpdateDefaultGroupTask.class.getSimpleName();
+        private final int NO_INTERNET = 2;
+        private final int SUCCESS = 1;
+        private final int OTHER_FAILURE = 0;
+
+        UpdateDefaultGroupTask(Activity parent, double latitude, double longitude) {
+            mParent = parent;
+        }
+
+        protected Integer doInBackground(Void... urls) {
+            // im gonna copy paste the networking code from Login here
+            // variables that we will have to close in try loop
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+
+
+            // the unparsed JSON response from the server
+            int responseCode;
+
+            // check for internet connection
+            ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo info = manager.getActiveNetworkInfo();
+
+            if(info == null || !info.isConnected()) {
+                // if there is no network, inform user through a toast
+                mParent.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                        Log.d(LOG_TAG, "No connection available");
+                    }
+                });
+                return NO_INTERNET;
+            } else {
+                BufferedWriter out = null;
+                try {
+                    // get user data
+                    SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key), MODE_PRIVATE);
+                    String userId = savedData.getString(getString(R.string.userId), "");
+                    String groupId = savedData.getString(getString(R.string.saved_group_id), "");
+
+                    // connect to the URL and open the reader
+                    Uri.Builder  builder = new Uri.Builder();
+                    Uri uri = builder.scheme("http")
+                            .encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
+                            .appendPath("showandsell")
+                            .appendPath("api")
+                            .appendPath("users")
+                            .appendPath("update")
+                            .appendQueryParameter("id", userId)
+                            .build();
+                    urlConnection = (HttpURLConnection) new URL(uri.toString()).openConnection();
+                    urlConnection.setReadTimeout(10000);
+                    urlConnection.setConnectTimeout(15000);
+                    urlConnection.setRequestMethod("PUT");
+                    urlConnection.setDoOutput(true);
+                    urlConnection.connect();
+
+                    // format user data as JSON
+                    String body = "";
+                    JSONObject user = new JSONObject();
+                    user.put("newGroupId", groupId);
+                    body = String.valueOf(user);
+
+                    // send JSON to Cloud Server
+                    out = new BufferedWriter(new OutputStreamWriter(urlConnection.getOutputStream(), "UTF-8"));
+                    out.write(body);
+                    out.flush();
+
+                    // obtain status code
+                    responseCode = urlConnection.getResponseCode();
+                    if(responseCode == 200) {
+                        // read response to get user data from server
+                        reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                        String responseBody = "";
+                        String line;
+                        while((line = reader.readLine()) != null) {
+                            responseBody += line + '\n';
+                        }
+
+                        // parse response as JSON
+                        JSONArray items = new JSONArray(responseBody);
+                        groupTexts.clear();
+                        groupIds.clear();
+
+                        for (int i = 0; i < items.length(); i++) {
+                            JSONObject itemJson = items.getJSONObject(i);
+
+                            groupTexts.add(itemJson.getString("name"));
+                            groupIds.add(itemJson.getString("ssGroupId"));
+                        }
+
+                        return SUCCESS;
+                    } else {
+                        return OTHER_FAILURE;
+                    }
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "Error getting response from server", e);
+                } catch (JSONException e) {
+                    Log.e(LOG_TAG, "Error parsing JSON", e);
+                } finally {
+                    // release system resources
+                    if(urlConnection != null) {
+                        urlConnection.disconnect();
+                    }
+                    if(reader != null) {
+                        try {
+                            reader.close();
+                            out.close();
                         } catch(IOException e) {
                             Log.e(LOG_TAG, "Error closing input stream", e);
                         }

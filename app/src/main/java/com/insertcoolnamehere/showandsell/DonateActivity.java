@@ -73,7 +73,6 @@ public class DonateActivity extends AppCompatActivity {
     private String mDetails;
     private String mPrice;
     private String mCondition;
-    private Bitmap mImage;
     private Bitmap mThumbnail;
 
     private String mCurrentPhotoPath;
@@ -106,14 +105,14 @@ public class DonateActivity extends AppCompatActivity {
             EditText priceEntry = (EditText) findViewById(R.id.item_price_entry);
             priceEntry.setError("Please enter a price");
             return;
-        } else if(mImage == null) {
+        } else if(mThumbnail == null) {
             mAdapter.openItem(0);
             Toast.makeText(this, "Please provide a picture", Toast.LENGTH_SHORT).show();
             return;
         }
 
         Log.d(LOG_TAG, "Making progress");
-        new UploadItemTask(this, mDescription, mPrice, mCondition, mDetails, mImage).execute();
+        new UploadItemTask(this, mDescription, mPrice, mCondition, mDetails, mThumbnail).execute();
     }
 
     private void attemptTakePic() {
@@ -168,8 +167,8 @@ public class DonateActivity extends AppCompatActivity {
             mThumbnail = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
             mImageView.setImageBitmap(mThumbnail);
 
-            bmOptions.inSampleSize = scaleFactor/2;
-            mImage = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+            //bmOptions.inSampleSize = scaleFactor/2;
+            //mImage = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
         }
     }
 
@@ -350,7 +349,7 @@ public class DonateActivity extends AppCompatActivity {
                     case 3:
                         View priceCustom = getLayoutInflater().inflate(R.layout.item_price_entry, flex, false);
                         editText = (EditText) priceCustom.findViewById(R.id.item_description_entry);
-                        editText.setText(mDetails);
+                        editText.setText(mPrice);
                         flex.addView(priceCustom);
                         break;
                     case 4:
@@ -482,7 +481,7 @@ public class DonateActivity extends AppCompatActivity {
                     // scale down image and convert to base64
                     Log.d(LOG_TAG, "is mBitmap null: "+(mBitmap == null));
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    mImage.compress(Bitmap.CompressFormat.PNG, 50, stream);
+                    mThumbnail.compress(Bitmap.CompressFormat.PNG, 100, stream);
                     byte[] byteArray = stream.toByteArray();
                     String thumbnail = Base64.encodeToString(byteArray,Base64.NO_WRAP);
 

@@ -1,0 +1,47 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical"
+    tools:context="com.insertcoolnamehere.showandsell.TutorialActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0"
+        android:layout_gravity="top"
+        android:id="@+id/tutorial_text"
+        android:text="@string/tutorial_1"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="@dimen/text_margin"
+        android:textAppearance="?textAppearanceListItem"
+        android:textColor="@color/ms_white" />
+    <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:src="@drawable/tutorial_1"
+        android:scaleType="centerInside"
+        android:layout_gravity="bottom"
+        android:id="@+id/tutorialImg"/>
+    <com.stepstone.stepper.StepperLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_weight="0"
+        android:gravity="bottom"
+        app:ms_stepperType="dots"
+        app:ms_activeStepColor="@color/ms_white"
+        app:ms_nextButtonColor="@color/ms_white"
+        app:ms_completeButtonText="Got it!   "
+        app:ms_completeButtonBackground="@color/colorPrimary"
+        app:ms_completeButtonColor="@color/ms_white"
+        app:ms_bottomNavigationBackground="@color/colorPrimary"
+        app:ms_backButtonColor="#B4FFFFFF"
+        android:id="@+id/stepper_layout" />
+
+</LinearLayout>

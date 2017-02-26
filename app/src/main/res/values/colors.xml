@@ -8,4 +8,6 @@
     <color name="hintOrDisabledText">#61000000</color>
     <color name="posterNameColor">#9FFFFFFF</color>
     <color name="unapprovedItem">#80000000</color>
+
+    <color name="black_overlay">#66000000</color>
 </resources>

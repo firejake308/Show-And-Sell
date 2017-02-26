@@ -1,8 +1,6 @@
 package com.insertcoolnamehere.showandsell;
 
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +27,7 @@ public class SummaryItemRecyclerViewAdapter extends RecyclerView.Adapter<Summary
     @Override
     public SummaryItemRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.browse_item, parent, false);
+                .inflate(R.layout.summary_item, parent, false);
         mParent = parent;
         return new SummaryItemRecyclerViewAdapter.ViewHolder(view);
     }
