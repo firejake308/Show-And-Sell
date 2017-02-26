@@ -18,6 +18,7 @@
     <string name="title_activity_donate">DonateActivity</string>
     <string name="title_activity_main">Show &amp; Sell</string>
     <string name="userId">UserId</string>
+    <string name="action_sign_in_google">Sign in with Google</string>
 
     <!-- CreateAccountActivity -->
     <string name="prompt_first_name">First Name</string>
