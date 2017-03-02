@@ -19,6 +19,7 @@
     <string name="title_activity_main">Show &amp; Sell</string>
     <string name="userId">UserId</string>
     <string name="action_sign_in_google">Sign in with Google</string>
+    <string name="server_client_id">Brayden's Server ID HERE</string> //TODO
 
     <!-- CreateAccountActivity -->
     <string name="prompt_first_name">First Name</string>

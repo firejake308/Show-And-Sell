@@ -37,5 +37,6 @@ dependencies {
     compile 'com.stepstone.stepper:material-stepper:2.3.0'
     compile 'com.google.android.gms:play-services:10.2.0'
     compile 'com.google.android.gms:play-services-location:10.2.0'
+    compile 'com.google.android.gms:play-services-auth:10.2.0'
     testCompile 'junit:junit:4.12'
 }

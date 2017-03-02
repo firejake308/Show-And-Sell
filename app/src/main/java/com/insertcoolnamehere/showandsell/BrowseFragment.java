@@ -114,8 +114,6 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                 // before clearing items list, record last item index
                 lastItemLoaded = Item.browseGroupItems.size();
-                // clear items list
-                Item.browseGroupItems.clear();
 
                 // find all items in that group and update the list
                 mFetchItemsTask = new FetchItemsTask(getActivity(), groupId).execute();

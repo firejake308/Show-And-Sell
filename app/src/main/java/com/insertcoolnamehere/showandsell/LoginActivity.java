@@ -195,14 +195,16 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         // Configure sign-in to request the user's ID, email address, and basic profile. ID and
         // basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.server_client_id))
                 .requestEmail()
                 .build();
-
-        // Build a GoogleApiClient with access to GoogleSignIn.API and the options above.
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, this)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
+        if (mGoogleApiClient == null) {
+            // Build a GoogleApiClient with access to GoogleSignIn.API and the options above.
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .enableAutoManage(this, this)
+                    .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                    .build();
+        }
 
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -215,6 +217,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            int statusCode = result.getStatus().getStatusCode();
+            Log.d("gfhdjwsfgj", "" + statusCode);
             handleSignInResult(result);
         }
     }

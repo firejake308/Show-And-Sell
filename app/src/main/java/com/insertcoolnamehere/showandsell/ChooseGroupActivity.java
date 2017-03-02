@@ -1,8 +1,11 @@
 package com.insertcoolnamehere.showandsell;
 
+import android.*;
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -11,6 +14,8 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -23,6 +28,8 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiActivity;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.insertcoolnamehere.showandsell.logic.Item;
 
@@ -45,7 +52,7 @@ import java.util.Locale;
  * This activity allows the user to choose and switch groups
  */
 
-public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
     // data for activity
     private String groupName = "";
     private List<String> groupTexts = new ArrayList<>();
@@ -61,6 +68,8 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
 
     private Location location;
     private FetchGroupsTask mAuthTask;
+
+    private final int MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 9801;
 
     // creates the choose group activity
     @Override
@@ -170,7 +179,24 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        final Activity cxtReference = this;
+        final ChooseGroupActivity cxtReference = this;
+        LocationRequest request = LocationRequest.create();
+        request.setNumUpdates(1);
+        request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        try {
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION);
+            }
+            while (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {try{Thread.sleep(500);}catch(Exception e){}}
+                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, request, cxtReference);
+        } catch (SecurityException se){Log.e("ChooseGroupActivity", "User Denied Permission");}
+        /*
         new Thread() {
             public void run() {
                 Log.d("ChooseGroupActivity", "I'm connected!");
@@ -188,7 +214,13 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
                     } catch (SecurityException se) {
                         Log.e("ChooseGroupActivity", "Security Error");
                     } catch (NullPointerException n) {
-                        Log.e("ChooseGroupActivity", "No location found");
+                        Log.d("ChooseGroupActivity", "No location found");
+                        LocationRequest request = LocationRequest.create();
+                        request.setNumUpdates(1);
+                        request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+                        try {
+                            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, request, cxtReference);
+                        } catch (SecurityException se) {Log.e("ChooseGroupActivity", "Security Error");}
                     }
                 } else {
                     Log.e("ChooseGroupActivity", "Not connected to Google API");
@@ -196,7 +228,17 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
                 mAuthTask = new ChooseGroupActivity.FetchGroupsTask(cxtReference, latitude, longitude);
                 mAuthTask.execute();
             }
-        }.start();
+        }.start();*/
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        latitude = location.getLatitude();
+        longitude = location.getLongitude();
+        Log.d("ChooseGroupActivity", "lat=" + latitude);
+        Log.d("ChooseGroupActivity", "lon=" + longitude);
+        mAuthTask = new ChooseGroupActivity.FetchGroupsTask(this, latitude, longitude);
+        mAuthTask.execute();
     }
 
     @Override
