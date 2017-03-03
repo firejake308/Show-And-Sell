@@ -1,0 +1,50 @@
+{
+  "project_info": {
+    "project_number": "367846868936",
+    "firebase_url": "https://show-and-sell.firebaseio.com",
+    "project_id": "show-and-sell",
+    "storage_bucket": "show-and-sell.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:367846868936:android:245249cb53324055",
+        "android_client_info": {
+          "package_name": "com.insertcoolnamehere.showandsell"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "367846868936-rjqg6pp4g4glrrg9vdntbc2lrh2lo5ld.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.insertcoolnamehere.showandsell",
+            "certificate_hash": "24967925007b1204c56ad57567d8d13c4039c713"
+          }
+        },
+        {
+          "client_id": "367846868936-8iu2t8kulvun2daiuqde8nlf7nm0q3ju.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMGLX9zcaQd2_apt7jBDS8arcsFCKXJUA"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
