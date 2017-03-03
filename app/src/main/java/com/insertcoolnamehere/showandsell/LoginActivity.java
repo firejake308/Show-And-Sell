@@ -180,7 +180,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             // perform the user login attempt.
             showProgress(true);
             mAuthTask = new UserLoginTask(this, email, password);
-            mAuthTask.execute((Void) null);
+            mAuthTask.execute();
         }
     }
 
@@ -195,7 +195,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         // Configure sign-in to request the user's ID, email address, and basic profile. ID and
         // basic profile are included in DEFAULT_SIGN_IN.
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.server_client_id))
                 .requestEmail()
                 .build();
         if (mGoogleApiClient == null) {

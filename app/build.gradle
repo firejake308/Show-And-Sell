@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 24
@@ -35,8 +36,8 @@ dependencies {
     compile 'com.android.support:support-vector-drawable:24.2.1'
     compile 'com.android.support:percent:24.2.1'
     compile 'com.stepstone.stepper:material-stepper:2.3.0'
-    compile 'com.google.android.gms:play-services:10.2.0'
-    compile 'com.google.android.gms:play-services-location:10.2.0'
-    compile 'com.google.android.gms:play-services-auth:10.2.0'
+    compile 'com.google.android.gms:play-services:9.0.0'
+    compile 'com.google.android.gms:play-services-location:9.0.0'
+    compile 'com.google.android.gms:play-services-auth:9.0.0'
     testCompile 'junit:junit:4.12'
 }
