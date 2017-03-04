@@ -248,6 +248,7 @@ public class CreateGroupActivity extends AppCompatActivity implements GoogleApiC
                         group.put("latitude", latitude);
                         group.put("longitude", longitude);
                     }
+                    group.put("address", streetAddress);
                     group.put("locationDetail", extraLocationData);
                     groupData.put("group", group);
                     groupData.put("password", password);

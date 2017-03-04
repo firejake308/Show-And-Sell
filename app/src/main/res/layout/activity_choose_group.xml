@@ -41,6 +41,11 @@
         android:id="@+id/textView4"
         android:paddingLeft="10dp"/>
 
+    <ProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/choose_group_progress" />
+
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

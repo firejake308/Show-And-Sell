@@ -324,7 +324,7 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
                         for (int i = 0; i < items.length(); i++) {
                             JSONObject itemJson = items.getJSONObject(i);
 
-                            groupTexts.add(itemJson.getString("name"));
+                            groupTexts.add(itemJson.getString("name")+" \u2014 "+itemJson.getString("address"));
                             groupIds.add(itemJson.getString("ssGroupId"));
                         }
 
@@ -359,7 +359,9 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
         protected void onPostExecute(Integer result) {
             // update list view
             mAdapter.notifyDataSetChanged();
-            Log.d(LOG_TAG, "data set changed");
+            View progressView = findViewById(R.id.choose_group_progress);
+            progressView.setVisibility(View.GONE);
+            Log.d(LOG_TAG, "available groups data set changed");
         }
     }
 }
