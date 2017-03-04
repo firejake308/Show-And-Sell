@@ -1,6 +1,7 @@
 package com.insertcoolnamehere.showandsell;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,7 +46,7 @@ public class FullItemRecyclerViewAdapter extends RecyclerView.Adapter<FullItemRe
         holder.mPriceView.setText(String.format(Locale.ENGLISH, "$%.2f", mItems.get(position).getPrice()));
         holder.mConditionView.setText(mItems.get(position).getCondition());
         holder.mThumbnailView.setImageBitmap(mItems.get(position).getPic());
-        holder.mThumbnailView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        holder.mThumbnailView.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
