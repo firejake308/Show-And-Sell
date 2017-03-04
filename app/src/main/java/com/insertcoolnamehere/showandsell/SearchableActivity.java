@@ -3,6 +3,7 @@ package com.insertcoolnamehere.showandsell;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -66,12 +67,17 @@ public class SearchableActivity extends AppCompatActivity {
     }
 
     public class SearchResultsAdapter<T extends Item> extends ArrayAdapter<Item> {
+        private Context context;
+        private ArrayList<Item> objects;
         public SearchResultsAdapter(Context context, int resource, ArrayList<Item> objects) {
             super(context, resource, objects);
+            this.context = context;
+            this.objects = objects;
         }
 
+        @NonNull
         @Override
-        public View getView (int position, View convertView, ViewGroup parent) {
+        public View getView (final int position, View convertView, @NonNull ViewGroup parent) {
             View view;
             if(convertView == null) {
                 // inflate a view of an item and its details
@@ -79,6 +85,16 @@ public class SearchableActivity extends AppCompatActivity {
             } else {
                 view = convertView;
             }
+
+            // open item if clicked
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(context, ItemDetailActivity.class);
+                    intent.putExtra(ItemDetailActivity.ITEM_ID, objects.get(position).getGuid());
+                    startActivity(intent);
+                }
+            });
 
             // populate the view
             TextView nameView = (TextView) view.findViewById(R.id.item_name);
