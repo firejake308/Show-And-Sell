@@ -20,8 +20,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".LoginActivity"
-            android:label="@string/app_name"
-            package="com.google.android.gms:play-services-auth:10.2.0" >
+            package="com.google.android.gms:play-services-auth:10.2.0"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -58,7 +58,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
         </activity>
-        <activity android:name=".ManageItemActivity"
+        <activity
+            android:name=".ManageItemActivity"
             android:parentActivityName=".ManageGroupActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustPan" />
@@ -90,8 +91,8 @@
             android:parentActivityName=".SettingsActivity" />
         <activity
             android:name=".DonateActivity"
-            android:windowSoftInputMode="adjustPan"
-            android:parentActivityName=".MainActivity"/>
+            android:parentActivityName=".MainActivity"
+            android:windowSoftInputMode="adjustPan" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -116,6 +117,16 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.insertcoolnamehere.showandsell.MainActivity" />
+        </activity>
+        <activity
+            android:name=".FullImageActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_full_image"
+            android:parentActivityName=".ItemDetailActivity"
+            android:theme="@style/FullscreenTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.insertcoolnamehere.showandsell.ItemDetailActivity" />
         </activity>
     </application>
 

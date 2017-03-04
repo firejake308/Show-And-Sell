@@ -83,6 +83,14 @@ public class ItemDetailActivity extends AppCompatActivity {
         ImageView itemImage = (ImageView) findViewById(R.id.item_detail_image);
         itemImage.setImageBitmap(mItem.getPic());
 
+        // open full image on click
+        itemImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openFullImage();
+            }
+        });
+
         // alternative item title
         CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbarLayout);
         toolbarLayout.setTitle(mItem.getName());
@@ -136,6 +144,12 @@ public class ItemDetailActivity extends AppCompatActivity {
         } else {
             return super.onOptionsItemSelected(menuItem);
         }
+    }
+
+    private void openFullImage() {
+        Intent intent = new Intent(this, FullImageActivity.class);
+        intent.putExtra(ITEM_ID, mItem.getGuid());
+        startActivity(intent);
     }
 
     private void initiatePurchase() {
