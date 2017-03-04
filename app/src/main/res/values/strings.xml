@@ -61,7 +61,9 @@
     <string name="item_condition">Condition</string>
     <string name="item_image">Image of Item</string>
     <string name="action_buy">Buy</string>
-    <string name="prompt_comment">Add a comment...</string>
+    <string name="prompt_comment">Add a comment&#8230;</string>
+    <string name="action_approve">Approve</string>
+    <string name="action_reject">Reject</string>
 
     <!-- Browse fragment -->
     <string name="action_refresh">Refresh</string>

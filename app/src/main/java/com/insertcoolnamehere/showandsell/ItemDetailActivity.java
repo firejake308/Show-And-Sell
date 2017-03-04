@@ -58,7 +58,7 @@ public class ItemDetailActivity extends AppCompatActivity {
     /**
      * This is the particular Item object whose data are displayed in this activity
      */
-    private Item mItem;
+    protected Item mItem;
 
     private ArrayList<Message> mComments = new ArrayList<>();
     private CommentAdapter<Message> mAdapter;
@@ -210,7 +210,7 @@ public class ItemDetailActivity extends AppCompatActivity {
      * Turns the progress spinner on/off
      * @param isLoading whether or not to show the progress spinner
      */
-    private void showProgress(boolean isLoading) {
+    protected void showProgress(boolean isLoading) {
         View actual = findViewById(R.id.items_actual_details);
         ProgressBar loading = (ProgressBar) findViewById(R.id.progress_bar);
         if(isLoading) {
@@ -355,7 +355,7 @@ public class ItemDetailActivity extends AppCompatActivity {
     /**
      * Changes the approved value of the displayed item on the server.
      */
-    private class ApproveItemTask extends AsyncTask<Void, Integer, Integer> {
+    protected class ApproveItemTask extends AsyncTask<Void, Integer, Integer> {
         private static final String LOG_TAG = "ApproveItemTask";
         private static final int SUCCESS = 0;
         private static final int NO_INTERNET = 1;
@@ -601,7 +601,7 @@ public class ItemDetailActivity extends AppCompatActivity {
         }
     }
 
-    private class RejectItemTask extends AsyncTask<Void, Integer, Integer> {
+    protected class RejectItemTask extends AsyncTask<Void, Integer, Integer> {
         private static final String LOG_TAG = "RejectItemTask";
         private static final int SUCCESS = 0;
         private static final int NO_INTERNET = 1;

@@ -107,7 +107,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             }
         });
 
-        Button mSignInGoogleButton = (Button) findViewById(R.id.sign_in_with_google_button);
+        SignInButton mSignInGoogleButton = (SignInButton) findViewById(R.id.sign_in_with_google_button);
         mSignInGoogleButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -229,7 +229,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             try {
                 GoogleSignInAccount acct = result.getSignInAccount();
                 String email = acct.getEmail();
-                String password = acct.getFamilyName();
+                String password = acct.getIdToken();
                 mAuthTask = new UserLoginTask(this, email, password);
                 mAuthTask.execute((Void) null);
             } catch (NullPointerException e) {

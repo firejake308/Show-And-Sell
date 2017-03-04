@@ -134,7 +134,8 @@ public class ManageGroupActivity extends AppCompatActivity implements SwipeRefre
     @Override
     public void onListFragmentInteraction(String itemId) {
         // start the ItemDetailActivity and tell it which item to show
-        Intent showItemDetailIntent = new Intent(this, ItemDetailActivity.class);
+        Log.d(LOG_TAG, "inside the onListFragmentInteraction for: "+itemId);
+        Intent showItemDetailIntent = new Intent(this, ManageItemActivity.class);
         showItemDetailIntent.putExtra(ItemDetailActivity.ITEM_ID, itemId);
         showItemDetailIntent.putExtra(ItemDetailActivity.OWNER_POWERS, true);
         startActivity(showItemDetailIntent);

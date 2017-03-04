@@ -3,9 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.insertcoolnamehere.showandsell.ItemDetailActivity">
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
+        android:id="@+id/action_approve"
+        android:orderInCategory="1"
         android:title="@string/action_settings"
-        android:icon="@drawable/ic_settings"
+        android:icon="@drawable/ic_approve"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_reject"
+        android:orderInCategory="2"
+        android:title="@string/action_reject"
+        android:icon="@drawable/ic_close_white_48px"
         app:showAsAction="ifRoom" />
 </menu>
