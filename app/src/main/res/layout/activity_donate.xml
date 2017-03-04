@@ -8,6 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="24dp"
+    android:orientation="vertical"
     tools:context="com.insertcoolnamehere.showandsell.DonateActivity">
     <ListView
         android:layout_width="match_parent"
@@ -16,4 +17,10 @@
         android:divider="@null"
         android:dividerHeight="0dp"
         android:descendantFocusability="afterDescendants"/>
+
+    <ProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/donate_progress_bar"
+        android:visibility="gone"/>
 </LinearLayout>

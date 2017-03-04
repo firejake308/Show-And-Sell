@@ -16,6 +16,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.NavUtils;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -189,6 +190,21 @@ public class DonateActivity extends AppCompatActivity {
         return  imgFile;
     }
 
+    /**
+     * Shows a loading animation
+     * @param loading whether or not to show the loading animation
+     */
+    private void showProgress(boolean loading) {
+        View progressBar = findViewById(R.id.donate_progress_bar);
+        if (loading) {
+            mListView.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+        } else {
+            mListView.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
+        }
+    }
+
     private class StepAdapter extends BaseAdapter {
         /**
          * The total number of steps displayed by this adapter
@@ -271,6 +287,7 @@ public class DonateActivity extends AppCompatActivity {
                                     mPrice = String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(editText.getText().toString()));
                             }
                         } else if (mCurrentStep == 4) {
+                            showProgress(true);
                             donate();
                             return;
                         }
@@ -543,6 +560,14 @@ public class DonateActivity extends AppCompatActivity {
             Button takePicBtn = (Button) findViewById(R.id.upload_img_btn);
             if (takePicBtn != null)
                 takePicBtn.setText(getString(R.string.prompt_image_upload));
+
+            // go back to main activity
+            if(result) {
+                Toast.makeText(mParent, R.string.successful_donation, Toast.LENGTH_SHORT).show();
+                NavUtils.navigateUpFromSameTask(mParent);
+            } else {
+                Toast.makeText(mParent, R.string.error_donate, Toast.LENGTH_SHORT).show();
+            }
         }
     }
 }

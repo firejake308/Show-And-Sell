@@ -90,7 +90,8 @@
             android:parentActivityName=".SettingsActivity" />
         <activity
             android:name=".DonateActivity"
-            android:windowSoftInputMode="adjustPan" />
+            android:windowSoftInputMode="adjustPan"
+            android:parentActivityName=".MainActivity"/>
 
         <provider
             android:name="android.support.v4.content.FileProvider"

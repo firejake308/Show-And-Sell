@@ -33,7 +33,7 @@
     <string name="action_logout">Logout</string>
     <string name="section_format">Hello %1$s from section: %2$d</string>
 
-    <!-- Donate Fragment -->
+    <!-- Donate Activity -->
     <string name="prompt_item_description">Title</string>
     <string name="prompt_item_details">Details</string>
     <string name="prompt_item_condition">Condition</string>
@@ -54,6 +54,8 @@
     <string name="step_condition_label">Is it new or used?</string>
     <string name="next_step_btn_label">Continue</string>
     <string name="prev_step_btn_label">Previous</string>
+    <string name="successful_donation">Item was donated successfully!</string>
+    <string name="error_donate">An error occurred during donation.</string>
 
     <!-- Item detail -->
     <string name="item_description">Description</string>
