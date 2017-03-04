@@ -21,7 +21,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -30,7 +29,6 @@ import android.widget.TextView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.insertcoolnamehere.showandsell.dummy.DummyContent;
 import com.insertcoolnamehere.showandsell.logic.Item;
 
 import org.json.JSONArray;
@@ -39,7 +37,6 @@ import org.json.JSONObject;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -47,7 +44,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.ListIterator;
 import java.util.Locale;
 
 public class ItemDetailActivity extends AppCompatActivity {
@@ -69,18 +65,16 @@ public class ItemDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // set the layout of the activity
-        setContentView(R.layout.activity_item_detail);
+        setContentView(this instanceof ManageItemActivity?R.layout.activity_manage_item:R.layout.activity_item_detail);
 
         // get item data from intent
         Intent startingIntent = getIntent();
         Uri data = startingIntent.getData();
-        boolean giveOwnerPowers;
+
         if (data == null) {
             // open from app
             mItem = Item.getItem(startingIntent.getStringExtra(ITEM_ID));
-            giveOwnerPowers = startingIntent.getBooleanExtra(OWNER_POWERS, false);
         } else {
-            giveOwnerPowers = false;
             mItem = Item.getItem(data.toString().split("://")[1]);
             Log.d("ItemDetailActivity", "uri="+data);
         }
@@ -93,39 +87,13 @@ public class ItemDetailActivity extends AppCompatActivity {
         CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbarLayout);
         toolbarLayout.setTitle(mItem.getName());
 
+        // populate item detail fields
         TextView itemPrice = (TextView) findViewById(R.id.item_detail_price);
         itemPrice.setText(String.format(Locale.ENGLISH, "%.2f", mItem.getPrice()));
         TextView itemCondition = (TextView) findViewById(R.id.item_detail_condition);
         itemCondition.setText(mItem.getCondition());
         TextView itemDescription = (TextView) findViewById(R.id.item_detail_description);
         itemDescription.setText(mItem.getDescription());
-
-        FloatingActionButton approveBtn = (FloatingActionButton) findViewById(R.id.btn_approve);
-        final Activity parentForTask = this;
-        if(giveOwnerPowers) {
-            // show reject button if group owner
-            FloatingActionButton rejectButton = (FloatingActionButton) findViewById(R.id.btn_reject);
-            //rejectButton.setVisibility(View.VISIBLE);
-            rejectButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    new RejectItemTask(parentForTask).execute();
-                    showProgress(true);
-                }
-            });
-
-            // show approve button if user is group owner and item needs approval
-            if (!mItem.isApproved()) {
-                //approveBtn.setVisibility(View.VISIBLE);
-                approveBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        new ApproveItemTask(parentForTask, true).execute();
-                        showProgress(true);
-                    }
-                });
-            }
-        }
 
         // set up comments list view
         ListView listView = (ListView) findViewById(R.id.item_comments);
@@ -212,16 +180,23 @@ public class ItemDetailActivity extends AppCompatActivity {
      */
     protected void showProgress(boolean isLoading) {
         View actual = findViewById(R.id.items_actual_details);
+        View image = findViewById(R.id.item_detail_image);
+        View button = findViewById(R.id.item_detail_buy);
         ProgressBar loading = (ProgressBar) findViewById(R.id.progress_bar);
+
         if(isLoading) {
             // hide actual details
             actual.setVisibility(View.GONE);
+            image.setVisibility(View.GONE);
+            button.setVisibility(View.GONE);
 
             // show progress bar
             loading.setVisibility(View.VISIBLE);
         } else {
             // show actual details
             actual.setVisibility(View.VISIBLE);
+            image.setVisibility(View.VISIBLE);
+            button.setVisibility(View.VISIBLE);
 
             // hide progress bar
             loading.setVisibility(View.GONE);
@@ -363,15 +338,19 @@ public class ItemDetailActivity extends AppCompatActivity {
 
         private Activity mParent;
         private boolean doApprove;
+        private String newPrice;
+        private String newDescription;
 
         /**
          * Creates a new ApproveTask to approve/disapprove an item
          * @param parent the parent activity to which the AsyncTask is bound
          * @param doApprove whether or not to approve the item
          */
-        ApproveItemTask(Activity parent, boolean doApprove) {
+        ApproveItemTask(Activity parent, String price, String description, boolean doApprove) {
             mParent = parent;
             this.doApprove = doApprove;
+            newPrice = price;
+            newDescription = description;
         }
 
         @Override
@@ -421,28 +400,28 @@ public class ItemDetailActivity extends AppCompatActivity {
                     conn.setChunkedStreamingMode(0);
                     conn.connect();
 
+                    // update new values for item
+                    mItem.setPrice(Double.parseDouble(newPrice));
+                    mItem.setDescription(newDescription);
+
                     // get values for item
                     String name = mItem.getName();
-                    String price = ""+mItem.getPrice();
                     String condition = mItem.getCondition();
-                    String description = mItem.getDescription();
                     Bitmap itemBitmap = mItem.getPic();
 
                     // scale down image and convert to base64
                     Log.d(LOG_TAG, "is itemBitmap null: "+(itemBitmap == null));
-                    double scaleFactor = Math.max(itemBitmap.getWidth()/250.0, itemBitmap.getHeight()/250.0);
-                    Bitmap bmp = Bitmap.createScaledBitmap(itemBitmap, (int)(itemBitmap.getWidth()/scaleFactor),(int)(itemBitmap.getHeight()/scaleFactor), false);
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    itemBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
                     byte[] byteArray = stream.toByteArray();
                     String thumbnail = Base64.encodeToString(byteArray, Base64.NO_WRAP);
 
                     // convert item to JSON
                     JSONObject item = new JSONObject();
                     item.put("newName", name);
-                    item.put("newPrice", price);
+                    item.put("newPrice", newPrice);
                     item.put("newCondition", condition);
-                    item.put("newDescription", description);
+                    item.put("newDescription", newDescription);
                     item.put("approved", doApprove);
                     item.put("newThumbnail", thumbnail);
                     String body = item.toString();
@@ -493,7 +472,7 @@ public class ItemDetailActivity extends AppCompatActivity {
                 showProgress(false);
 
                 // return to previous activity
-                Intent goHomeIntent = new Intent(mParent, MainActivity.class);
+                Intent goHomeIntent = new Intent(mParent, ManageGroupActivity.class);
                 startActivity(goHomeIntent);
             } else if (result == OTHER_FAILURE) {
                 showProgress(false);
@@ -700,7 +679,7 @@ public class ItemDetailActivity extends AppCompatActivity {
                 showProgress(false);
 
                 // return to previous activity
-                Intent goHomeIntent = new Intent(mParent, MainActivity.class);
+                Intent goHomeIntent = new Intent(mParent, ManageGroupActivity.class);
                 startActivity(goHomeIntent);
             }
         }

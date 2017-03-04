@@ -135,36 +135,10 @@
         app:backgroundTint="?attr/colorAccent"
         app:elevation="6dp"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        app:fabSize="mini"
-        app:srcCompat="@drawable/ic_close_white_48px"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="6dp"
-        android:id="@+id/btn_reject"
-        app:backgroundTint="#F44336"
-        android:visibility="gone"
-        app:elevation="6dp"/>
-
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        app:fabSize="mini"
-        app:srcCompat="@drawable/ic_approve"
-        android:layout_alignParentTop="true"
-        android:layout_toStartOf="@id/btn_reject"
-        android:layout_marginEnd="12dp"
-        android:id="@+id/btn_approve"
-        app:backgroundTint="?attr/colorPrimary"
-        android:visibility="gone"
-        app:elevation="6dp"/>
     <ProgressBar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="?attr/actionBarSize"
         android:id="@+id/progress_bar"
         android:visibility="gone" />
 </android.support.design.widget.CoordinatorLayout>

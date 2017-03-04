@@ -74,6 +74,7 @@ public class DonateActivity extends AppCompatActivity {
     private String mPrice;
     private String mCondition;
     private Bitmap mThumbnail;
+    private Bitmap mImage;
 
     private String mCurrentPhotoPath;
 
@@ -112,7 +113,7 @@ public class DonateActivity extends AppCompatActivity {
         }
 
         Log.d(LOG_TAG, "Making progress");
-        new UploadItemTask(this, mDescription, mPrice, mCondition, mDetails, mThumbnail).execute();
+        new UploadItemTask(this, mDescription, mPrice, mCondition, mDetails, mImage).execute();
     }
 
     private void attemptTakePic() {
@@ -167,8 +168,8 @@ public class DonateActivity extends AppCompatActivity {
             mThumbnail = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
             mImageView.setImageBitmap(mThumbnail);
 
-            //bmOptions.inSampleSize = scaleFactor/2;
-            //mImage = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+            bmOptions.inSampleSize = 4;
+            mImage = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
         }
     }
 
