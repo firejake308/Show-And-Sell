@@ -13,7 +13,7 @@
     <string name="action_sign_in_google">Iniciar sesión con Google</string>
     <string name="action_sign_in_short">Iniciar sesión</string>
     <string name="action_sign_up">Crear cuenta</string>
-    <string name="actions">Acciones</string>
+    <string name="actions">ACCIONES</string>
     <string name="choose_group">Elegir Grupo Primario</string>
     <string name="choose_group_instructions">Seleccionar un grupo aquí decidirá cuales artículos aparezcan en la lista y dónde van los artículos donados.</string>
     <string name="condition_new"></string>
@@ -26,7 +26,7 @@
     <string name="error_incorrect_email">Ningún usuario así existe</string>
     <string name="error_incorrect_password">Contraseña incorrecta</string>
     <string name="error_invalid_email">Correo inválido</string>
-    <string name="error_invalid_password"></string>
+    <string name="error_invalid_password">Necesita 4+ letras</string>
     <string name="error_no_group">Parece que todavía no ha escogido ningún grupo. Toque aquí y le ayudamos escoger.</string>
     <string name="error_not_group_owner">Parece que todavía no has creado ningún grupo. Si quisiera empezar su propia venta de garaje, toque aquí y le ayudamos.</string>
     <string name="error_password_match">Contraseñas necesitan igualar</string>
@@ -39,8 +39,8 @@
     <string name="item_image">Imágen del Artículo</string>
     <string name="manage_group">Mi Grupo</string>
     <string name="next_step_btn_label">Seguir</string>
-    <string name="options">OPCIÓNES</string>
-    <string name="prompt_comment">Añadir comento&#8320;</string>
+    <string name="options">OPCIONES</string>
+    <string name="prompt_comment">Añadir comentario...</string>
     <string name="prompt_confirm_password">Confirmar Contraseña</string>
     <string name="prompt_email">Correo Electrónico</string>
     <string name="prompt_enter_city">Ciudad</string>
@@ -73,4 +73,7 @@
     <string name="tutorial_6">Sólo entreque la información solicitada y lleve el artículo a la Estación de Recoger para que la gerente del grupo lo apruebe.</string>
     <string name="tutorial_7">Los gerentes pueden crear sus propios Grupos desde Configuración &gt; Mi Grupo. Sólo llene la información sobre la escuela. Para el campo\nde \"Información Extra de Ubicación\" provea instrucciones sobre dónde en la escuela los compradores puedan recoger los artículos.</string>
     <string name="tweet_pattern">¡Mira este %2$s de $%1$.2f en Mostrar y Comprar! http://ich-showandsell.gear.host/?itemId=%3$s</string>
+    <string name="title_activity_main">Mostrar y Comprar</string>
+    <string name="title_activity_tutorial">Ayuda</string>
+    <string name="prev_step_btn_label">Atrás</string>
 </resources>

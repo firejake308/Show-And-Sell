@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.AsyncTask;
@@ -239,9 +240,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             try {
                 GoogleSignInAccount acct = result.getSignInAccount();
                 String email = acct.getEmail();
-                String password = acct.getIdToken();
+                String password = acct.getId();
                 mAuthTask = new UserLoginTask(this, email, password);
-                mAuthTask.execute((Void) null);
+                mAuthTask.execute();
             } catch (NullPointerException e) {
                 Log.e("LoginActivity", "null exception");
             }
@@ -251,7 +252,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult result) {
+    public void onConnectionFailed(@NonNull ConnectionResult result) {
         Log.e("LoginActivity", "I'm a failure at life and i should kill myself");
     }
 

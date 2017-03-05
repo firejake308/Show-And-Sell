@@ -77,17 +77,12 @@
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".ChooseGroupActivity"
-            package="com.google.android.gms.location.sample.basiclocationsample"
-            android:label="ChooseGroup"
+            android:label="@string/choose_group"
             android:parentActivityName=".SettingsActivity" />
-
-        <service
-            android:name=".GetUpdatesService"
-            android:enabled="true"
-            android:exported="true" />
 
         <activity
             android:name=".ManageGroupActivity"
+            android:label="@string/manage_group"
             android:parentActivityName=".SettingsActivity" />
         <activity
             android:name=".DonateActivity"

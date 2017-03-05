@@ -182,7 +182,9 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
             if (mColumnCount <= 1) {
                 mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
-                mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(mColumnCount, StaggeredGridLayoutManager.VERTICAL));
+                StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(mColumnCount, StaggeredGridLayoutManager.VERTICAL);
+                layoutManager.setReverseLayout(true);
+                mRecyclerView.setLayoutManager(layoutManager);
             }
             if(isBookmark())
                 adapter = new FullItemRecyclerViewAdapter(Item.bookmarkedItems, mListener);
@@ -260,7 +262,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 .appendPath("approvedinrange")
                 .appendQueryParameter("groupId", id)
                 .appendQueryParameter("start", ""+lastItemLoaded)
-                .appendQueryParameter("end", ""+(lastItemLoaded+5))
+                .appendQueryParameter("end", ""+(lastItemLoaded+6))
                 .build();
         Log.d("BrowseFragment", builder.toString());
         return new URL(builder.toString());
