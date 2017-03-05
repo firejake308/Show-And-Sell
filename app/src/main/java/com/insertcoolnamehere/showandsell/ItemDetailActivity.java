@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -17,6 +18,8 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +33,14 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.insertcoolnamehere.showandsell.logic.Item;
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterAuthToken;
+import com.twitter.sdk.android.core.TwitterCore;
+import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.identity.TwitterLoginButton;
+import com.twitter.sdk.android.tweetcomposer.ComposerActivity;
+import com.twitter.sdk.android.tweetcomposer.TweetComposer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,6 +56,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Locale;
+
+import io.fabric.sdk.android.Fabric;
 
 public class ItemDetailActivity extends AppCompatActivity {
 
@@ -74,11 +87,126 @@ public class ItemDetailActivity extends AppCompatActivity {
         if (data == null) {
             // open from app
             mItem = Item.getItem(startingIntent.getStringExtra(ITEM_ID));
+
+            // set text and images for the activity view
+            ImageView itemImage = (ImageView) findViewById(R.id.item_detail_image);
+            itemImage.setImageBitmap(mItem.getPic());
+
+            // open full image on click
+            itemImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    openFullImage();
+                }
+            });
+
+            // alternative item title
+            CollapsingToolbarLayout toolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsingToolbarLayout);
+            toolbarLayout.setTitle(mItem.getName());
+
+            // populate item detail fields
+            TextView itemPrice = (TextView) findViewById(R.id.item_detail_price);
+            itemPrice.setText(String.format(Locale.ENGLISH, "%.2f", mItem.getPrice()));
+            TextView itemCondition = (TextView) findViewById(R.id.item_detail_condition);
+            itemCondition.setText(mItem.getCondition());
+            TextView itemDescription = (TextView) findViewById(R.id.item_detail_description);
+            itemDescription.setText(mItem.getDescription());
+
+            // set up comments list view
+            ListView listView = (ListView) findViewById(R.id.item_comments);
+            mAdapter = new CommentAdapter<>(this, R.layout.text_view_comment_right, mComments);
+            listView.setAdapter(mAdapter);
+            if (mFetchCommentsTask == null) {
+                new FetchCommentsTask(this).execute();
+            }
         } else {
-            mItem = Item.getItem(data.toString().split("://")[1]);
+            new FetchItemTask(this, data.toString().split("://")[1]).execute();
             Log.d("ItemDetailActivity", "uri="+data);
+            showProgress(true);
+            return;
         }
 
+        // set up post comment button
+        final ImageButton postComment = (ImageButton) findViewById(R.id.btn_send_message);
+        final EditText commentEntry = (EditText) findViewById(R.id.enter_comment);
+        postComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                attemptPostComment(commentEntry.getText().toString());
+                commentEntry.setText("");
+            }
+        });
+
+        // set up buy button
+        FloatingActionButton buyButton = (FloatingActionButton) findViewById(R.id.item_detail_buy);
+        buyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                initiatePurchase();
+            }
+        });
+
+        // set up toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        // set up Twitter
+        TwitterAuthConfig authConfig = new TwitterAuthConfig("TRASsuHji6yAXISCkDdUyABKy", "Oz3kxcNGJfM9QKfkfRETavcJEPdtovHFhnPtDmD56b5hjdRAyR");
+        Fabric.with(this, new TwitterCore(authConfig), new TweetComposer());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_item_detail, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        if (menuItem.getItemId() == android.R.id.home) {
+            NavUtils.navigateUpFromSameTask(this);
+            return true;
+        } else if (menuItem.getItemId() == R.id.action_share) {
+            /*loginButton = (TwitterLoginButton) findViewById(R.id.twitter_login_button);
+            loginButton.setCallback(new Callback<TwitterSession>() {
+                @Override
+                public void success(Result<TwitterSession> result) {
+                    // The TwitterSession is also available through:
+                    // Twitter.getInstance().core.getSessionManager().getActiveSession()
+                    TwitterSession session = result.data;
+                    // TODO: Remove toast and use the TwitterSession's userID
+                    // with your app's user model
+                    String msg = "@" + session.getUserName() + " logged in! (#" + session.getUserId() + ")";
+                    Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+                }
+                @Override
+                public void failure(TwitterException exception) {
+                    Log.d("TwitterKit", "Login with Twitter failure", exception);
+                }
+            });*/
+            TwitterSession session = Twitter.getSessionManager().getActiveSession();
+            if (session != null) {
+                TweetComposer.Builder builder = new TweetComposer.Builder(this)
+                        .text(String.format(getString(R.string.tweet_pattern), mItem.getPrice(), mItem.getName(), mItem.getGuid()));
+                builder.show();
+            } else {
+                TweetComposer.Builder builder = new TweetComposer.Builder(this)
+                        .text(String.format(getString(R.string.tweet_pattern), mItem.getPrice(), mItem.getName(), mItem.getGuid()));
+                builder.show();
+                Toast.makeText(this, "Please add your Twitter account under Settings to share", Toast.LENGTH_SHORT).show();
+            }
+            return true;
+        } else if(menuItem.getItemId() == R.id.action_bookmark) {
+            attemptPostBookmark();
+            return true;
+        }else {
+            return super.onOptionsItemSelected(menuItem);
+        }
+    }
+
+    private void finishCreation() {
         // set text and images for the activity view
         ImageView itemImage = (ImageView) findViewById(R.id.item_detail_image);
         itemImage.setImageBitmap(mItem.getPic());
@@ -109,40 +237,6 @@ public class ItemDetailActivity extends AppCompatActivity {
         listView.setAdapter(mAdapter);
         if (mFetchCommentsTask == null) {
             new FetchCommentsTask(this).execute();
-        }
-
-        // set up post comment button
-        final ImageButton postComment = (ImageButton) findViewById(R.id.btn_send_message);
-        final EditText commentEntry = (EditText) findViewById(R.id.enter_comment);
-        postComment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                attemptPostComment(commentEntry.getText().toString());
-                commentEntry.setText("");
-            }
-        });
-
-        // set up buy button
-        FloatingActionButton buyButton = (FloatingActionButton) findViewById(R.id.item_detail_buy);
-        buyButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                initiatePurchase();
-            }
-        });
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem menuItem) {
-        if (menuItem.getItemId() == android.R.id.home) {
-            NavUtils.navigateUpFromSameTask(this);
-            return true;
-        } else {
-            return super.onOptionsItemSelected(menuItem);
         }
     }
 
@@ -1064,6 +1158,135 @@ public class ItemDetailActivity extends AppCompatActivity {
                 showProgress(false);
                 mFetchCommentsTask = null;
             }
+        }
+    }
+
+    private class FetchItemTask extends AsyncTask<Void, Integer, Integer> {
+        /**
+         * The Activity within which this AsyncTask runs
+         */
+        private Activity mParent;
+        private String mItemId;
+
+        private final String LOG_TAG = FetchItemTask.class.getSimpleName();
+        private final int NOT_FOUND = 3;
+        private final int NO_INERNET = 2;
+        private final int SUCCESS = 1;
+        private final int OTHER_FAILURE = 0;
+
+        public FetchItemTask(Activity parent, String itemId) {
+            mParent = parent;
+            mItemId = itemId;
+        }
+
+        protected Integer doInBackground(Void... urls) {
+            // im gonna copy paste the networking code from Login here
+            // variables that we will have to close in try loop
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+
+            // the unparsed JSON response from the server
+            int responseCode = -1;
+
+            // cancel if task is detached from activity
+            // check for internet connection
+            ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo info = manager.getActiveNetworkInfo();
+
+            if(info == null || !info.isConnected()) {
+                // if there is no network, inform user through a toast
+                mParent.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                        Log.d(LOG_TAG, "No connection available");
+                    }
+                });
+                return NO_INERNET;
+            } else {
+                try {
+                    String location = new Uri.Builder().scheme("http")
+                            .encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
+                            .appendEncodedPath("showandsell")
+                            .appendPath("api")
+                            .appendPath("items")
+                            .appendPath("item")
+                            .appendQueryParameter("id", mItemId).build().toString();
+                    URL url = new URL(location);
+
+                    // connect to the URL and open the reader
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setReadTimeout(10000);
+                    urlConnection.setConnectTimeout(15000);
+                    urlConnection.setRequestMethod("GET");
+                    urlConnection.connect();
+
+                    // obtain status code
+                    responseCode = urlConnection.getResponseCode();
+                    Log.d(LOG_TAG, "response code="+responseCode);
+                    if(responseCode == 200) {
+                        // read response to get user data from server
+                        reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                        String line = "";
+                        String responseBody = "";
+                        while((line = reader.readLine()) != null) {
+                            responseBody += line + '\n';
+                        }
+
+                        // parse response as JSON
+                        JSONObject itemJson = new JSONObject(responseBody);
+
+                        mItem = new Item(itemJson.getString("ssItemId"), Item.BOOKMARK);
+                        Log.d(LOG_TAG, "Server contains item #"+mItem.getGuid());
+                        mItem.setName(itemJson.getString("name"));
+                        mItem.setPrice(itemJson.getDouble("price"));
+                        mItem.setCondition(itemJson.getString("condition"));
+                        mItem.setDescription(itemJson.getString("description"));
+                        byte[] imgBytes = Base64.decode(itemJson.getString("thumbnail"), Base64.NO_PADDING);
+                        mItem.setPic(BitmapFactory.decodeByteArray(imgBytes, 0, imgBytes.length));
+                        mItem.setApproved(itemJson.getBoolean("approved"));
+                        mItem.setOwnerId(itemJson.getString("ownerId"));
+                        Log.d(LOG_TAG, "Item # "+mItem+" is approved? "+mItem.isApproved());
+
+                        return SUCCESS;
+                    } else if (responseCode == 404) {
+                        return NOT_FOUND;
+                    } else {
+                        return OTHER_FAILURE;
+                    }
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "Error getting response from server", e);
+                } catch (JSONException e) {
+                    Log.e(LOG_TAG, "Error parsing JSON", e);
+                } finally {
+                    // release system resources
+                    if(urlConnection != null) {
+                        urlConnection.disconnect();
+                    }
+                    if(reader != null) {
+                        try {
+                            reader.close();
+                        } catch(IOException e) {
+                            Log.e(LOG_TAG, "Error closing input stream", e);
+                        }
+                    }
+                }
+            }
+
+            // if anything goes wrong, return the other failure code
+            return OTHER_FAILURE;
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            if (result == SUCCESS) {
+                finishCreation();
+            } else if(result == OTHER_FAILURE) {
+                Log.e(LOG_TAG, "It appears that the task failed :(");
+            }
+
+            // no matter what happens, show user that we're done trying here
+            showProgress(false);
         }
     }
 

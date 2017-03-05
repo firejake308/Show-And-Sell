@@ -68,7 +68,9 @@
     <string name="action_reject">Reject</string>
     <string name="confirm_delete">Are you sure you want to delete this item?</string>
     <string name="confirm">OK</string>
-    <string name="cancel">CANCEL</string>
+    <string name="action_bookmark">Bookmark</string>
+    <string name="action_share">Share</string>
+    <string name="tweet_pattern">Check out this $%1$.2f %2$s on Show &amp; Sell! http://ich-showandsell.gear.host/?itemId=%3$s</string>
 
     <!-- Browse fragment -->
     <string name="action_refresh">Refresh</string>

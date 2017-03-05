@@ -27,6 +27,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import io.fabric.sdk.android.Fabric;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -54,6 +57,11 @@ import static android.content.ContentValues.TAG;
  */
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
 
+    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
+    private static final String TWITTER_KEY = "TRASsuHji6yAXISCkDdUyABKy";
+    private static final String TWITTER_SECRET = "Oz3kxcNGJfM9QKfkfRETavcJEPdtovHFhnPtDmD56b5hjdRAyR";
+
+
     public static final String CLOUD_SERVER_IP = "68.248.214.70:8080";
 
     /**
@@ -73,6 +81,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+        Fabric.with(this, new Twitter(authConfig));
 
         // if user is already logged in, go straight to main activity
         SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key),
