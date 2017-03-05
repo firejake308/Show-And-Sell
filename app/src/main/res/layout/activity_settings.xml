@@ -52,15 +52,6 @@
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="5dp" />
-
-    <com.twitter.sdk.android.core.identity.TwitterLoginButton
-        android:id="@+id/twitter_login_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <Space
-        android:layout_width="match_parent"
         android:layout_height="35dp" />
 
     <TextView

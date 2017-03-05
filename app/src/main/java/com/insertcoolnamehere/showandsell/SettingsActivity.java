@@ -53,8 +53,6 @@ import com.twitter.sdk.android.core.identity.TwitterLoginButton;
  */
 public class SettingsActivity extends AppCompatActivity {
 
-    private TwitterLoginButton loginButton;
-
     // create settings activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,31 +92,6 @@ public class SettingsActivity extends AppCompatActivity {
                 openHelp();
             }
         });
-
-        loginButton = (TwitterLoginButton) findViewById(R.id.twitter_login_button);
-        loginButton.setCallback(new Callback<TwitterSession>() {
-            @Override
-            public void success(Result<TwitterSession> result) {
-                // The TwitterSession is also available through:
-                // Twitter.getInstance().core.getSessionManager().getActiveSession()
-                TwitterSession session = result.data;
-                // TODO: Remove toast and use the TwitterSession's userID
-                String msg = "@" + session.getUserName() + " logged in! (#" + session.getUserId() + ")";
-                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
-            }
-            @Override
-            public void failure(TwitterException exception) {
-                Log.d("TwitterKit", "Login with Twitter failure", exception);
-            }
-        });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        // Make sure that the loginButton hears the result from any
-        // Activity that it triggered.
-        loginButton.onActivityResult(requestCode, resultCode, data);
     }
 
     /**

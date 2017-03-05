@@ -169,34 +169,9 @@ public class ItemDetailActivity extends AppCompatActivity {
             NavUtils.navigateUpFromSameTask(this);
             return true;
         } else if (menuItem.getItemId() == R.id.action_share) {
-            /*loginButton = (TwitterLoginButton) findViewById(R.id.twitter_login_button);
-            loginButton.setCallback(new Callback<TwitterSession>() {
-                @Override
-                public void success(Result<TwitterSession> result) {
-                    // The TwitterSession is also available through:
-                    // Twitter.getInstance().core.getSessionManager().getActiveSession()
-                    TwitterSession session = result.data;
-                    // TODO: Remove toast and use the TwitterSession's userID
-                    // with your app's user model
-                    String msg = "@" + session.getUserName() + " logged in! (#" + session.getUserId() + ")";
-                    Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
-                }
-                @Override
-                public void failure(TwitterException exception) {
-                    Log.d("TwitterKit", "Login with Twitter failure", exception);
-                }
-            });*/
-            TwitterSession session = Twitter.getSessionManager().getActiveSession();
-            if (session != null) {
-                TweetComposer.Builder builder = new TweetComposer.Builder(this)
-                        .text(String.format(getString(R.string.tweet_pattern), mItem.getPrice(), mItem.getName(), mItem.getGuid()));
-                builder.show();
-            } else {
-                TweetComposer.Builder builder = new TweetComposer.Builder(this)
-                        .text(String.format(getString(R.string.tweet_pattern), mItem.getPrice(), mItem.getName(), mItem.getGuid()));
-                builder.show();
-                Toast.makeText(this, "Please add your Twitter account under Settings to share", Toast.LENGTH_SHORT).show();
-            }
+            TweetComposer.Builder builder = new TweetComposer.Builder(this)
+                .text(String.format(getString(R.string.tweet_pattern), mItem.getPrice(), mItem.getName(), mItem.getGuid()));
+            builder.show();
             return true;
         } else if(menuItem.getItemId() == R.id.action_bookmark) {
             attemptPostBookmark();
