@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "367846868936-7f1vu8vqkjdus1925pu0presnirg9jk9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.insertcoolnamehere.showandsell",
+            "certificate_hash": "55ab78ca35e7d9c5e793a13147203c0ee1e97282"
+          }
+        },
+        {
           "client_id": "367846868936-rjqg6pp4g4glrrg9vdntbc2lrh2lo5ld.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

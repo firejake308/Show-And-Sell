@@ -32,6 +32,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.insertcoolnamehere.showandsell.logic.CryptoTool;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -156,7 +157,8 @@ public class CreateAccountActivity extends AppCompatActivity implements OnConnec
             // cancel and inform user of any errors
             focusView.requestFocus();
         } else {
-            mAuthTask = new CreateAccountTask(this, firstName, lastName, email, password1);
+
+            mAuthTask = new CreateAccountTask(this, firstName, lastName, email, CryptoTool.encrypt(password1));
             mAuthTask.execute();
         }
     }

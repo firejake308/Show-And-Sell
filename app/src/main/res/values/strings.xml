@@ -13,9 +13,9 @@
     <string name="error_incorrect_email">No such user exists</string>
     <string name="error_incorrect_password">Password is incorrect</string>
     <string name="error_field_required">This field is required</string>
-    <string name="title_activity_item_detail">ItemDetailActivity</string>
+    <string name="title_activity_item_detail" translatable="false">ItemDetailActivity</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_donate">DonateActivity</string>
+    <string name="title_activity_donate" translatable="false">DonateActivity</string>
     <string name="title_activity_main">Show &amp; Sell</string>
     <string name="userId" translatable="false">UserId</string>
     <string name="action_sign_in_google">Sign in with Google</string>
@@ -31,7 +31,7 @@
 
     <!-- MainActivity -->
     <string name="action_logout">Logout</string>
-    <string name="section_format">Hello %1$s from section: %2$d</string>
+    <string name="section_format" translatable="false">Hello %1$s from section: %2$d</string>
 
     <!-- Donate Activity -->
     <string name="prompt_item_description">Name</string>
@@ -73,7 +73,7 @@
     <string name="tweet_pattern">Check out this $%1$.2f %2$s on Show &amp; Sell! http://ich-showandsell.gear.host/?itemId=%3$s</string>
 
     <!-- Browse fragment -->
-    <string name="action_refresh">Refresh</string>
+    <string name="action_refresh" translatable="false">Refresh</string>
     <string name="title_activity_settings">Settings</string>
     <string name="saved_group_id" translatable="false">SAVED_GROUP_ID</string>
     <string name="saved_group_name" translatable="false">SAVED_GROUP_NAME</string>
@@ -119,32 +119,13 @@
     <string name="group_owner_boolean" translatable="false">isGroupOwner</string>
 
     <!-- Example General settings -->
-    <string name="pref_header_general">General</string>
-
-    <string name="pref_title_social_recommendations">Enable social recommendations</string>
-    <string name="pref_description_social_recommendations">Recommendations for people to contact
-        based on your message history
-    </string>
-
-    <string name="pref_title_display_name">Display name</string>
-    <string name="pref_default_display_name">John Smith</string>
-
-    <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
-    <string-array name="pref_example_list_titles">
-        <item>Always</item>
-        <item>When possible</item>
-        <item>Never</item>
-    </string-array>
-    <string-array name="pref_example_list_values">
-        <item>1</item>
-        <item>0</item>
-        <item>-1</item>
-    </string-array>
+    <string name="pref_title_display_name" translatable="false">Display name</string>
+    <string name="pref_default_display_name" translatable="false">John Smith</string>
 
     <!-- Example settings for Data & Sync -->
-    <string name="pref_header_data_sync">Data &amp; sync</string>
+    <string name="pref_header_data_sync" translatable="false">Data &amp; sync</string>
 
-    <string name="pref_title_sync_frequency">Sync frequency</string>
+    <string name="pref_title_sync_frequency" translatable="false">Sync frequency</string>
     <string-array name="pref_sync_frequency_titles">
         <item>15 minutes</item>
         <item>30 minutes</item>
@@ -174,19 +155,12 @@
         <item>3</item>
     </string-array>
 
-    <string-array name="multi_select_list_preference_default_value" />
-
-    <string name="pref_title_system_sync_settings">System sync settings</string>
+    <string name="pref_title_system_sync_settings" translatable="false">System sync settings</string>
 
     <!-- Example settings for Notifications -->
-    <string name="pref_header_notifications">Notifications</string>
+    <string name="pref_header_notifications" translatable="false">Notifications</string>
 
-    <string name="pref_title_new_message_notifications">New message notifications</string>
-
-    <string name="pref_title_ringtone">Ringtone</string>
-    <string name="pref_ringtone_silent">Silent</string>
-
-    <string name="pref_title_vibrate">Vibrate</string>
+    <string name="pref_title_new_message_notifications" translatable="false">New message notifications</string>
 
     <!-- CreateGroupActivity -->
     <string name="prompt_group_name">Group Name</string>
@@ -194,18 +168,18 @@
     <string name="prompt_enter_city">City</string>
     <string name="prompt_enter_state">State Abbreviation</string>
     <string name="prompt_extra_location_data">Extra Location Information</string>
-    <string name="prompt_group_password">Account Password</string>
+    <string name="prompt_group_password" translatable="false">Account Password</string>
     <string name="error_un_group_name_duplicate">Group name already in use</string>
     <string name="action_create_group">Create Group</string>
-    <string name="title_activity_nav_bar">NavBarActivity</string>
+    <string name="title_activity_nav_bar" translatable="false">NavBarActivity</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
 
     <string name="title_activity_tutorial">THelp</string>
 
 
-    <string name="title_activity_full_image">Full Image</string>
+    <string name="title_activity_full_image" translatable="false">Full Image</string>
 
 
 </resources>

@@ -16,22 +16,35 @@ repositories {
 
 
 android {
+    signingConfigs {
+        config_release {
+            keyAlias 'MyAndroidKey1'
+            keyPassword '$how&$ell'
+            storeFile file('C:/Users/hassa/keystores/android.jks')
+            storePassword '$how&$ell'
+        }
+    }
     compileSdkVersion 24
     buildToolsVersion '24.0.3'
-
     defaultConfig {
         applicationId "com.insertcoolnamehere.showandsell"
         minSdkVersion 19
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode 1
-        versionName "1.0"
+        versionName "1.10.1"
         vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            debuggable false
+            signingConfig signingConfigs.config_release
+            proguardFile 'C:/Users/hassa/AndroidStudioProjects/Show-And-Sell/app/proguard-rules.pro'
         }
+    }
+    lintOptions {
+        abortOnError false
     }
 }
 

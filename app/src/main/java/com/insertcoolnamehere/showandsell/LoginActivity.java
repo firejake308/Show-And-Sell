@@ -28,6 +28,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.insertcoolnamehere.showandsell.logic.CryptoTool;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import io.fabric.sdk.android.Fabric;
@@ -190,7 +191,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(this, email, password);
+            mAuthTask = new UserLoginTask(this, email, CryptoTool.encrypt(password));
             mAuthTask.execute();
         }
     }
@@ -241,7 +242,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 GoogleSignInAccount acct = result.getSignInAccount();
                 String email = acct.getEmail();
                 String password = acct.getId();
-                mAuthTask = new UserLoginTask(this, email, password);
+                mAuthTask = new UserLoginTask(this, email, CryptoTool.encrypt(password));
                 mAuthTask.execute();
             } catch (NullPointerException e) {
                 Log.e("LoginActivity", "null exception");

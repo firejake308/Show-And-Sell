@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
         openDonateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent goToDonate = new Intent(cxt, DonateActivity.class); // TODO reset
+                Intent goToDonate = new Intent(cxt, DonateActivity.class);
                 startActivity(goToDonate);
             }
         });

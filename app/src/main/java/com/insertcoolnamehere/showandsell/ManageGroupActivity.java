@@ -69,7 +69,6 @@ public class ManageGroupActivity extends AppCompatActivity implements SwipeRefre
             mRecyclerView.setAdapter(adapter);
         }
 
-        // TODO link text view to create group activity
         View errorView = findViewById(R.id.error_not_group_owner);
         errorView.setOnClickListener(new View.OnClickListener() {
             @Override

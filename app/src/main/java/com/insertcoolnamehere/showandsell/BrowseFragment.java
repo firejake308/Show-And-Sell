@@ -264,7 +264,6 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 .appendQueryParameter("start", ""+lastItemLoaded)
                 .appendQueryParameter("end", ""+(lastItemLoaded+6))
                 .build();
-        Log.d("BrowseFragment", builder.toString());
         return new URL(builder.toString());
     }
 
@@ -312,7 +311,6 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                     @Override
                     public void run() {
                         Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
-                        Log.d(LOG_TAG, "No connection available");
                     }
                 });
                 return NO_INERNET;
@@ -327,7 +325,6 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                     // obtain status code
                     responseCode = urlConnection.getResponseCode();
-                    Log.d(LOG_TAG, "response code="+responseCode);
                     if(responseCode == 200) {
                         // read response to get user data from server
                         reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
@@ -349,7 +346,6 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                             }
 
                             Item item = new Item(itemJson.getString("ssItemId"), isBookmark()?Item.BOOKMARK:Item.BROWSE);
-                            Log.d(LOG_TAG, "Server contains item #"+item.getGuid());
                             item.setName(itemJson.getString("name"));
                             item.setPrice(itemJson.getDouble("price"));
                             item.setCondition(itemJson.getString("condition"));
@@ -358,7 +354,6 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                             item.setPic(BitmapFactory.decodeByteArray(imgBytes, 0, imgBytes.length));
                             item.setApproved(itemJson.getBoolean("approved"));
                             item.setOwnerId(itemJson.getString("ownerId"));
-                            Log.d(LOG_TAG, "Item # "+item+" is approved? "+item.isApproved());
                         }
 
                         return SUCCESS;

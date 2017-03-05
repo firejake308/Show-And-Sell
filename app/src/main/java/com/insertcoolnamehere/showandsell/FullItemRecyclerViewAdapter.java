@@ -9,14 +9,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.insertcoolnamehere.showandsell.BrowseFragment.OnListFragmentInteractionListener;
-import com.insertcoolnamehere.showandsell.dummy.DummyContent.DummyItem;
 import com.insertcoolnamehere.showandsell.logic.Item;
 
 import java.util.List;
 import java.util.Locale;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link Item} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
  */
 public class FullItemRecyclerViewAdapter extends RecyclerView.Adapter<FullItemRecyclerViewAdapter.ViewHolder> {

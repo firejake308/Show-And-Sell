@@ -117,7 +117,7 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
                         .build();
                 mGoogleApiClient.connect();
             }
-        }catch(Exception e){Log.d("ERROR", "GEO");}
+        }catch(Exception e){Log.e("ERROR", "GEO", e);}
     }
 
     /**
@@ -134,8 +134,6 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
 
         // clear browse group items, because that has changed
         Item.browseGroupItems.clear();
-
-        Log.d("ChooseGroupActivity", "curr grp id: "+currentGroupId);
 
         // update group name and id in the app
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
@@ -235,8 +233,6 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
     public void onLocationChanged(Location location) {
         latitude = location.getLatitude();
         longitude = location.getLongitude();
-        Log.d("ChooseGroupActivity", "lat=" + latitude);
-        Log.d("ChooseGroupActivity", "lon=" + longitude);
         mAuthTask = new ChooseGroupActivity.FetchGroupsTask(this, latitude, longitude);
         mAuthTask.execute();
     }
@@ -292,7 +288,6 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
                     @Override
                     public void run() {
                         Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
-                        Log.d(LOG_TAG, "No connection available");
                     }
                 });
                 return NO_INTERNET;

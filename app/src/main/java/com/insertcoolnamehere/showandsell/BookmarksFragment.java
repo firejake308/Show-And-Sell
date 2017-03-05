@@ -48,7 +48,6 @@ public class BookmarksFragment extends BrowseFragment {
             SharedPreferences savedData = getActivity().getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
             String userId = savedData.getString(getString(R.string.prompt_email), "NULL");
             String pw = savedData.getString(getString(R.string.prompt_password), "NULL");
-            Log.d("BookmarksFragment", "Using bookmarks call");
 
             // construct the URL to fetch bookmarks
             Uri.Builder  builder = new Uri.Builder();

@@ -16,7 +16,6 @@
     <string name="actions">ACCIONES</string>
     <string name="choose_group">Elegir Grupo Primario</string>
     <string name="choose_group_instructions">Seleccionar un grupo aquí decidirá cuales artículos aparezcan en la lista y dónde van los artículos donados.</string>
-    <string name="condition_new"></string>
     <string name="confirm">Bien</string>
     <string name="confirm_delete">¿Está seguro que quieres borrar este artículo?</string>
     <string name="current_group">GRUPO ACTUAL</string>
@@ -40,6 +39,10 @@
     <string name="manage_group">Mi Grupo</string>
     <string name="next_step_btn_label">Seguir</string>
     <string name="options">OPCIONES</string>
+    <string-array name="possible_conditions">
+        <item>Used</item>
+        <item>New</item>
+    </string-array>
     <string name="prompt_comment">Añadir comentario...</string>
     <string name="prompt_confirm_password">Confirmar Contraseña</string>
     <string name="prompt_email">Correo Electrónico</string>
@@ -49,7 +52,6 @@
     <string name="prompt_extra_location_data">Informacíon Extra de Ubicación</string>
     <string name="prompt_first_name">Nombre</string>
     <string name="prompt_group_name">Nombre de Grupo</string>
-    <string name="prompt_group_password"></string>
     <string name="prompt_image_upload">Toque el dibujo para sacar una foto</string>
     <string name="prompt_item_condition">Condición</string>
     <string name="prompt_item_description">Nombre</string>
@@ -76,4 +78,34 @@
     <string name="title_activity_main">Mostrar y Comprar</string>
     <string name="title_activity_tutorial">Ayuda</string>
     <string name="prev_step_btn_label">Atrás</string>
+    <string name="action_bookmark">Marcar</string>
+    <string name="title_activity_settings">Configuración</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>3 hours</item>
+        <item>6 hours</item>
+        <item>Never</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>15</item>
+        <item>30</item>
+        <item>60</item>
+        <item>180</item>
+        <item>360</item>
+        <item>-1</item>
+    </string-array>
+
+    <string-array name="list_preference_entries">
+        <item>Entry 1</item>
+        <item>Entry 2</item>
+        <item>Entry 3</item>
+    </string-array>
+
+    <string-array name="list_preference_entry_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
 </resources>
