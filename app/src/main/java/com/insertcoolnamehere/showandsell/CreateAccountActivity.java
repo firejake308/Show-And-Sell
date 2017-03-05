@@ -22,7 +22,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.location.Geocoder;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.location.LocationServices;
@@ -48,7 +53,9 @@ import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class CreateAccountActivity extends AppCompatActivity {
+import static android.content.ContentValues.TAG;
+
+public class CreateAccountActivity extends AppCompatActivity implements OnConnectionFailedListener{
 
     // references to UI views
     private EditText firstNameEntry;
@@ -65,6 +72,9 @@ public class CreateAccountActivity extends AppCompatActivity {
     private String password2;
     private String userId;
 
+    private GoogleApiClient mGoogleApiClient;
+    private static final int RC_SIGN_IN = 9001;
+
     // reference to AsyncTask
     private CreateAccountTask mAuthTask;
 
@@ -80,6 +90,7 @@ public class CreateAccountActivity extends AppCompatActivity {
         passwordEntry = (EditText) findViewById(R.id.password_entry);
         confirmPwEntry = (EditText) findViewById(R.id.confirm_password);
         createAccountButton = (Button) findViewById(R.id.create_account_btn);
+        View signInButton = findViewById(R.id.create_account_with_google_btn);
 
         // hook up action listeners
         confirmPwEntry.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -96,6 +107,12 @@ public class CreateAccountActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 attemptCreateAccount();
+            }
+        });
+        signInButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                attemptCreateAccountWithGoogle();
             }
         });
     }
@@ -142,6 +159,65 @@ public class CreateAccountActivity extends AppCompatActivity {
             mAuthTask = new CreateAccountTask(this, firstName, lastName, email, password1);
             mAuthTask.execute();
         }
+    }
+
+    /**
+     * Attempts to sign in the user using google
+     */
+    private void attemptCreateAccountWithGoogle() {
+        // Configure sign-in to request the user's ID, email address, and basic profile. ID and
+        // basic profile are included in DEFAULT_SIGN_IN.
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        if (mGoogleApiClient == null) {
+            // Build a GoogleApiClient with access to GoogleSignIn.API and the options above.
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .enableAutoManage(this, this)
+                    .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                    .build();
+        }
+
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            int statusCode = result.getStatus().getStatusCode();
+            Log.d("gfhdjwsfgj", "" + statusCode);
+            handleSignInResult(result);
+        }
+    }
+
+    private void handleSignInResult(GoogleSignInResult result) {
+        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
+        if (result.isSuccess()) {
+            // Signed in successfully, show authenticated UI.
+            try {
+                GoogleSignInAccount acct = result.getSignInAccount();
+                String email = acct.getEmail();
+                String firstName = acct.getGivenName();
+                String lastName = acct.getFamilyName();
+                String password = acct.getId();
+                mAuthTask = new CreateAccountTask(this, firstName, lastName, email, password);
+                mAuthTask.execute();
+            } catch (NullPointerException e) {
+                Log.e("LoginActivity", "null exception");
+            }
+        } else {
+            // Signed out, show unauthenticated UI.
+        }
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        Log.e("LoginActivity", "I'm a failure at life and i should kill myself");
     }
 
     public class CreateAccountTask extends AsyncTask<Void, Void, Boolean> {

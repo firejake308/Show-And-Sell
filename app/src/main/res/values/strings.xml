@@ -1,7 +1,7 @@
 <resources>
     <!-- App-wide Strings -->
     <string name="app_name">Show &amp; Sell</string>
-    <string name="saved_data_file_key">com.insertcoolnamehere.showandsell.SAVED_DATA</string>
+    <string name="saved_data_file_key" translatable="false">com.insertcoolnamehere.showandsell.SAVED_DATA</string>
 
     <!-- Strings related to login -->
     <string name="prompt_password">Password</string>
@@ -17,9 +17,9 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_donate">DonateActivity</string>
     <string name="title_activity_main">Show &amp; Sell</string>
-    <string name="userId">UserId</string>
+    <string name="userId" translatable="false">UserId</string>
     <string name="action_sign_in_google">Sign in with Google</string>
-    <string name="server_client_id">367846868936-rjqg6pp4g4glrrg9vdntbc2lrh2lo5ld.apps.googleusercontent.com</string>
+    <string name="server_client_id" translatable="false">367846868936-rjqg6pp4g4glrrg9vdntbc2lrh2lo5ld.apps.googleusercontent.com</string>
 
     <!-- CreateAccountActivity -->
     <string name="prompt_first_name">First Name</string>
@@ -34,7 +34,7 @@
     <string name="section_format">Hello %1$s from section: %2$d</string>
 
     <!-- Donate Activity -->
-    <string name="prompt_item_description">Title</string>
+    <string name="prompt_item_description">Name</string>
     <string name="prompt_item_details">Details</string>
     <string name="prompt_item_condition">Condition</string>
     <string name="prompt_suggested_price">Suggested Price</string>
@@ -42,8 +42,8 @@
         <item>Used</item>
         <item>New</item>
     </string-array>
-    <string name="condition_new">New</string>
-    <string name="condition_used">Used</string>
+    <string name="condition_new" translatable="false">New</string>
+    <string name="condition_used" translatable="false">Used</string>
     <string name="prompt_image_upload">Tap the icon to take a picture</string>
     <string name="prompt_picture_taken">Picture Taken!</string>
     <string name="action_donate">Donate</string>
@@ -75,11 +75,11 @@
     <!-- Browse fragment -->
     <string name="action_refresh">Refresh</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="saved_group_id">SAVED_GROUP_ID</string>
-    <string name="saved_group_name">SAVED_GROUP_NAME</string>
+    <string name="saved_group_id" translatable="false">SAVED_GROUP_ID</string>
+    <string name="saved_group_name" translatable="false">SAVED_GROUP_NAME</string>
     <string name="error_no_group">It looks like you haven\'t selected a group yet. Tap here and
         we\'ll help you choose.</string>
-    <string name="last_group_loaded">LAST_GROUP_ID</string>
+    <string name="last_group_loaded" translatable="false">LAST_GROUP_ID</string>
 
     <!-- Search -->
     <string name="search_hint">Search for an item</string>
@@ -116,7 +116,7 @@
     <string name="help">HELP</string>
 
     <!-- Saved data -->
-    <string name="group_owner_boolean">isGroupOwner</string>
+    <string name="group_owner_boolean" translatable="false">isGroupOwner</string>
 
     <!-- Example General settings -->
     <string name="pref_header_general">General</string>
