@@ -4,12 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.XmlResourceParser;
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.media.Image;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -21,11 +19,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.GridLayoutManager;
-import android.text.InputFilter;
-import android.text.InputType;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
 import android.util.TypedValue;
@@ -99,12 +93,12 @@ public class DonateActivity extends AppCompatActivity {
             return;
         } else if(mDetails.length() == 0) {
             mAdapter.openItem(2);
-            EditText detailsEntry = (EditText) findViewById(R.id.item_details_entry);
+            EditText detailsEntry = (EditText) findViewById(R.id.item_description_entry);
             detailsEntry.setError("Please provide details");
             return;
         } else if(mPrice.length() == 0) {
             mAdapter.openItem(3);
-            EditText priceEntry = (EditText) findViewById(R.id.item_price_entry);
+            EditText priceEntry = (EditText) findViewById(R.id.item_description_entry);
             priceEntry.setError("Please enter a price");
             return;
         } else if(mThumbnail == null) {

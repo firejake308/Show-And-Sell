@@ -1,13 +1,10 @@
 package com.insertcoolnamehere.showandsell;
 
-import android.*;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -26,7 +23,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiActivity;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -248,7 +244,6 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
         mAuthTask = new ChooseGroupActivity.FetchGroupsTask(this, latitude, longitude);
     }
 
-    // insert an AsyncTask here, using the ones in LoginActivity or DonateFragment or BrowseFragment as a reference
     private class FetchGroupsTask extends AsyncTask<Void, Integer, Integer> {
         /**
          * The Activity within which this AsyncTask runs

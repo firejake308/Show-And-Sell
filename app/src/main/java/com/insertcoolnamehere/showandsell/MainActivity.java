@@ -43,7 +43,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity implements DonateFragment.OnDonationListener, BrowseFragment.OnListFragmentInteractionListener{
+public class MainActivity extends AppCompatActivity implements BrowseFragment.OnListFragmentInteractionListener{
 
     private static final int REQUEST_IMAGE_CAPTURE = 0;
 
@@ -179,27 +179,6 @@ public class MainActivity extends AppCompatActivity implements DonateFragment.On
         Intent startCameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if(startCameraIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(startCameraIntent, REQUEST_IMAGE_CAPTURE);
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == REQUEST_IMAGE_CAPTURE) {
-            try {
-                // when the camera app returns a picture to us
-                Bundle extras = data.getExtras();
-                itemPic = (Bitmap) extras.get("data");
-                Log.d(LOG_TAG, "When camera takes picture, height is: "+itemPic.getHeight());
-                imageTakenYet = true;
-
-                // update text of button
-                Button takePicBtn = (Button) findViewById(R.id.upload_img_btn);
-                takePicBtn.setText(getString(R.string.prompt_picture_taken));
-            } catch (NullPointerException e) {
-                Log.d(LOG_TAG, "The user didn't actually take a picture");
-                Button donateBtn = (Button) findViewById(R.id.donate_btn);
-                imageTakenYet = false;
-            }
         }
     }
 

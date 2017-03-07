@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:maxLines="1"
-        android:id="@id/item_description_entry"
+        android:id="@+id/item_description_entry"
         android:inputType="textCapWords|textAutoCorrect"
         android:maxLength="20"
         android:hint="@string/prompt_item_description"/>

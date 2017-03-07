@@ -207,7 +207,7 @@ public class CreateAccountActivity extends AppCompatActivity implements OnConnec
                 String firstName = acct.getGivenName();
                 String lastName = acct.getFamilyName();
                 String password = acct.getId();
-                mAuthTask = new CreateAccountTask(this, firstName, lastName, email, password);
+                mAuthTask = new CreateAccountTask(this, firstName, lastName, email, CryptoTool.encrypt(password));
                 mAuthTask.execute();
             } catch (NullPointerException e) {
                 Log.e("LoginActivity", "null exception");

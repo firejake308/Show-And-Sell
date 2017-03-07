@@ -7,7 +7,7 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@id/item_description_entry"
+        android:id="@+id/item_description_entry"
         android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
         android:hint="@string/prompt_item_details"/>
 </android.support.design.widget.TextInputLayout>
