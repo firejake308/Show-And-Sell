@@ -242,7 +242,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 GoogleSignInAccount acct = result.getSignInAccount();
                 String email = acct.getEmail();
                 String password = acct.getId();
-                mAuthTask = new UserLoginTask(this, email, CryptoTool.encrypt(password));
+                mAuthTask = new UserLoginTask(this, email, password);
                 mAuthTask.execute();
             } catch (NullPointerException e) {
                 Log.e("LoginActivity", "null exception");

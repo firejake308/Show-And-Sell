@@ -18,6 +18,7 @@ public class CryptoTool {
         // Caesar shift
         for (int i = 0; i < original.length(); i++) {
             char c = original.charAt(i);
+            c = Character.toChars(Character.valueOf(c)+1)[0];
             encrypted += c;
         }
 
