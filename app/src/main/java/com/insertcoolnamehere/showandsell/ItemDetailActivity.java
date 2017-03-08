@@ -859,11 +859,12 @@ public class ItemDetailActivity extends AppCompatActivity {
                         String responseBody = "";
                         String line;
                         while((line = reader.readLine()) != null) {
-                            responseBody += line + '\n';
+                            responseBody += line;
                         }
                         try {
                             // parse response as not JSON
                             mToken = responseBody;
+                            Log.d(LOG_TAG, "mToken = "+mToken);
                         } catch (Exception e) {Log.e(LOG_TAG, "Error with JSON");}
 
                         return SUCCESS;
