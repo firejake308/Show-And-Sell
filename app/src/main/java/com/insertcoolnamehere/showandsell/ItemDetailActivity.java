@@ -230,7 +230,8 @@ public class ItemDetailActivity extends AppCompatActivity {
     }
     private void initiatePurchase() {
         new GetClientTokenTask(this).execute();
-
+    }
+    private void finishPurchase() {
         DropInRequest dropInRequest = new DropInRequest()
                 .clientToken(mToken);
         startActivityForResult(dropInRequest.getIntent(this), REQUEST_CODE);
@@ -885,6 +886,19 @@ public class ItemDetailActivity extends AppCompatActivity {
             // in case of failure
             return OTHER_FAILURE;
         }
+        @Override
+        protected void onPostExecute(Integer result) {
+            if(result == SUCCESS) {
+                Toast.makeText(mParent, "Item bought!", Toast.LENGTH_SHORT).show();
+                showProgress(false);
+
+                finishPurchase();
+            }
+            else
+                Toast.makeText(mParent, "Purchase failed :(", Toast.LENGTH_SHORT).show();
+            showProgress(false);
+        }
+
     }
     private class PurchaseItemTask extends AsyncTask<Void, Void, Integer> {
         private static final int SUCCESS = 0;
