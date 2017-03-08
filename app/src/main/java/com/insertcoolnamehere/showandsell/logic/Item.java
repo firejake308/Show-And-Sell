@@ -24,6 +24,7 @@ public class Item implements Serializable {
     public static final int BROWSE = 0;
     public static final int BOOKMARK = 1;
     public static final int MANAGE = 2;
+    public static final int OTHER = 3;
 
     private static int numOfItems = 0;
 

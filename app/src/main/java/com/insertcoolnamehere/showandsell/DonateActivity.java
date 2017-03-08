@@ -44,6 +44,7 @@ import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -73,10 +74,14 @@ public class DonateActivity extends AppCompatActivity {
 
     private String mCurrentPhotoPath;
 
+    private boolean donateAttempted;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_donate);
+
+        donateAttempted = false;
 
         mListView = (ListView) findViewById(R.id.steps_listview);
         mAdapter = new StepAdapter();
@@ -85,29 +90,27 @@ public class DonateActivity extends AppCompatActivity {
 
     private void donate() {
         Log.d(LOG_TAG, "Beginning to donate item");
+        donateAttempted = true;
         // make sure the user has actually given us all the fields we asked for
         if(mDescription.length() == 0) {
             mAdapter.openItem(1);
-            EditText descriptionEntry = (EditText) findViewById(R.id.item_description_entry);
-            descriptionEntry.setError("Please enter a description");
             return;
         } else if(mDetails.length() == 0) {
             mAdapter.openItem(2);
-            EditText detailsEntry = (EditText) findViewById(R.id.item_description_entry);
-            detailsEntry.setError("Please provide details");
             return;
         } else if(mPrice.length() == 0) {
             mAdapter.openItem(3);
-            EditText priceEntry = (EditText) findViewById(R.id.item_description_entry);
-            priceEntry.setError("Please enter a price");
             return;
-        } else if(mThumbnail == null) {
+        } else if(Double.parseDouble(mPrice) < 0.31){
+            mAdapter.openItem(3);
+        } else if(mImage == null) {
             mAdapter.openItem(0);
             Toast.makeText(this, "Please provide a picture", Toast.LENGTH_SHORT).show();
             return;
         }
 
         Log.d(LOG_TAG, "Making progress");
+        showProgress(true);
         new UploadItemTask(this, mDescription, mPrice, mCondition, mDetails, mImage).execute();
     }
 
@@ -281,7 +284,6 @@ public class DonateActivity extends AppCompatActivity {
                                     mPrice = String.format(Locale.ENGLISH, "%.2f", Double.parseDouble(editText.getText().toString()));
                             }
                         } else if (mCurrentStep == 4) {
-                            showProgress(true);
                             donate();
                             return;
                         }
@@ -350,18 +352,29 @@ public class DonateActivity extends AppCompatActivity {
                         View titleEntry = getLayoutInflater().inflate(R.layout.item_title_entry, flex, false);
                         EditText editText = (EditText) titleEntry.findViewById(R.id.item_description_entry);
                         editText.setText(mDescription);
+                        if (TextUtils.isEmpty(mDescription) && donateAttempted) {
+                            editText.setError("Please enter a description");
+                        }
                         flex.addView(titleEntry);
                         break;
                     case 2:
                         View detailsCustom = getLayoutInflater().inflate(R.layout.item_details_entry, flex, false);
                         editText = (EditText) detailsCustom.findViewById(R.id.item_description_entry);
                         editText.setText(mDetails);
+                        if(TextUtils.isEmpty(mDetails) && donateAttempted)
+                            editText.setError("Please provide details");
                         flex.addView(detailsCustom);
                         break;
                     case 3:
                         View priceCustom = getLayoutInflater().inflate(R.layout.item_price_entry, flex, false);
                         editText = (EditText) priceCustom.findViewById(R.id.item_description_entry);
                         editText.setText(mPrice);
+                        if(TextUtils.isEmpty(mPrice) && donateAttempted)
+                            editText.setError("Please enter a price");
+                        else if (mPrice != null) {
+                            if(Double.parseDouble(mPrice) < 0.31 && donateAttempted)
+                                editText.setError("Price must be >$0.31");
+                        }
                         flex.addView(priceCustom);
                         break;
                     case 4:
@@ -551,7 +564,7 @@ public class DonateActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean result) {
             // update text of button
-            Button takePicBtn = (Button) findViewById(R.id.upload_img_btn);
+            TextView takePicBtn = (TextView) findViewById(R.id.primary_step_label);
             if (takePicBtn != null)
                 takePicBtn.setText(getString(R.string.prompt_image_upload));
 
