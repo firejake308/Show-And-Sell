@@ -861,12 +861,8 @@ public class ItemDetailActivity extends AppCompatActivity {
                             responseBody += line + '\n';
                         }
                         try {
-                            // parse response as JSON
-                            JSONArray items = new JSONArray(responseBody);
-
-                            JSONObject itemJson = items.getJSONObject(0);
-
-                            String mToken = itemJson.getString("paymenttoken");
+                            // parse response as not JSON
+                            mToken = responseBody;
                         } catch (Exception e) {Log.e(LOG_TAG, "Error with JSON");}
 
                         return SUCCESS;

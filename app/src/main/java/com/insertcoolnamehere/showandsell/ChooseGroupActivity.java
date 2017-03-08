@@ -164,8 +164,8 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
                 .appendPath("showandsell")
                 .appendPath("api")
                 .appendPath("groups")
-                .appendPath("groupsinradius")
-                .appendQueryParameter("radius", "20.0")
+                .appendPath("closestgroups")
+                .appendQueryParameter("n", "10")
                 .appendQueryParameter("latitude", ""+lat)
                 .appendQueryParameter("longitude", ""+lon)
                 .build();
