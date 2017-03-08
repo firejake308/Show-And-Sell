@@ -154,6 +154,7 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
                     .appendPath("groups")
                     .appendPath("allgroups")
                     .build();
+            Log.d("REACHED", "REACHED");
             return new URL(builder.toString());
         }
         // construct URL to fetch groups in a 20 mile radius if location input
@@ -188,7 +189,7 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
             while (ContextCompat.checkSelfPermission(this,
                     Manifest.permission.ACCESS_COARSE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED) {try{Thread.sleep(500);}catch(Exception e){}}
-                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, request, cxtReference);
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, request, cxtReference);
         } catch (SecurityException se){Log.e("ChooseGroupActivity", "User Denied Permission");}
         /*
         new Thread() {

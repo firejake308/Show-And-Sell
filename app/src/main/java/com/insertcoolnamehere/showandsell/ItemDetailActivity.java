@@ -228,20 +228,11 @@ public class ItemDetailActivity extends AppCompatActivity {
         intent.putExtra(ITEM_ID, mItem.getGuid());
         startActivity(intent);
     }
-    //TODO
-    private void initiatePurchase() {/*
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.get("https://your-server/client_token", new TextHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, PreferenceActivity.Header[] headers, String clientToken) {
-                this.clientToken = clientToken;
-                mToken = clientToken;
-            }
-        });*/
+    private void initiatePurchase() {
+        new GetClientTokenTask(this).execute();
 
         DropInRequest dropInRequest = new DropInRequest()
-                .clientToken("eyJ2ZXJzaW9uIjoyLCJhdXRob3JpemF0aW9uRmluZ2VycHJpbnQiOiJlOTlmZTcwOTI3MWRhZGY2YTU0NTJhZGVhZmYzZmFiNmIyOTRmY2I1ZGRhMzAyYTdlNzc1NWFiYzc3MWIxZGVmfGNyZWF0ZWRfYXQ9MjAxNy0wMy0wNlQxMzoxMTo0Mi43NTMyNTEzNTIrMDAwMFx1MDAyNm1lcmNoYW50X2lkPTM0OHBrOWNnZjNiZ3l3MmJcdTAwMjZwdWJsaWNfa2V5PTJuMjQ3ZHY4OWJxOXZtcHIiLCJjb25maWdVcmwiOiJodHRwczovL2FwaS5zYW5kYm94LmJyYWludHJlZWdhdGV3YXkuY29tOjQ0My9tZXJjaGFudHMvMzQ4cGs5Y2dmM2JneXcyYi9jbGllbnRfYXBpL3YxL2NvbmZpZ3VyYXRpb24iLCJjaGFsbGVuZ2VzIjpbXSwiZW52aXJvbm1lbnQiOiJzYW5kYm94IiwiY2xpZW50QXBpVXJsIjoiaHR0cHM6Ly9hcGkuc2FuZGJveC5icmFpbnRyZWVnYXRld2F5LmNvbTo0NDMvbWVyY2hhbnRzLzM0OHBrOWNnZjNiZ3l3MmIvY2xpZW50X2FwaSIsImFzc2V0c1VybCI6Imh0dHBzOi8vYXNzZXRzLmJyYWludHJlZWdhdGV3YXkuY29tIiwiYXV0aFVybCI6Imh0dHBzOi8vYXV0aC52ZW5tby5zYW5kYm94LmJyYWludHJlZWdhdGV3YXkuY29tIiwiYW5hbHl0aWNzIjp7InVybCI6Imh0dHBzOi8vY2xpZW50LWFuYWx5dGljcy5zYW5kYm94LmJyYWludHJlZWdhdGV3YXkuY29tLzM0OHBrOWNnZjNiZ3l3MmIifSwidGhyZWVEU2VjdXJlRW5hYmxlZCI6dHJ1ZSwicGF5cGFsRW5hYmxlZCI6dHJ1ZSwicGF5cGFsIjp7ImRpc3BsYXlOYW1lIjoiQWNtZSBXaWRnZXRzLCBMdGQuIChTYW5kYm94KSIsImNsaWVudElkIjpudWxsLCJwcml2YWN5VXJsIjoiaHR0cDovL2V4YW1wbGUuY29tL3BwIiwidXNlckFncmVlbWVudFVybCI6Imh0dHA6Ly9leGFtcGxlLmNvbS90b3MiLCJiYXNlVXJsIjoiaHR0cHM6Ly9hc3NldHMuYnJhaW50cmVlZ2F0ZXdheS5jb20iLCJhc3NldHNVcmwiOiJodHRwczovL2NoZWNrb3V0LnBheXBhbC5jb20iLCJkaXJlY3RCYXNlVXJsIjpudWxsLCJhbGxvd0h0dHAiOnRydWUsImVudmlyb25tZW50Tm9OZXR3b3JrIjp0cnVlLCJlbnZpcm9ubWVudCI6Im9mZmxpbmUiLCJ1bnZldHRlZE1lcmNoYW50IjpmYWxzZSwiYnJhaW50cmVlQ2xpZW50SWQiOiJtYXN0ZXJjbGllbnQzIiwiYmlsbGluZ0FncmVlbWVudHNFbmFibGVkIjp0cnVlLCJtZXJjaGFudEFjY291bnRJZCI6ImFjbWV3aWRnZXRzbHRkc2FuZGJveCIsImN1cnJlbmN5SXNvQ29kZSI6IlVTRCJ9LCJjb2luYmFzZUVuYWJsZWQiOmZhbHNlLCJtZXJjaGFudElkIjoiMzQ4cGs5Y2dmM2JneXcyYiIsInZlbm1vIjoib2ZmIn0=");
-        mToken = "eyJ2ZXJzaW9uIjoyLCJhdXRob3JpemF0aW9uRmluZ2VycHJpbnQiOiJlOTlmZTcwOTI3MWRhZGY2YTU0NTJhZGVhZmYzZmFiNmIyOTRmY2I1ZGRhMzAyYTdlNzc1NWFiYzc3MWIxZGVmfGNyZWF0ZWRfYXQ9MjAxNy0wMy0wNlQxMzoxMTo0Mi43NTMyNTEzNTIrMDAwMFx1MDAyNm1lcmNoYW50X2lkPTM0OHBrOWNnZjNiZ3l3MmJcdTAwMjZwdWJsaWNfa2V5PTJuMjQ3ZHY4OWJxOXZtcHIiLCJjb25maWdVcmwiOiJodHRwczovL2FwaS5zYW5kYm94LmJyYWludHJlZWdhdGV3YXkuY29tOjQ0My9tZXJjaGFudHMvMzQ4cGs5Y2dmM2JneXcyYi9jbGllbnRfYXBpL3YxL2NvbmZpZ3VyYXRpb24iLCJjaGFsbGVuZ2VzIjpbXSwiZW52aXJvbm1lbnQiOiJzYW5kYm94IiwiY2xpZW50QXBpVXJsIjoiaHR0cHM6Ly9hcGkuc2FuZGJveC5icmFpbnRyZWVnYXRld2F5LmNvbTo0NDMvbWVyY2hhbnRzLzM0OHBrOWNnZjNiZ3l3MmIvY2xpZW50X2FwaSIsImFzc2V0c1VybCI6Imh0dHBzOi8vYXNzZXRzLmJyYWludHJlZWdhdGV3YXkuY29tIiwiYXV0aFVybCI6Imh0dHBzOi8vYXV0aC52ZW5tby5zYW5kYm94LmJyYWludHJlZWdhdGV3YXkuY29tIiwiYW5hbHl0aWNzIjp7InVybCI6Imh0dHBzOi8vY2xpZW50LWFuYWx5dGljcy5zYW5kYm94LmJyYWludHJlZWdhdGV3YXkuY29tLzM0OHBrOWNnZjNiZ3l3MmIifSwidGhyZWVEU2VjdXJlRW5hYmxlZCI6dHJ1ZSwicGF5cGFsRW5hYmxlZCI6dHJ1ZSwicGF5cGFsIjp7ImRpc3BsYXlOYW1lIjoiQWNtZSBXaWRnZXRzLCBMdGQuIChTYW5kYm94KSIsImNsaWVudElkIjpudWxsLCJwcml2YWN5VXJsIjoiaHR0cDovL2V4YW1wbGUuY29tL3BwIiwidXNlckFncmVlbWVudFVybCI6Imh0dHA6Ly9leGFtcGxlLmNvbS90b3MiLCJiYXNlVXJsIjoiaHR0cHM6Ly9hc3NldHMuYnJhaW50cmVlZ2F0ZXdheS5jb20iLCJhc3NldHNVcmwiOiJodHRwczovL2NoZWNrb3V0LnBheXBhbC5jb20iLCJkaXJlY3RCYXNlVXJsIjpudWxsLCJhbGxvd0h0dHAiOnRydWUsImVudmlyb25tZW50Tm9OZXR3b3JrIjp0cnVlLCJlbnZpcm9ubWVudCI6Im9mZmxpbmUiLCJ1bnZldHRlZE1lcmNoYW50IjpmYWxzZSwiYnJhaW50cmVlQ2xpZW50SWQiOiJtYXN0ZXJjbGllbnQzIiwiYmlsbGluZ0FncmVlbWVudHNFbmFibGVkIjp0cnVlLCJtZXJjaGFudEFjY291bnRJZCI6ImFjbWV3aWRnZXRzbHRkc2FuZGJveCIsImN1cnJlbmN5SXNvQ29kZSI6IlVTRCJ9LCJjb2luYmFzZUVuYWJsZWQiOmZhbHNlLCJtZXJjaGFudElkIjoiMzQ4cGs5Y2dmM2JneXcyYiIsInZlbm1vIjoib2ZmIn0=";
+                .clientToken(mToken);
         startActivityForResult(dropInRequest.getIntent(this), REQUEST_CODE);
     }
 
@@ -802,7 +793,103 @@ public class ItemDetailActivity extends AppCompatActivity {
             }
         }
     }
-    //TODO
+    private class GetClientTokenTask extends AsyncTask<Void, Void, Integer> {
+        private static final int SUCCESS = 0;
+        private static final int NO_INTERNET = 1;
+        private static final int OTHER_FAILURE = 2;
+        private final String LOG_TAG = GetClientTokenTask.class.getSimpleName();
+
+        private final Activity mParent;
+
+        GetClientTokenTask(Activity parent) {
+            mParent = parent;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            // check if we have an Internet connection
+            ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo info = manager.getActiveNetworkInfo();
+
+            if(info == null || !info.isConnected()) {
+                // if there is no network, inform user through a toast
+                mParent.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                        Log.d(LOG_TAG, "No connection available");
+                    }
+                });
+                return NO_INTERNET;
+            } else {
+                // declare resources to close in finally clause
+                HttpURLConnection conn = null;
+                try {
+                    // get group owner password
+                    SharedPreferences savedData = mParent.getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+
+                    // form a URL to connect to
+                    Uri.Builder builder = new Uri.Builder();
+                    String uri = builder.encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
+                            .scheme("http")
+                            .appendPath("showandsell")
+                            .appendPath("api")
+                            .appendPath("items")
+                            .appendPath("paymenttoken").build().toString();
+                    URL url = new URL(uri);
+
+                    // form connection
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setDoOutput(false);
+                    conn.setRequestMethod("GET");
+                    conn.setConnectTimeout(10000);
+                    conn.setReadTimeout(15000);
+                    conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    conn.setChunkedStreamingMode(0);
+                    conn.connect();
+
+                    // see if post was a success
+                    int responseCode = conn.getResponseCode();
+                    Log.d(LOG_TAG, "Response Code from Cloud Server: "+responseCode);
+
+                    if(responseCode == 200) {
+                        Log.d(LOG_TAG, "Token Acquired Successfully");
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                        String responseBody = "";
+                        String line;
+                        while((line = reader.readLine()) != null) {
+                            responseBody += line + '\n';
+                        }
+                        try {
+                            // parse response as JSON
+                            JSONArray items = new JSONArray(responseBody);
+
+                            JSONObject itemJson = items.getJSONObject(0);
+
+                            String mToken = itemJson.getString("paymenttoken");
+                        } catch (Exception e) {Log.e(LOG_TAG, "Error with JSON");}
+
+                        return SUCCESS;
+                    } else if(responseCode == 404) {
+                        Log.d(LOG_TAG, "Token not acquired-failure");
+                        return OTHER_FAILURE;
+                    } else {
+                        Log.e(LOG_TAG, "response Code = "+responseCode);
+                        return OTHER_FAILURE;
+                    }
+                } catch (MalformedURLException e) {
+                    Log.e(LOG_TAG, "Bad URL", e);
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "Error opening URL connection (probably?)", e);
+                } finally {
+                    conn.disconnect();
+                }
+            }
+
+            // in case of failure
+            return OTHER_FAILURE;
+        }
+    }
     private class PurchaseItemTask extends AsyncTask<Void, Void, Integer> {
         private static final int SUCCESS = 0;
         private static final int NO_INTERNET = 1;
@@ -855,9 +942,6 @@ public class ItemDetailActivity extends AppCompatActivity {
                             .appendQueryParameter("token", mToken)
                             .appendQueryParameter("paymentMethodNonce", ""+mNonce)
                             .appendQueryParameter("amount", ""+mItem.getPrice()).build().toString();
-                            //.appendQueryParameter("userId", un)
-                            //.appendQueryParameter("id", mItem.getGuid())
-                            //.appendQueryParameter("password", pw).build().toString();
                     URL url = new URL(uri);
 
                     // form connection
