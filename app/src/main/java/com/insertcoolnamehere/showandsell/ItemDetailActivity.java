@@ -890,13 +890,11 @@ public class ItemDetailActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Integer result) {
             if(result == SUCCESS) {
-                Toast.makeText(mParent, "Item bought!", Toast.LENGTH_SHORT).show();
                 showProgress(false);
-
                 finishPurchase();
             }
             else
-                Toast.makeText(mParent, "Purchase failed :(", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mParent, "An unknown error occurred. Please try again later.", Toast.LENGTH_SHORT).show();
             showProgress(false);
         }
 
@@ -983,10 +981,10 @@ public class ItemDetailActivity extends AppCompatActivity {
                     Log.d(LOG_TAG, "Response Code from Cloud Server: "+responseCode);
 
                     if(responseCode == 200) {
-                        Log.d(LOG_TAG, "Post was success");
+                        Log.d(LOG_TAG, "Item bought! You will receive an email shortly.");
                         return SUCCESS;
                     } else if(responseCode == 404) {
-                        Log.d(LOG_TAG, "Post failure");
+                        Log.d(LOG_TAG, "Purchase failed :(");
                         return OTHER_FAILURE;
                     } else {
                         Log.e(LOG_TAG, "response Code = "+responseCode);

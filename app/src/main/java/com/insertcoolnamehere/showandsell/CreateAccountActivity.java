@@ -192,7 +192,6 @@ public class CreateAccountActivity extends AppCompatActivity implements OnConnec
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             int statusCode = result.getStatus().getStatusCode();
-            Log.d("gfhdjwsfgj", "" + statusCode);
             handleSignInResult(result);
         }
     }
@@ -219,7 +218,7 @@ public class CreateAccountActivity extends AppCompatActivity implements OnConnec
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
-        Log.e("LoginActivity", "I'm a failure at life and i should kill myself");
+        Log.e("LoginActivity", "Connection to Google API Client failed");
     }
 
     public class CreateAccountTask extends AsyncTask<Void, Void, Boolean> {
