@@ -108,4 +108,5 @@
         <item>2</item>
         <item>3</item>
     </string-array>
+    <string name="report_bug">REPORTAR UN ERROR</string>
 </resources>

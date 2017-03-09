@@ -92,6 +92,23 @@ public class SettingsActivity extends AppCompatActivity {
                 openHelp();
             }
         });
+
+        Button reportBug = (Button) findViewById(R.id.settings_report_bug);
+        reportBug.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reportBug();
+            }
+        });
+    }
+
+    /**
+     * Open an email to report a bug
+     */
+    private void reportBug() {
+        Intent reportIntent = new Intent(Intent.ACTION_SENDTO);
+        reportIntent.setData(Uri.parse("mailto:showandsellmail@gmail.com"));
+        startActivity(reportIntent);
     }
 
     /**

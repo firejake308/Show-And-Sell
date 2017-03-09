@@ -114,6 +114,7 @@
     <string name="options">OPTIONS</string>
     <string name="actions">ACTIONS</string>
     <string name="help">HELP</string>
+    <string name="report_bug">REPORT A BUG</string>
 
     <!-- Saved data -->
     <string name="group_owner_boolean" translatable="false">isGroupOwner</string>

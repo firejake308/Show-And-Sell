@@ -68,4 +68,16 @@
         android:layout_height="wrap_content"
         android:id="@+id/settings_logout"
         android:background="@android:color/background_light" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="5dp" />
+
+    <Button
+        android:text="@string/report_bug"
+        android:textColor="@android:color/holo_red_dark"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/settings_report_bug"
+        android:background="@android:color/background_light" />
 </LinearLayout>
