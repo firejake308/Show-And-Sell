@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.insertcoolnamehere.showandsell.EditAccountActivity">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <EditText
+            android:id="@+id/first_name_entry_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/prompt_first_name"
+            android:inputType="text"
+            android:maxLines="1"
+            android:singleLine="true"/>
+        <EditText
+            android:id="@+id/last_name_entry_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/prompt_last_name"
+            android:inputType="text"
+            android:maxLines="1"
+            android:singleLine="true"/>
+        <EditText
+            android:id="@+id/email_entry_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/prompt_email"
+            android:inputType="textEmailAddress"
+            android:maxLines="1"/>
+        <EditText
+            android:id="@+id/password_entry_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/prompt_password"
+            android:inputType="textPassword"
+            android:maxLines="1"/>
+        <EditText
+            android:id="@+id/confirm_password_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/prompt_confirm_password"
+            android:imeActionId="@+id/create_account"
+            android:imeActionLabel="@string/action_sign_up"
+            android:imeOptions="actionUnspecified"
+            android:inputType="textPassword"
+            android:maxLines="1"/>
+
+        <Button
+            android:id="@+id/update_account_btn"
+            style="?android:textAppearanceSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/action_update_account"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:background="@color/colorAccent" />
+    </LinearLayout>
+</ScrollView>

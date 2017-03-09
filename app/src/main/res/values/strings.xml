@@ -115,6 +115,10 @@
     <string name="actions">ACTIONS</string>
     <string name="help">HELP</string>
     <string name="report_bug">REPORT A BUG</string>
+    <string name="account">ACCOUNT SETTINGS</string>
+
+    <!-- Strings related to Edit Account -->
+    <string name="action_update_account">UPDATE ACCOUNT</string>
 
     <!-- Saved data -->
     <string name="group_owner_boolean" translatable="false">isGroupOwner</string>

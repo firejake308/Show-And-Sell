@@ -52,6 +52,19 @@
 
     <Space
         android:layout_width="match_parent"
+        android:layout_height="5dp" />
+
+    <Button
+        android:text="@string/account"
+        android:textAlignment="textStart"
+        android:paddingLeft="@dimen/patricks_btn_padding"
+        android:layout_width="match_parent"
+        android:id="@+id/settings_account_btn"
+        android:background="@android:color/background_light"
+        android:layout_height="wrap_content" />
+
+    <Space
+        android:layout_width="match_parent"
         android:layout_height="35dp" />
 
     <TextView

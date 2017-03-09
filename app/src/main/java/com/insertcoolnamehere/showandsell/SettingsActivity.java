@@ -93,6 +93,14 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        Button openAccount = (Button) findViewById(R.id.settings_account_btn);
+        openAccount.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openAccount();
+            }
+        });
+
         Button reportBug = (Button) findViewById(R.id.settings_report_bug);
         reportBug.setOnClickListener(new OnClickListener() {
             @Override
@@ -135,6 +143,15 @@ public class SettingsActivity extends AppCompatActivity {
     private void openHelp() {
         // go to tutorial activity
         Intent intent = new Intent(this, TutorialActivity.class);
+        startActivity(intent);
+    }
+
+    /**
+     * Exit settings activity and open edit account activity
+     */
+    private void openAccount() {
+        // go to edit account activity
+        Intent intent = new Intent(this, EditAccountActivity.class);
         startActivity(intent);
     }
 
