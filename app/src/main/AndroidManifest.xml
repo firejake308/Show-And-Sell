@@ -85,6 +85,10 @@
             android:label="@string/manage_group"
             android:parentActivityName=".SettingsActivity" />
         <activity
+            android:name=".EditAccountActivity"
+            android:label="@string/account"
+            android:parentActivityName=".SettingsActivity" />
+        <activity
             android:name=".DonateActivity"
             android:parentActivityName=".MainActivity"
             android:windowSoftInputMode="adjustPan" />
