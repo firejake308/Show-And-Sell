@@ -11,6 +11,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -89,9 +90,9 @@ public class SearchableActivity extends AppCompatActivity {
     }
 
     public class SearchResultsAdapter<T extends Item> extends ArrayAdapter<Item> {
-        private Context context;
+        private Activity context;
         private ArrayList<Item> objects;
-        public SearchResultsAdapter(Context context, int resource, ArrayList<Item> objects) {
+        public SearchResultsAdapter(Activity context, int resource, ArrayList<Item> objects) {
             super(context, resource, objects);
             this.context = context;
             this.objects = objects;
@@ -131,6 +132,11 @@ public class SearchableActivity extends AppCompatActivity {
                         // the FetchManagedItemsTask figure it out
                         editor.putBoolean(getString(R.string.group_owner_boolean), false);
                         editor.commit();
+
+                        //
+
+                        // go back where we came from
+                        NavUtils.navigateUpFromSameTask(context);
                     }
                 });
 

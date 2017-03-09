@@ -936,6 +936,7 @@ public class ItemDetailActivity extends AppCompatActivity {
             } else {
                 // declare resources to close in finally clause
                 HttpURLConnection conn = null;
+                BufferedOutputStream out = null;
                 try {
                     // get group owner password
                     SharedPreferences savedData = mParent.getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
@@ -950,20 +951,32 @@ public class ItemDetailActivity extends AppCompatActivity {
                             .appendPath("api")
                             .appendPath("items")
                             .appendPath("buyitem")
-                            .appendQueryParameter("token", mToken)
-                            .appendQueryParameter("paymentMethodNonce", ""+mNonce)
-                            .appendQueryParameter("amount", ""+mItem.getPrice()).build().toString();
+                            .appendQueryParameter("id", mItem.getGuid())
+                            .appendQueryParameter("userId", ""+un)
+                            .appendQueryParameter("password", ""+pw)
+                            .build().toString();
                     URL url = new URL(uri);
+                    Log.d(LOG_TAG, url.toString());
 
                     // form connection
                     conn = (HttpURLConnection) url.openConnection();
-                    conn.setDoOutput(false);
+                    conn.setDoOutput(true);
                     conn.setRequestMethod("POST");
                     conn.setConnectTimeout(10000);
                     conn.setReadTimeout(15000);
                     conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                     conn.setChunkedStreamingMode(0);
                     conn.connect();
+
+                    // send JSON
+                    out = new BufferedOutputStream(conn.getOutputStream());
+                    JSONObject purchaseInfo = new JSONObject();
+                    purchaseInfo.put("token", mToken);
+                    purchaseInfo.put("paymentMethodNonce", mNonce);
+                    purchaseInfo.put("amount", mItem.getPrice());
+                    String body = purchaseInfo.toString();
+                    out.write(body.getBytes());
+                    out.flush();
 
                     // see if post was a success
                     int responseCode = conn.getResponseCode();
@@ -983,7 +996,9 @@ public class ItemDetailActivity extends AppCompatActivity {
                     Log.e(LOG_TAG, "Bad URL", e);
                 } catch (IOException e) {
                     Log.e(LOG_TAG, "Error opening URL connection (probably?)", e);
-                } finally {
+                } catch (JSONException e){
+                    Log.e(LOG_TAG, "Error parsing JSON", e);
+                }finally {
                     conn.disconnect();
                 }
             }
