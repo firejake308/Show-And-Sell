@@ -188,6 +188,12 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             // form field with an error.
             focusView.requestFocus();
         } else {
+            // remember that the user didn't sign in with google
+            SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = savedData.edit();
+            editor.putBoolean(getString(R.string.is_google_user), false);
+            editor.apply();
+
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
@@ -242,6 +248,13 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 GoogleSignInAccount acct = result.getSignInAccount();
                 String email = acct.getEmail();
                 String password = acct.getId();
+
+                // remember that the user signed in with google
+                SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = savedData.edit();
+                editor.putBoolean(getString(R.string.is_google_user), true);
+                editor.apply();
+
                 mAuthTask = new UserLoginTask(this, email, CryptoTool.encrypt(password));
                 mAuthTask.execute();
             } catch (NullPointerException e) {

@@ -157,7 +157,11 @@ public class CreateAccountActivity extends AppCompatActivity implements OnConnec
             // cancel and inform user of any errors
             focusView.requestFocus();
         } else {
-
+            // remember that the user didn't sign in with google
+            SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = savedData.edit();
+            editor.putBoolean(getString(R.string.is_google_user), false);
+            editor.apply();
             mAuthTask = new CreateAccountTask(this, firstName, lastName, email, CryptoTool.encrypt(password1));
             mAuthTask.execute();
         }
@@ -208,6 +212,12 @@ public class CreateAccountActivity extends AppCompatActivity implements OnConnec
                 String password = acct.getId();
                 mAuthTask = new CreateAccountTask(this, firstName, lastName, email, CryptoTool.encrypt(password));
                 mAuthTask.execute();
+
+                // remember that the user signed in with google
+                SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = savedData.edit();
+                editor.putBoolean(getString(R.string.is_google_user), true);
+                editor.apply();
             } catch (NullPointerException e) {
                 Log.e("LoginActivity", "null exception");
             }

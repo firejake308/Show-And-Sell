@@ -80,8 +80,8 @@ public class EditAccountActivity extends AppCompatActivity {
         String fn = savedData.getString(getString(R.string.prompt_first_name), "");
         String ln = savedData.getString(getString(R.string.prompt_last_name), "");
         String em = savedData.getString(getString(R.string.prompt_email), "");
-        String pa = savedData.getString(getString(R.string.prompt_password), "");
-        String pa2 = savedData.getString(getString(R.string.prompt_password), "");
+        String pa = CryptoTool.decrypt(savedData.getString(getString(R.string.prompt_password), ""));
+        String pa2 = CryptoTool.decrypt(savedData.getString(getString(R.string.prompt_password), ""));
 
         password0 = pa;
 
@@ -97,6 +97,15 @@ public class EditAccountActivity extends AppCompatActivity {
         confirmPwEntry = (EditText) findViewById(R.id.confirm_password_edit);
         confirmPwEntry.setText(pa2);
         updateAccountButton = (Button) findViewById(R.id.update_account_btn);
+
+        // remember that the user signed in with google
+        boolean isGoogleUser = savedData.getBoolean(getString(R.string.is_google_user), false);
+        if (isGoogleUser) {
+            passwordEntry.setEnabled(false);
+            passwordEntry.setFocusable(false);
+            confirmPwEntry.setEnabled(false);
+            confirmPwEntry.setFocusable(false);
+        }
 
         updateAccountButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,7 +184,6 @@ public class EditAccountActivity extends AppCompatActivity {
             SharedPreferences savedData = mParent.getSharedPreferences(getString(R.string.saved_data_file_key),
                     Context.MODE_PRIVATE);
             userId = savedData.getString(getString(R.string.userId), "");
-            userId = "37569961-2214-40e4-afa2-c1a7c433d397";
 
             Uri.Builder builder = new Uri.Builder();
             String uri = builder.encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
@@ -283,15 +291,14 @@ public class EditAccountActivity extends AppCompatActivity {
                         Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = savedData.edit();
                 editor.putString(getString(R.string.prompt_email), email);
-                editor.putString(getString(R.string.prompt_password), password);
+                editor.putString(getString(R.string.prompt_password), CryptoTool.encrypt(password));
                 editor.putString(getString(R.string.prompt_first_name), firstName);
                 editor.putString(getString(R.string.prompt_last_name), lastName);
                 editor.putString(getString(R.string.userId), userId);
                 editor.apply();
 
                 // launch tutorial activity so user can figure out how app works
-                Intent intent = new Intent(mParent, TutorialActivity.class);
-                startActivity(intent);
+
             } else {
                 // alert user that they had a duplicate email
                 emailEntry.setError(getString(R.string.error_email_duplicate));

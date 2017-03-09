@@ -34,6 +34,8 @@ a) Open Android Studio and select the File >> Open option. Navigate to the paren
 b) Clone the [project repository](https://github.com/firejake308/Show-And-Sell) and import into Android Studio.
 3. Build and Run the app to view the debug version. Alternatively, you can go to Build >> Generate Signed APK to test the release version.
 4. The app is also available on [Google Play](https://play.google.com/store/apps/details?id=com.insertcoolnamehere.showandsell).
+5. [Link to the Apple version](https://github.com/mcjcloud/Show-And-Sell)
+6. [Link to the Backend repo](https://github.com/mcjcloud/ShowAndSellAPI)
 
 ###Software Used
 The Android app was developed with Android Studio, with code hosted on a GitHub repository and a GearHost server for Twitter deep links. 

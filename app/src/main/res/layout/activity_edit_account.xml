@@ -13,46 +13,68 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-        <EditText
-            android:id="@+id/first_name_entry_edit"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/prompt_first_name"
-            android:inputType="text"
-            android:maxLines="1"
-            android:singleLine="true"/>
-        <EditText
-            android:id="@+id/last_name_entry_edit"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/first_name_entry_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_first_name"
+                android:inputType="text"
+                android:maxLines="1"
+                android:singleLine="true"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/prompt_last_name"
-            android:inputType="text"
-            android:maxLines="1"
-            android:singleLine="true"/>
-        <EditText
-            android:id="@+id/email_entry_edit"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/last_name_entry_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_last_name"
+                android:inputType="text"
+                android:maxLines="1"
+                android:singleLine="true"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/prompt_email"
-            android:inputType="textEmailAddress"
-            android:maxLines="1"/>
-        <EditText
-            android:id="@+id/password_entry_edit"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/email_entry_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_email"
+                android:inputType="textEmailAddress"
+                android:maxLines="1"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/prompt_password"
-            android:inputType="textPassword"
-            android:maxLines="1"/>
-        <EditText
-            android:id="@+id/confirm_password_edit"
+            android:layout_height="wrap_content" >
+            <EditText
+                android:id="@+id/password_entry_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_password"
+                android:inputType="textPassword"
+                android:maxLines="1"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/prompt_confirm_password"
-            android:imeActionId="@+id/create_account"
-            android:imeActionLabel="@string/action_sign_up"
-            android:imeOptions="actionUnspecified"
-            android:inputType="textPassword"
-            android:maxLines="1"/>
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/confirm_password_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_confirm_password"
+                android:imeOptions="actionUnspecified"
+                android:inputType="textPassword"
+                android:maxLines="1"/>
+        </android.support.design.widget.TextInputLayout>
 
         <Button
             android:id="@+id/update_account_btn"

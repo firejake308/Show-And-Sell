@@ -1,6 +1,9 @@
 package com.insertcoolnamehere.showandsell.logic;
 
 import android.util.Base64;
+import android.util.Log;
+
+import java.io.ByteArrayInputStream;
 
 /**
  * A tool to help with encryption and decryption
@@ -26,5 +29,23 @@ public class CryptoTool {
         encrypted = Base64.encodeToString(encrypted.getBytes(), Base64.NO_WRAP);
 
         return encrypted;
+    }
+
+    /**
+     * Decrypts a String using Base 64 and then an un-Caesar shift
+     * @param original encrypted String
+     * @return decrypted, human-readable String
+     */
+    public static String decrypt(String original) {
+        // undo base 64
+        original = new String(Base64.decode(original.getBytes(), Base64.NO_WRAP));
+
+        // undo Caesar shift
+        String decrypted = "";
+        for(int i = 0; i < original.length(); i++) {
+            decrypted += Character.toChars(original.charAt(i)-1)[0];
+        }
+
+        return decrypted;
     }
 }

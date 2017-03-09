@@ -119,6 +119,7 @@
 
     <!-- Strings related to Edit Account -->
     <string name="action_update_account">UPDATE ACCOUNT</string>
+    <string name="is_google_user" translatable="false">IS_GOOGLE_USER</string>
 
     <!-- Saved data -->
     <string name="group_owner_boolean" translatable="false">isGroupOwner</string>
