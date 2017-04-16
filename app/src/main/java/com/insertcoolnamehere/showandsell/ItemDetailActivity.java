@@ -598,6 +598,7 @@ public class ItemDetailActivity extends AppCompatActivity {
         private static final int SUCCESS = 0;
         private static final int NO_INTERNET = 1;
         private static final int OTHER_FAILURE = 2;
+        private static final int ALREADY_EXISTS = 3;
         private final String LOG_TAG = PostBookmarkTask.class.getSimpleName();
 
         private final Activity mParent;
@@ -659,6 +660,9 @@ public class ItemDetailActivity extends AppCompatActivity {
                     if(responseCode == 200) {
                         Log.d(LOG_TAG, "Post was success");
                         return SUCCESS;
+                    } else if(responseCode == 409) {
+                        Log.d(LOG_TAG, "Bookmark already exists");
+                        return ALREADY_EXISTS;
                     } else if(responseCode == 449) {
                         Log.d(LOG_TAG, "Post failure");
                         return OTHER_FAILURE;
@@ -680,13 +684,16 @@ public class ItemDetailActivity extends AppCompatActivity {
         }
         @Override
         protected void onPostExecute(Integer result) {
+            // inform user of success
             if(result == SUCCESS) {
                 Toast.makeText(mParent, "Added bookmark!", Toast.LENGTH_SHORT).show();
                 showProgress(false);
             }
-            else
+            else if(result == OTHER_FAILURE)
                 Toast.makeText(mParent, "Bookmark failed :(", Toast.LENGTH_SHORT).show();
-                showProgress(false);
+
+            // no matter what, turn off progress spinner
+            showProgress(false);
         }
     }
 
