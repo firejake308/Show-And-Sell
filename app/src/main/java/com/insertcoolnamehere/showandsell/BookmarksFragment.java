@@ -36,7 +36,7 @@ public class BookmarksFragment extends BrowseFragment {
         } else {
             // get user id and password
             SharedPreferences savedData = getActivity().getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
-            String userId = savedData.getString(getString(R.string.prompt_email), "NULL");
+            String userId = savedData.getString(getString(R.string.userId), "NULL");
             String pw = savedData.getString(getString(R.string.prompt_password), "NULL");
 
             // construct the URL to fetch bookmarks
@@ -50,6 +50,7 @@ public class BookmarksFragment extends BrowseFragment {
                     .appendQueryParameter("userId", userId)
                     .appendQueryParameter("password", pw)
                     .build();
+            Log.d("BookmarksFragment", "URL: "+builder.toString());
             return new URL(builder.toString());
         }
     }

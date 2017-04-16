@@ -366,6 +366,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                     // obtain status code
                     responseCode = urlConnection.getResponseCode();
+                    Log.d(LOG_TAG, "response code: "+responseCode);
                     if(responseCode == 200) {
                         // read response to get user data from server
                         reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
