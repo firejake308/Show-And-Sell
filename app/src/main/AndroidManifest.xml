@@ -74,7 +74,8 @@
         </activity>
         <activity
             android:name=".SettingsActivity"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".MainActivity"
+            android:label="@string/action_settings" />
         <activity
             android:name=".ChooseGroupActivity"
             android:label="@string/choose_group"

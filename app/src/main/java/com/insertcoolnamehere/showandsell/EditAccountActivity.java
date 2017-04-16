@@ -83,7 +83,7 @@ public class EditAccountActivity extends AppCompatActivity {
         String pa = CryptoTool.decrypt(savedData.getString(getString(R.string.prompt_password), ""));
         String pa2 = CryptoTool.decrypt(savedData.getString(getString(R.string.prompt_password), ""));
 
-        password0 = pa;
+        password0 = CryptoTool.encrypt(pa);
 
         // find all the views
         firstNameEntry = (EditText) findViewById(R.id.first_name_entry_edit);
