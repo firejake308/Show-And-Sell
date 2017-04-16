@@ -277,6 +277,7 @@ public class CreateAccountActivity extends AppCompatActivity implements OnConnec
                 try {
                     URL url = new URL(uri);
 
+                    // open connection and configure for output
                     connection = (HttpURLConnection) url.openConnection();
                     connection.setReadTimeout(10000);
                     connection.setConnectTimeout(15000);
@@ -372,6 +373,7 @@ public class CreateAccountActivity extends AppCompatActivity implements OnConnec
         }
     }
 
+    // TODO remove this unused class if @Patrick says we don't need it
     private class DataLongOperationAsyncTask extends AsyncTask<String, Void, String[]> {
         private String address = "8116 Island Park Court";
 

@@ -182,7 +182,7 @@
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
     <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
 
-    <string name="title_activity_tutorial">THelp</string>
+    <string name="title_activity_tutorial">Help</string>
 
 
     <string name="title_activity_full_image" translatable="false">Full Image</string>

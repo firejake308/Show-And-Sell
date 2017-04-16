@@ -14,7 +14,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 /**
- * A simple {@link DialogFragment} subclass.
+ * A simple {@link DialogFragment} subclass that confirms that a group manager actually wants to
+ * delete an item
  */
 public class ConfirmDeleteFragment extends DialogFragment {
 
@@ -46,7 +47,13 @@ public class ConfirmDeleteFragment extends DialogFragment {
         return builder.create();
     }
 
+    /**
+     * Listener that deals with actual deletion of items
+     */
     public interface OnConfirmDeleteListener {
+        /**
+         * Once the user confirms the deletion, sends the request to remove the item from the server
+         */
         void onConfirmDelete();
     }
 }

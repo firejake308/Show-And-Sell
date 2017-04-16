@@ -37,7 +37,6 @@ import java.net.URL;
 
 /**
  * A fragment representing a list of Items.
- * <p/>
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
@@ -69,18 +68,22 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        // if no items are present, fetch some from the server
         if(!Item.hasBrowseItems()) {
             updateItems();
         }
     }
 
     /**
-     * Update items when user swipes to refresh
+     * Updates items when user swipes to refresh
      */
     public void onRefresh() {
         updateItems();
     }
 
+    /**
+     * Updates the <code>Item.browseGroupItems</code> array with fresh items from the server
+     */
     public void updateItems() {
         // fetch items from server
         if(mFetchItemsTask == null) {
@@ -146,6 +149,11 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
         editor.apply();
     }
 
+    /**
+     * Creates a new instance with the given number of columns in the grid layout
+     * @param columnCount
+     * @return
+     */
     @SuppressWarnings("unused")
     public static BrowseFragment newInstance(int columnCount) {
         BrowseFragment fragment = new BrowseFragment();
@@ -159,6 +167,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // set the number of columns in the grid layout
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
@@ -167,25 +176,32 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_item_list, container, false);
 
+        // create a reference to the fragment for later use
         fragView = view;
+
+        // identify views and initialize
         View recyclerView = view.findViewById(R.id.list);
         SwipeRefreshLayout swiper = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
         swiper.setOnRefreshListener(this);
         swiper.setColorSchemeResources(R.color.colorAccent);
 
-        // Set the adapter
+        // Set the layout and adapter for the RecyclerView
         if (recyclerView instanceof RecyclerView) {
             Context context = recyclerView.getContext();
             mRecyclerView = (RecyclerView) recyclerView;
             if (mColumnCount <= 1) {
+                // use a linear layout for a single-column view
                 mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
+                // use a bottom-stacking staggered grid layout for multiple columns
                 StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(mColumnCount, StaggeredGridLayoutManager.VERTICAL);
                 layoutManager.setReverseLayout(true);
                 mRecyclerView.setLayoutManager(layoutManager);
             }
+            // Show several details for bookmarks, but only picture and price for browse items
             if(isBookmark())
                 adapter = new FullItemRecyclerViewAdapter(Item.bookmarkedItems, mListener);
             else
@@ -200,6 +216,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnListFragmentInteractionListener) {
+            // hook up parent activity as listener
             mListener = (OnListFragmentInteractionListener) context;
         } else {
           throw new RuntimeException(context.toString()
@@ -225,7 +242,16 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
+        /**
+         * Reacts to the user tapping an item in the Browse list
+         * @param itemId id of selected item
+         */
         void onListFragmentInteraction(String itemId);
+
+        /**
+         * Opens the ChooseGroupActivity when the user clicks on the link that is shown in the
+         * BrowseFragment when no group is selected
+         */
         void openChooseGroup();
     }
 
@@ -251,6 +277,12 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
         }
     }
 
+    /**
+     * Helper method that returns the appropriate API Call as a URL for the FetchItemsTask
+     * @param id group ID
+     * @return API call as a URL
+     * @throws MalformedURLException
+     */
     protected URL getAPICall(String id) throws MalformedURLException {
         // construct the URL to fetch a user
         Uri.Builder  builder = new Uri.Builder();
@@ -267,10 +299,17 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
         return new URL(builder.toString());
     }
 
+    /**
+     * Equivalent to <code>this instanceof BookmarksFragment</code>
+     * @return whether or not this is a bookmark fragment
+     */
     protected boolean isBookmark() {
         return false;
     }
 
+    /**
+     * Task that asynchronously queries the server for a fresh list of items
+     */
     private class FetchItemsTask extends AsyncTask<Void, Integer, Integer> {
         /**
          * The Activity within which this AsyncTask runs
@@ -279,6 +318,8 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
         private String mGroupId;
 
         private final String LOG_TAG = FetchItemsTask.class.getSimpleName();
+
+        // result codes for possible outcomes of the doInBackground method
         private final int NO_ITEMS = 3;
         private final int NO_INERNET = 2;
         private final int SUCCESS = 1;
@@ -345,6 +386,8 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                                 itemJson = itemJson.getJSONObject("item");
                             }
 
+                            // create a new Item and initialize it with all of the characteristics
+                            // provided by the server
                             Item item = new Item(itemJson.getString("ssItemId"), isBookmark()?Item.BOOKMARK:Item.BROWSE);
                             item.setName(itemJson.getString("name"));
                             item.setPrice(itemJson.getDouble("price"));

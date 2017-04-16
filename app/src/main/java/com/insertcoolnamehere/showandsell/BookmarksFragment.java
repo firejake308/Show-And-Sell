@@ -15,12 +15,7 @@ import java.net.URL;
 
 
 /**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link OnOpenBookmarkListener} interface
- * to handle interaction events.
- * Use the {@link BookmarksFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * A fragment from where the user can browse all of their bookmarks
  */
 public class BookmarksFragment extends BrowseFragment {
 
@@ -29,22 +24,17 @@ public class BookmarksFragment extends BrowseFragment {
     }
 
     /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment BookmarksFragment.
+     * Helper method that returns the appropriate API Call as a URL for the FetchItemsTask
+     * @param id group ID
+     * @return API call as a URL
+     * @throws MalformedURLException
      */
-    public static BookmarksFragment newInstance(String param1, String param2) {
-        BookmarksFragment fragment = new BookmarksFragment();
-        return fragment;
-    }
-
     @Override
     protected URL getAPICall(String id) throws MalformedURLException {
         if(getActivity() == null) {
             return null;
         } else {
-            // get user id and pass
+            // get user id and password
             SharedPreferences savedData = getActivity().getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
             String userId = savedData.getString(getString(R.string.prompt_email), "NULL");
             String pw = savedData.getString(getString(R.string.prompt_password), "NULL");
@@ -56,6 +46,7 @@ public class BookmarksFragment extends BrowseFragment {
                     .appendPath("showandsell")
                     .appendPath("api")
                     .appendPath("bookmarks")
+                    .appendPath("bookmarks")
                     .appendQueryParameter("userId", userId)
                     .appendQueryParameter("password", pw)
                     .build();
@@ -63,6 +54,10 @@ public class BookmarksFragment extends BrowseFragment {
         }
     }
 
+    /**
+     * Equivalent to <code>this instanceof BookmarksFragment</code>
+     * @return
+     */
     @Override
     protected boolean isBookmark() {
         return true;

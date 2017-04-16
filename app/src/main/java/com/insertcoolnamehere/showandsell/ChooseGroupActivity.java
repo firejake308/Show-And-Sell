@@ -62,7 +62,6 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
     private GoogleApiClient mGoogleApiClient;
     private final Object dataLock = new Object();
 
-    private Location location;
     private FetchGroupsTask mAuthTask;
 
     private final int MY_PERMISSIONS_REQUEST_ACCESS_COARSE_LOCATION = 9801;
@@ -100,8 +99,8 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
     }
 
     /**
-     * This method will update groups for refreshing and onCreate
-     * 11/23/2016
+     * Updates groups for refreshing and onCreate by polling the server for nearby groups if location
+     * is available, and all groups if not
      */
     private void updateGroups() {
         try {
@@ -117,8 +116,7 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
     }
 
     /**
-     * This method will change the user's group when a new one is selected
-     * 11/23/2016
+     * Changes the user's primary group when they select a new one
      */
     private void setNewGroup(int position) {
         // get new group id and name
@@ -131,7 +129,7 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
         // clear browse group items, because that has changed
         Item.browseGroupItems.clear();
 
-        // update group name and id in the app
+        // update group name and id in the saved data
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(getString(R.string.saved_group_id), currentGroupId);
@@ -142,7 +140,14 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
         editor.commit();
     }
 
-    // get URL for groups
+    /**
+     * Determines the appropriate URL for the API call in FetchGroupsTask based on the availability
+     * of location data
+     * @param lat latitiude of user's current position
+     * @param lon longitude of user's current position
+     * @return API call as URL
+     * @throws MalformedURLException
+     */
     protected URL getAPICall(double lat, double lon) throws MalformedURLException {
         // construct the URL to fetch groups, all if no location data
         if (lat == 0 && lon == 0) {
@@ -174,13 +179,13 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        final ChooseGroupActivity cxtReference = this;
+        // create a LocationRequest
         LocationRequest request = LocationRequest.create();
         request.setNumUpdates(1);
         request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         try {
-            if (ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION)
+            // get permission for location from the user
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
@@ -189,47 +194,19 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
             while (ContextCompat.checkSelfPermission(this,
                     Manifest.permission.ACCESS_COARSE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED) {try{Thread.sleep(500);}catch(Exception e){}}
-            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, request, cxtReference);
-        } catch (SecurityException se){Log.e("ChooseGroupActivity", "User Denied Permission");}
-        /*
-        new Thread() {
-            public void run() {
-                Log.d("ChooseGroupActivity", "I'm connected!");
-                if (mGoogleApiClient.isConnected()) {
-                    try {
-                        location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                        latitude = location.getLatitude();
-                        longitude = location.getLongitude();
-                        Log.d("ChooseGroupActivity", "lat=" + latitude);
-                        Log.d("ChooseGroupActivity", "lon=" + longitude);
 
-                        if (latitude == 0 && longitude == 0) {
-                            return;
-                        }
-                    } catch (SecurityException se) {
-                        Log.e("ChooseGroupActivity", "Security Error");
-                    } catch (NullPointerException n) {
-                        Log.d("ChooseGroupActivity", "No location found");
-                        LocationRequest request = LocationRequest.create();
-                        request.setNumUpdates(1);
-                        request.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-                        try {
-                            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, request, cxtReference);
-                        } catch (SecurityException se) {Log.e("ChooseGroupActivity", "Security Error");}
-                    }
-                } else {
-                    Log.e("ChooseGroupActivity", "Not connected to Google API");
-                }
-                mAuthTask = new ChooseGroupActivity.FetchGroupsTask(cxtReference, latitude, longitude);
-                mAuthTask.execute();
-            }
-        }.start();*/
+            // once we have permission, send the request for location
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, request, this);
+        } catch (SecurityException se){Log.e("ChooseGroupActivity", "User Denied Permission");}
     }
 
     @Override
     public void onLocationChanged(Location location) {
+        // update latitude and longitude
         latitude = location.getLatitude();
         longitude = location.getLongitude();
+
+        // update groups
         mAuthTask = new ChooseGroupActivity.FetchGroupsTask(this, latitude, longitude);
         mAuthTask.execute();
     }
@@ -253,7 +230,12 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
         private double lat;
         private double lon;
 
+        /**
+         * Tag to identify this task in debug and error logs
+         */
         private final String LOG_TAG = ChooseGroupActivity.FetchGroupsTask.class.getSimpleName();
+
+        // result codes
         private final int NO_INTERNET = 2;
         private final int SUCCESS = 1;
         private final int OTHER_FAILURE = 0;
@@ -265,13 +247,11 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
         }
 
         protected Integer doInBackground(Void... urls) {
-            // im gonna copy paste the networking code from Login here
             // variables that we will have to close in try loop
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
 
-
-            // the unparsed JSON response from the server
+            // the raw, un-parsed JSON response from the server
             int responseCode;
 
             // check for internet connection
@@ -315,6 +295,7 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
                         for (int i = 0; i < items.length(); i++) {
                             JSONObject itemJson = items.getJSONObject(i);
 
+                            // update list of group names to display and corresponding IDs
                             groupTexts.add(itemJson.getString("name")+" \u2014 "+itemJson.getString("address"));
                             groupIds.add(itemJson.getString("ssGroupId"));
                         }
@@ -350,6 +331,8 @@ public class ChooseGroupActivity extends AppCompatActivity implements GoogleApiC
         protected void onPostExecute(Integer result) {
             // update list view
             mAdapter.notifyDataSetChanged();
+
+            // stop the progress spinner
             View progressView = findViewById(R.id.choose_group_progress);
             progressView.setVisibility(View.GONE);
             Log.d(LOG_TAG, "available groups data set changed");
