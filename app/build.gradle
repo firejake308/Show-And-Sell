@@ -35,6 +35,9 @@ android {
         versionName "1.10.1"
         vectorDrawables.useSupportLibrary = true
     }
+    dexOptions {
+        javaMaxHeapSize "2g"
+    }
     buildTypes {
         release {
             minifyEnabled true
