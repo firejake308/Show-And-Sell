@@ -18,15 +18,19 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <activity android:name=".SplashActivity"
+            android:theme="@style/SplashScreenStyle">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".LoginActivity"
             package="com.google.android.gms:play-services-auth:10.2.0"
             android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".CreateAccountActivity"
@@ -63,7 +67,8 @@
             android:parentActivityName=".ManageGroupActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".SearchableActivity"
+        <activity
+            android:name=".SearchableActivity"
             android:parentActivityName=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
@@ -75,13 +80,12 @@
         </activity>
         <activity
             android:name=".SettingsActivity"
-            android:parentActivityName=".MainActivity"
-            android:label="@string/action_settings" />
+            android:label="@string/action_settings"
+            android:parentActivityName=".MainActivity" />
         <activity
             android:name=".ChooseGroupActivity"
             android:label="@string/choose_group"
             android:parentActivityName=".SettingsActivity" />
-
         <activity
             android:name=".ManageGroupActivity"
             android:label="@string/manage_group"
@@ -129,6 +133,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.insertcoolnamehere.showandsell.ItemDetailActivity" />
         </activity>
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="4f0210ec182579301c572a1053346b30220467a7" />

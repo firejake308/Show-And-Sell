@@ -86,15 +86,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
         Fabric.with(this, new Twitter(authConfig));
 
-        // if user is already logged in, go straight to main activity
-        SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key),
-                Context.MODE_PRIVATE);
-        if(savedData.contains(getString(R.string.prompt_email))) {
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-            finish();
-        }
-
         setContentView(R.layout.activity_login);
         // Set up the login form.
         mEmailView = (EditText) findViewById(R.id.email);
