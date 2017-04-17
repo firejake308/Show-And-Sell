@@ -56,6 +56,7 @@
     <string name="prev_step_btn_label">Previous</string>
     <string name="successful_donation">Item was donated successfully!</string>
     <string name="error_donate">An error occurred during donation.</string>
+    <string name="error_group_not_found">Group Not Found</string>
 
     <!-- Item detail -->
     <string name="item_description">Description</string>

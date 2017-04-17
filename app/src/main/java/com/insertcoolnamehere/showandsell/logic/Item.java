@@ -91,6 +91,7 @@ public class Item implements Serializable {
     private boolean approved;
     private int mItemType;
     private String ownerId;
+    private String groupId;
 
     public Item(String guid, int itemType) {
         this.guid = guid;
@@ -185,6 +186,14 @@ public class Item implements Serializable {
 
     public void setOwnerId(String ownerId) {
         this.ownerId = ownerId;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 
     @Override

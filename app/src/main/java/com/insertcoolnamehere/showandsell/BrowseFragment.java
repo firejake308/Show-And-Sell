@@ -398,6 +398,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                             item.setPic(BitmapFactory.decodeByteArray(imgBytes, 0, imgBytes.length));
                             item.setApproved(itemJson.getBoolean("approved"));
                             item.setOwnerId(itemJson.getString("ownerId"));
+                            item.setGroupId(itemJson.getString("groupId"));
                         }
 
                         return SUCCESS;

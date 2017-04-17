@@ -111,4 +111,5 @@
     <string name="report_bug">REPORTAR UN ERROR</string>
     <string name="action_update_account">ACTUALIZAR CUENTA</string>
     <string name="account">AJUSTES DE CUENTA</string>
+    <string name="error_group_not_found">Grupo No Encontrado</string>
 </resources>

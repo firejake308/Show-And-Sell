@@ -80,6 +80,7 @@ public class ItemDetailActivity extends AppCompatActivity {
     private AsyncTask mFetchCommentsTask;
 
     private String mToken;
+    private String mItemGroupName = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +120,8 @@ public class ItemDetailActivity extends AppCompatActivity {
             itemCondition.setText(mItem.getCondition());
             TextView itemDescription = (TextView) findViewById(R.id.item_detail_description);
             itemDescription.setText(mItem.getDescription());
+            TextView itemGroup = (TextView) findViewById(R.id.item_detail_group_name);
+            new FetchGroupTask(this).execute();
 
             // set up comments list view
             ListView listView = (ListView) findViewById(R.id.item_comments);
@@ -213,6 +216,8 @@ public class ItemDetailActivity extends AppCompatActivity {
         itemCondition.setText(mItem.getCondition());
         TextView itemDescription = (TextView) findViewById(R.id.item_detail_description);
         itemDescription.setText(mItem.getDescription());
+        TextView itemGroup = (TextView) findViewById(R.id.item_detail_group_name);
+        new FetchGroupTask(this).execute();
 
         // set up comments list view
         ListView listView = (ListView) findViewById(R.id.item_comments);
@@ -1156,7 +1161,6 @@ public class ItemDetailActivity extends AppCompatActivity {
         }
 
         protected Integer doInBackground(Void... urls) {
-            // im gonna copy paste the networking code from Login here
             // variables that we will have to close in try loop
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
@@ -1419,6 +1423,119 @@ public class ItemDetailActivity extends AppCompatActivity {
 
             // no matter what happens, show user that we're done trying here
             showProgress(false);
+        }
+    }
+
+    private class FetchGroupTask extends AsyncTask<Void, Void, Integer> {
+        // instance variables
+        private Activity mParent;
+
+        // result codes
+        private final int SUCCESS = 0;
+        private final int NO_INTERNET = 1;
+        private final int OTHER_FAILURE = 2;
+        // for use in debug logs
+        private final String LOG_TAG = "FetchGroupTask";
+
+        FetchGroupTask(Activity parent) {
+            mParent = parent;
+        }
+
+        public Integer doInBackground(Void... params) {
+            // variables that we will have to close in try loop
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+
+            // the unparsed JSON response from the server
+            int responseCode = -1;
+
+            // check for internet connection
+            ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo info = manager.getActiveNetworkInfo();
+
+            if(info == null || !info.isConnected()) {
+                // if there is no network, inform user through a toast
+                mParent.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                        Log.d(LOG_TAG, "No connection available");
+                    }
+                });
+                return NO_INTERNET;
+            } else {
+                try {
+                    // connect to the URL and open the reader
+                    Uri.Builder  builder = new Uri.Builder();
+                    builder.scheme("http")
+                            .encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
+                            .appendPath("showandsell")
+                            .appendPath("api")
+                            .appendPath("groups")
+                            .appendPath("group")
+                            .appendQueryParameter("id", mItem.getGroupId())
+                            .build();
+                    URL url = new URL(builder.toString());
+                    urlConnection = (HttpURLConnection) url.openConnection();
+                    urlConnection.setReadTimeout(10000);
+                    urlConnection.setConnectTimeout(15000);
+                    urlConnection.setRequestMethod("GET");
+                    urlConnection.connect();
+
+                    // obtain status code
+                    responseCode = urlConnection.getResponseCode();
+                    Log.d(LOG_TAG, "response code="+responseCode);
+                    if(responseCode == 200) {
+                        // read response to get user data from server
+                        reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+                        String line = "";
+                        String responseBody = "";
+                        while((line = reader.readLine()) != null) {
+                            responseBody += line + '\n';
+                        }
+
+                        // parse response as JSON
+                        JSONObject itemJson = new JSONObject(responseBody);
+
+                        Log.d(LOG_TAG, itemJson.toString());
+                        mItemGroupName = itemJson.getString("name");
+
+                        return SUCCESS;
+                    } else {
+                        return OTHER_FAILURE;
+                    }
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "Error getting response from server", e);
+                } catch (JSONException e) {
+                    Log.e(LOG_TAG, "Error parsing JSON", e);
+                } finally {
+                    // release system resources
+                    if(urlConnection != null) {
+                        urlConnection.disconnect();
+                    }
+                    if(reader != null) {
+                        try {
+                            reader.close();
+                        } catch(IOException e) {
+                            Log.e(LOG_TAG, "Error closing input stream", e);
+                        }
+                    }
+                }
+            }
+
+            // if anything goes wrong, return the other failure code
+            return OTHER_FAILURE;
+        }
+
+        @Override
+        public void onPostExecute(Integer result) {
+            if (result == SUCCESS) {
+                TextView itemGroup = (TextView) findViewById(R.id.item_detail_group_name);
+                itemGroup.setText(mItemGroupName);
+            } else {
+                TextView itemGroup = (TextView) findViewById(R.id.item_detail_group_name);
+                itemGroup.setText(R.string.error_group_not_found);
+            }
         }
     }
 
