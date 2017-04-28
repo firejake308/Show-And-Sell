@@ -412,7 +412,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 }
             }
 
-            // if anything goes wrong, don't let them log in and act like the password was wrong
+            // if anything goes wrong, don't let them log in
             return OTHER_FAILURE;
         }
 
