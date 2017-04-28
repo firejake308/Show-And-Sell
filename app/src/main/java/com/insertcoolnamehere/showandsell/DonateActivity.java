@@ -436,9 +436,13 @@ public class DonateActivity extends AppCompatActivity {
      * Asynchronous task that uploads a donated item to the server on a separate thread, so that it
      * won't block the UI thread with networking work.
      */
-    public class UploadItemTask extends AsyncTask<Bitmap, Void, Boolean> {
+    public class UploadItemTask extends AsyncTask<Bitmap, Void, Integer> {
 
         private static final String LOG_TAG = "UploadItemTask";
+        private static final int SUCCESS = 0;
+        private static final int NO_CONNECTION = 1;
+        private static final int NO_GROUP = 2;
+        private static final int OTHER_FAILURE = 3;
 
         private Activity mParent;
         private String mName;
@@ -457,18 +461,12 @@ public class DonateActivity extends AppCompatActivity {
         }
 
         @Override
-        protected Boolean doInBackground(Bitmap... bmpData) {
+        protected Integer doInBackground(Bitmap... bmpData) {
             ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo info = manager.getActiveNetworkInfo();
             if(info == null || !info.isConnected()) {
                 // if there is no network, inform user through a toast
-                mParent.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
-                        Log.d(LOG_TAG, "No connection available");
-                    }
-                });
+                return NO_CONNECTION;
             } else {
                 // declare resources to close in finally clause
                 HttpURLConnection conn = null;
@@ -503,6 +501,11 @@ public class DonateActivity extends AppCompatActivity {
                     String condition = mCondition;
                     String description = mDescription;
 
+                    // require the user to have chosen a group to donate
+                    if (groupId.equals("")) {
+                        throw new IllegalArgumentException();
+                    }
+
                     // scale down image and convert to base64
                     Log.d(LOG_TAG, "is mBitmap null: "+(mBitmap == null));
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -534,10 +537,10 @@ public class DonateActivity extends AppCompatActivity {
 
                     if(responseCode == 200) {
                         Log.d(LOG_TAG, "Post was success");
-                        return true;
+                        return SUCCESS;
                     } else if(responseCode == 449) {
                         Log.d(LOG_TAG, "Group may have been deleted, Post failure");
-                        return false;
+                        return OTHER_FAILURE;
                     } else {
                         Log.e(LOG_TAG, "response Code = "+responseCode);
                     }
@@ -547,10 +550,14 @@ public class DonateActivity extends AppCompatActivity {
                     Log.e(LOG_TAG, "Error opening URL connection (probably?)", e);
                 } catch (JSONException e) {
                     Log.e(LOG_TAG, "Error forming JSON", e);
+                } catch(IllegalArgumentException e) {
+                    Log.e(LOG_TAG, "No group chosen");
+                    return NO_GROUP;
                 } finally {
                     conn.disconnect();
                     try {
-                        out.close();
+                        if (out != null)
+                            out.close();
                     } catch(Exception e) {
                         Log.e(LOG_TAG, "Error closing output stream", e);
                     }
@@ -558,20 +565,28 @@ public class DonateActivity extends AppCompatActivity {
             }
 
             // in case of failure
-            return false;
+            return OTHER_FAILURE;
         }
 
         @Override
-        protected void onPostExecute(Boolean result) {
+        protected void onPostExecute(Integer result) {
             // update text of button
             TextView takePicBtn = (TextView) findViewById(R.id.primary_step_label);
             if (takePicBtn != null)
                 takePicBtn.setText(getString(R.string.prompt_image_upload));
 
             // go back to main activity
-            if(result) {
+            if(result == SUCCESS) {
                 Toast.makeText(mParent, R.string.successful_donation, Toast.LENGTH_SHORT).show();
                 NavUtils.navigateUpFromSameTask(mParent);
+            } else if (result == NO_CONNECTION) {
+                Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                Log.d(LOG_TAG, "No connection available");
+            } else if (result == NO_GROUP) {
+                Toast.makeText(mParent, "Please choose a group to donate to.", Toast.LENGTH_SHORT).show();
+                showProgress(false);
+                Intent chooseGroupIntent = new Intent(mParent, ChooseGroupActivity.class);
+                startActivity(chooseGroupIntent);
             } else {
                 Toast.makeText(mParent, R.string.error_donate, Toast.LENGTH_SHORT).show();
             }
