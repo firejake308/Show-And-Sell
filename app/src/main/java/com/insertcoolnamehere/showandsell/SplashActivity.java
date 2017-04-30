@@ -39,7 +39,6 @@ public class SplashActivity extends AppCompatActivity {
             // get email and password
             String email = savedData.getString(getString(R.string.prompt_email), "");
             String pw = savedData.getString(getString(R.string.prompt_password), "");
-            Log.d("SplashActivity", "Server contains email, so we're doing good");
             new UserLoginTask(this, email, pw).execute();
         } else {
             // otherwise, take user to login activity

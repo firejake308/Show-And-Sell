@@ -167,7 +167,8 @@ public class DonateActivity extends AppCompatActivity {
             mImageView.setImageBitmap(mThumbnail);
 
             // get larger image for upload
-            mImage = BitmapFactory.decodeFile(mCurrentPhotoPath);
+            bmOptions.inSampleSize = 8;
+            mImage = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
         }
     }
 
@@ -509,7 +510,7 @@ public class DonateActivity extends AppCompatActivity {
                     // scale down image and convert to base64
                     Log.d(LOG_TAG, "is mBitmap null: "+(mBitmap == null));
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    mThumbnail.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    mBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
                     byte[] byteArray = stream.toByteArray();
                     String thumbnail = Base64.encodeToString(byteArray,Base64.NO_WRAP);
 

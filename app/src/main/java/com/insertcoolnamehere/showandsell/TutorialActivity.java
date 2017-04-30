@@ -2,6 +2,7 @@ package com.insertcoolnamehere.showandsell;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
@@ -194,8 +195,9 @@ public class TutorialActivity extends AppCompatActivity implements StepperLayout
 
     @Override
     public void onCompleted(View completeButton) {
-        // go back to main activity
-        NavUtils.navigateUpFromSameTask(this);
+        // go to main activity
+        Intent goMainIntent = new Intent(this, MainActivity.class);
+        startActivity(goMainIntent);
     }
 
     @Override
