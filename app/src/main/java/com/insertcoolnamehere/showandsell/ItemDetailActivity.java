@@ -60,6 +60,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -125,6 +126,14 @@ public class ItemDetailActivity extends AppCompatActivity {
             TextView itemDescription = (TextView) findViewById(R.id.item_detail_description);
             itemDescription.setText(mItem.getDescription());
             TextView itemGroup = (TextView) findViewById(R.id.item_detail_group_name);
+            final Context cxtRef = this;
+            itemGroup.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent openGroupIntent = new Intent(cxtRef, GroupDetailActivity.class);
+                    startActivity(openGroupIntent);
+                }
+            });
             new FetchGroupTask(this).execute();
 
             // set up comments list view
@@ -221,6 +230,14 @@ public class ItemDetailActivity extends AppCompatActivity {
         TextView itemDescription = (TextView) findViewById(R.id.item_detail_description);
         itemDescription.setText(mItem.getDescription());
         TextView itemGroup = (TextView) findViewById(R.id.item_detail_group_name);
+        final Context cxtRef = this;
+        itemGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent openGroupIntent = new Intent(cxtRef, GroupDetailActivity.class);
+                startActivity(openGroupIntent);
+            }
+        });
         new FetchGroupTask(this).execute();
 
         // set up comments list view

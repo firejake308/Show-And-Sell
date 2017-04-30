@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<CoordinatorLayout
+<android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -64,7 +64,7 @@
                 android:id="@+id/group_detail_address"
                 android:textAppearance="?textAppearanceListItem"
                 android:gravity="center_vertical"
-                android:drawableStart="@drawable/ic_buy_dark"
+                android:drawableStart="@drawable/ic_address"
                 android:drawablePadding="@dimen/activity_horizontal_margin"/>
 
             <TextView
@@ -75,7 +75,7 @@
                 android:id="@+id/group_detail_extra_info"
                 android:layout_marginTop="16dp"
                 android:gravity="center_vertical"
-                android:drawableStart="@drawable/ic_condition"
+                android:drawableStart="@drawable/ic_description"
                 android:drawablePadding="@dimen/activity_horizontal_margin"/>
 
             <RatingBar
@@ -98,4 +98,4 @@
         android:id="@+id/item_detail_buy"
         app:backgroundTint="?attr/colorAccent"
         app:elevation="6dp"/>
-</CoordinatorLayout>
+</android.support.design.widget.CoordinatorLayout>

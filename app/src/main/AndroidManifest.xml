@@ -137,7 +137,12 @@
             android:name="io.fabric.ApiKey"
             android:value="4f0210ec182579301c572a1053346b30220467a7" />
 
-        <activity android:name=".GroupDetailActivity"></activity>
+        <activity
+            android:name=".GroupDetailActivity"
+            android:label=""
+            android:parentActivityName=".ItemDetailActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan" />
     </application>
 
 </manifest>
