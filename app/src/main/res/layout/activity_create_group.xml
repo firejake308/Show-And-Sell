@@ -63,6 +63,36 @@
                 android:maxLines="1"
                 android:singleLine="true"/>
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/explanation"
+                android:layout_marginLeft="5dp"/>
+
+            <EditText
+                android:id="@+id/account_number_entry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_account_number"
+                android:inputType="number"
+                android:maxLines="1"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/routing_number_entry"
+                android:hint="@string/prompt_routing_number"
+                android:inputType="number"
+                android:maxLines="1"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/prompt_DOB"
+                android:id="@+id/dob_entry"
+                android:inputType="date"
+                android:maxLines="1"/>
+
             <Button
                 android:id="@+id/create_group_btn"
                 style="?android:textAppearanceSmall"

@@ -112,4 +112,9 @@
     <string name="action_update_account">ACTUALIZAR CUENTA</string>
     <string name="account">AJUSTES DE CUENTA</string>
     <string name="error_group_not_found">Grupo No Encontrado</string>
+    <string name="prompt_routing_number">Número de enrutamiento</string>
+    <string name="prompt_DOB">Fecha de Nacimiento</string>
+    <string name="prompt_account_number">Número de Cuenta</string>
+    <string name="explanation">Necesitamos la información siguiente para asegurar que recibe la ganancia de su recuadación de fondos. Nunca usaremos los detalles del banco para cualguier otro propósito.</string>
+    <string name="error_required">Obligatorio</string>
 </resources>

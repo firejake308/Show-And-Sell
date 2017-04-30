@@ -49,6 +49,9 @@ public class CreateGroupActivity extends AppCompatActivity implements GoogleApiC
     private EditText cityEntry;
     private EditText stateEntry;
     private EditText extraLocationDataEntry;
+    private EditText accountNumberEntry;
+    private EditText routingNumberEntry;
+    private EditText dobEntry;
     private Button   createGroupButton;
 
     // reference to ASyncTask
@@ -59,6 +62,9 @@ public class CreateGroupActivity extends AppCompatActivity implements GoogleApiC
     private String streetAddress = "";
     private String mGroupName = "";
     private String mExtraLocationData = "";
+    private String accountNumber = "";
+    private String routingNumber = "";
+    private String dob = "";
     private double latitude = 0;
     private double longitude = 0;
 
@@ -74,7 +80,11 @@ public class CreateGroupActivity extends AppCompatActivity implements GoogleApiC
         addressEntry = (EditText) findViewById(R.id.location_name_entry);
         cityEntry = (EditText) findViewById(R.id.city_name_entry);
         stateEntry = (EditText) findViewById(R.id.state_name_entry);
+        accountNumberEntry = (EditText) findViewById(R.id.account_number_entry);
+        routingNumberEntry = (EditText) findViewById(R.id.routing_number_entry);
+        dobEntry = (EditText) findViewById(R.id.dob_entry);
         extraLocationDataEntry = (EditText) findViewById(R.id.extra_location_data_entry);
+
         createGroupButton = (Button) findViewById(R.id.create_group_btn);
 
         createGroupButton.setOnClickListener(new View.OnClickListener() {
@@ -86,8 +96,6 @@ public class CreateGroupActivity extends AppCompatActivity implements GoogleApiC
     }
 
     private void attemptCreateGroup() {
-        // if the AsyncTask has already been created, then don't restart it
-
         // for reporting errors
         boolean cancel = false;
         View focusView = null;
@@ -96,6 +104,9 @@ public class CreateGroupActivity extends AppCompatActivity implements GoogleApiC
         mGroupName = groupNameEntry.getText().toString();
         streetAddress = addressEntry.getText().toString() + ", " + cityEntry.getText().toString() + ", " + stateEntry.getText().toString();
         mExtraLocationData = extraLocationDataEntry.getText().toString();
+        accountNumber = accountNumberEntry.getText().toString();
+        routingNumber = routingNumberEntry.getText().toString();
+        dob = dobEntry.getText().toString();
 
         try {
             synchronized (dataLock) {
@@ -119,6 +130,18 @@ public class CreateGroupActivity extends AppCompatActivity implements GoogleApiC
             cancel = true;
             addressEntry.setError("Incorrect Address");
             focusView = addressEntry;
+        } else if(accountNumber.length() < 4) {
+            cancel = true;
+            accountNumberEntry.setError(getString(R.string.error_field_required));
+            focusView = accountNumberEntry;
+        } else if(routingNumber.length() < 4) {
+            cancel = true;
+            routingNumberEntry.setError(getString(R.string.error_field_required));
+            focusView = routingNumberEntry;
+        } else if(dob.length() < 5) {
+            cancel = true;
+            dobEntry.setError(getString(R.string.error_field_required));
+            focusView = dobEntry;
         }
 
         if(cancel) {
@@ -152,7 +175,7 @@ public class CreateGroupActivity extends AppCompatActivity implements GoogleApiC
                         Log.e("CreateGroupActivity", "Error geocoding address", e);
                     }
                 } else {
-                    Log.e("CreateGroupActivit9y", "Not connected to Google API");
+                    Log.e("CreateGroupActivity", "Not connected to Google API");
                 }
                 mAuthTask = new CreateGroupTask(cxtReference, mGroupName, latitude, longitude, mExtraLocationData);
                 mAuthTask.execute();
@@ -169,7 +192,6 @@ public class CreateGroupActivity extends AppCompatActivity implements GoogleApiC
     public void onConnectionFailed(ConnectionResult result) {
         addressEntry.setError("Not connected to Google API");
         addressEntry.requestFocus();
-        Log.e("CreateGroupActivity", "I'm a failure at life and i should kill myself");
     }
 
     public class CreateGroupTask extends AsyncTask<Void, Void, Integer> {
@@ -249,6 +271,7 @@ public class CreateGroupActivity extends AppCompatActivity implements GoogleApiC
                         group.put("longitude", longitude);
                     }
                     group.put("address", streetAddress);
+                    group.put("routing", routingNumber);
                     group.put("locationDetail", extraLocationData);
                     groupData.put("group", group);
                     groupData.put("password", password);

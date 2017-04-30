@@ -18,20 +18,19 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <activity android:name=".SplashActivity"
+        <activity
+            android:name=".SplashActivity"
             android:theme="@style/SplashScreenStyle">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".LoginActivity"
             package="com.google.android.gms:play-services-auth:10.2.0"
-            android:label="@string/app_name">
-        </activity>
+            android:label="@string/app_name"></activity>
         <activity
             android:name=".CreateAccountActivity"
             android:parentActivityName=".LoginActivity" />
@@ -128,7 +127,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_full_image"
             android:parentActivityName=".ItemDetailActivity"
-            android:theme="@style/FullscreenTheme">
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.insertcoolnamehere.showandsell.ItemDetailActivity" />
@@ -137,6 +136,8 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="4f0210ec182579301c572a1053346b30220467a7" />
+
+        <activity android:name=".GroupDetailActivity"></activity>
     </application>
 
 </manifest>

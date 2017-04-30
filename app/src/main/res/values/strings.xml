@@ -175,9 +175,15 @@
     <string name="prompt_enter_city">City</string>
     <string name="prompt_enter_state">State Abbreviation</string>
     <string name="prompt_extra_location_data">Extra Location Information</string>
+    <string name="prompt_account_number">Bank Account Number</string>
+    <string name="prompt_routing_number">Routing Number</string>
+    <string name="prompt_DOB">Date of Birth</string>
+    <string name="explanation">We need the following information to ensure that you get the proceeds
+     from your fundraiser. We won\'t ever use your bank details for any unauthorized transactions.</string>
     <string name="prompt_group_password" translatable="false">Account Password</string>
     <string name="error_un_group_name_duplicate">Group name already in use</string>
     <string name="action_create_group">Create Group</string>
+
     <string name="title_activity_nav_bar" translatable="false">NavBarActivity</string>
 
     <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
