@@ -83,6 +83,9 @@ public class ItemDetailActivity extends AppCompatActivity {
 
     private String mToken;
     private String mItemGroupName = null;
+    private String mGroupAddress = null;
+    private String mGroupLocationDetail = null;
+    private double mGroupRating = 0.0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,12 +129,10 @@ public class ItemDetailActivity extends AppCompatActivity {
             TextView itemDescription = (TextView) findViewById(R.id.item_detail_description);
             itemDescription.setText(mItem.getDescription());
             TextView itemGroup = (TextView) findViewById(R.id.item_detail_group_name);
-            final Context cxtRef = this;
             itemGroup.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent openGroupIntent = new Intent(cxtRef, GroupDetailActivity.class);
-                    startActivity(openGroupIntent);
+                    openGroupDetail();
                 }
             });
             new FetchGroupTask(this).execute();
@@ -230,12 +231,10 @@ public class ItemDetailActivity extends AppCompatActivity {
         TextView itemDescription = (TextView) findViewById(R.id.item_detail_description);
         itemDescription.setText(mItem.getDescription());
         TextView itemGroup = (TextView) findViewById(R.id.item_detail_group_name);
-        final Context cxtRef = this;
         itemGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent openGroupIntent = new Intent(cxtRef, GroupDetailActivity.class);
-                startActivity(openGroupIntent);
+                openGroupDetail();
             }
         });
         new FetchGroupTask(this).execute();
@@ -247,6 +246,15 @@ public class ItemDetailActivity extends AppCompatActivity {
         if (mFetchCommentsTask == null) {
             new FetchCommentsTask(this).execute();
         }
+    }
+
+    private void openGroupDetail() {
+        Intent openGroupIntent = new Intent(this, GroupDetailActivity.class);
+        openGroupIntent.putExtra(GroupDetailActivity.EXTRA_NAME, mItemGroupName);
+        openGroupIntent.putExtra(GroupDetailActivity.EXTRA_ADDRESS, mGroupAddress);
+        openGroupIntent.putExtra(GroupDetailActivity.EXTRA_LOCATION_DETAIL, mGroupLocationDetail);
+        openGroupIntent.putExtra(GroupDetailActivity.EXTRA_RATING, mGroupRating);
+        startActivity(openGroupIntent);
     }
 
     private void openFullImage() {
@@ -1520,6 +1528,9 @@ public class ItemDetailActivity extends AppCompatActivity {
 
                         Log.d(LOG_TAG, itemJson.toString());
                         mItemGroupName = itemJson.getString("name");
+                        mGroupAddress = itemJson.getString("address");
+                        mGroupLocationDetail = itemJson.getString("locationDetail");
+                        mGroupRating = itemJson.getDouble("rating");
 
                         return SUCCESS;
                     } else {

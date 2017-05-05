@@ -63,6 +63,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/group_detail_address"
                 android:textAppearance="?textAppearanceListItem"
+                android:text="@string/prompt_enter_location"
                 android:gravity="center_vertical"
                 android:drawableStart="@drawable/ic_address"
                 android:drawablePadding="@dimen/activity_horizontal_margin"/>
@@ -80,8 +81,10 @@
 
             <RatingBar
                 android:id="@+id/rating_bar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:numStars="5"/>
         </LinearLayout>
 
     </android.support.v4.widget.NestedScrollView>
