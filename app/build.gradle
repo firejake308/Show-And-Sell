@@ -55,6 +55,9 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     //compile 'com.braintreepayments.api:braintree:2.+'
+    compile('com.twitter.sdk.android:twitter:2.3.2@aar') {
+        transitive = true;
+    }
     compile 'com.braintreepayments.api:drop-in:3.+'
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:design:24.2.1'
@@ -68,9 +71,6 @@ dependencies {
     compile 'com.google.android.gms:play-services-location:10.2.0'
     compile 'com.google.android.gms:play-services-auth:10.2.0'
     testCompile 'junit:junit:4.12'
-    compile('com.twitter.sdk.android:twitter:2.3.2@aar') {
-        transitive = true;
-    }
 }
 
 

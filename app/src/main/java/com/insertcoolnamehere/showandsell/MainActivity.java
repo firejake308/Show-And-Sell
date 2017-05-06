@@ -43,7 +43,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity implements BrowseFragment.OnListFragmentInteractionListener{
+public class MainActivity extends AppCompatActivity implements BrowseFragment.OnListFragmentInteractionListener, ChooseGroupFragment.OnChooseGroupListener{
 
     private static final int REQUEST_IMAGE_CAPTURE = 0;
 
@@ -82,12 +82,13 @@ public class MainActivity extends AppCompatActivity implements BrowseFragment.On
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-        mViewPager.setCurrentItem(0);
+        mViewPager.setCurrentItem(1);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
-        tabLayout.getTabAt(0).setIcon(R.drawable.ic_browse);
-        tabLayout.getTabAt(1).setIcon(R.drawable.ic_bookmarks);
+        tabLayout.getTabAt(1).setIcon(R.drawable.ic_browse);
+        tabLayout.getTabAt(0).setIcon(R.drawable.ic_bookmarks);
+        tabLayout.getTabAt(2).setIcon(R.drawable.ic_group_light);
 
         FloatingActionButton openDonateBtn = (FloatingActionButton) findViewById(R.id.openDonateBtn);
         final Context cxt = this;
@@ -192,6 +193,11 @@ public class MainActivity extends AppCompatActivity implements BrowseFragment.On
     }
 
     @Override
+    public void onChooseGroup(String group) {
+        // TODO do something
+    }
+
+    @Override
     public void onListFragmentInteraction(String itemId) {
         // start the ItemDetailActivity and tell it which item to show
         Intent showItemDetailIntent = new Intent(this, ItemDetailActivity.class);
@@ -222,10 +228,13 @@ public class MainActivity extends AppCompatActivity implements BrowseFragment.On
             switch(position) {
                 case 0:
                     // browse tab
-                    return BrowseFragment.newInstance(2);
+                    return new BookmarksFragment();
                 case 1:
                     // bookmarks tab
-                    return new BookmarksFragment();
+                    return BrowseFragment.newInstance(2);
+                case 2:
+                    // group tab
+                    return new ChooseGroupFragment(); // TODO create choose group frag
             }
             return null;
         }
@@ -233,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements BrowseFragment.On
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 2;
+            return 3;
         }/*
 
         @Override
