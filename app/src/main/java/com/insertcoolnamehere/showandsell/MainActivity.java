@@ -31,6 +31,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.insertcoolnamehere.showandsell.logic.Group;
 import com.insertcoolnamehere.showandsell.logic.Item;
 
 import org.json.JSONException;
@@ -193,8 +194,20 @@ public class MainActivity extends AppCompatActivity implements BrowseFragment.On
     }
 
     @Override
-    public void onChooseGroup(String group) {
-        // TODO do something
+    public void onChooseGroup(Group group) {
+        // get group details
+        String name = group.getName();
+        String address = group.getPickupAddress();
+        String extraInfo = group.getExtraInfo();
+        double rating = group.getRating();
+
+        // send details through intent
+        Intent intent = new Intent(this, GroupDetailActivity.class);
+        intent.putExtra(GroupDetailActivity.EXTRA_NAME, name);
+        intent.putExtra(GroupDetailActivity.EXTRA_ADDRESS, address);
+        intent.putExtra(GroupDetailActivity.EXTRA_LOCATION_DETAIL, extraInfo);
+        intent.putExtra(GroupDetailActivity.EXTRA_RATING, rating);
+        startActivity(intent);
     }
 
     @Override

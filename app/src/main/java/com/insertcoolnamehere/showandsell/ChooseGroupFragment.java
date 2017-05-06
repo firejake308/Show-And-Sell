@@ -1,6 +1,5 @@
 package com.insertcoolnamehere.showandsell;
 
-import android.*;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,18 +9,20 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -29,6 +30,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.insertcoolnamehere.showandsell.logic.Group;
 import com.insertcoolnamehere.showandsell.logic.Item;
 
 import org.json.JSONArray;
@@ -41,8 +43,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.StringTokenizer;
 
 
 /**
@@ -51,17 +51,16 @@ import java.util.StringTokenizer;
  * {@link ChooseGroupFragment.OnChooseGroupListener} interface
  * to handle interaction events.
  */
-public class ChooseGroupFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class ChooseGroupFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, GroupViewAdapter.NewGroupListener {
 
     private OnChooseGroupListener mListener;
+    private GroupViewAdapter mAdapter;
     private String groupName;
-    private Button currentGroup;
-    private ArrayAdapter<String> mAdapter;
-    private ArrayList<String> groupTexts = new ArrayList<>();
-    private ArrayList<String> groupIds = new ArrayList<>();
+    private FrameLayout currentGroupLayout;
     private GoogleApiClient mGoogleApiClient;
     private FetchGroupsTask mAuthTask;
     private View rootView;
+    private RecyclerView groupRecyclerView;
 
     private double latitude = 0;
     private double longitude = 0;
@@ -86,30 +85,55 @@ public class ChooseGroupFragment extends Fragment implements GoogleApiClient.Con
 
         updateGroups();
 
-        // update current group text
-        SharedPreferences sharedPref = getContext().getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
-        groupName = sharedPref.getString(getString(R.string.saved_group_name), "No Group Selected");
-        currentGroup = (Button) rootView.findViewById(R.id.current_group);
-        currentGroup.setText(groupName);
-
         // add group buttons to list
-        ListView groups = (ListView) rootView.findViewById(R.id.list_of_groups);
-        mAdapter = new ArrayAdapter<>(
-                getContext(),
-                android.R.layout.simple_list_item_1,
-                groupTexts);
-        groups.setAdapter(mAdapter);
-        groups.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // set new group
-                setNewGroup(position);
-                // update group texts and ids for the list
-                updateGroups();
-            }
-        });
+        groupRecyclerView = (RecyclerView) rootView.findViewById(R.id.list_of_groups);
+        mAdapter = new GroupViewAdapter(Group.unselectedGroups, mListener, this);
+        groupRecyclerView.setAdapter(mAdapter);
+        groupRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
 
         return rootView;
+    }
+
+    private void updateCurrentGroupView(LayoutInflater inflater) {
+        // update current group view
+        SharedPreferences sharedPref = getContext().getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+        String groupId = sharedPref.getString(getString(R.string.saved_group_id), "NO GROUP SELECTED");
+        Group currGroup = Group.getGroup(groupId);
+
+        updateCurrentGroupView(inflater, currGroup);
+    }
+
+    private void updateCurrentGroupView(LayoutInflater inflater, Group currGroup) {
+        currentGroupLayout = (FrameLayout) rootView.findViewById(R.id.current_group);
+        View currentGroupView;
+        if(this.currentGroupLayout.getChildCount() < 1) {
+            currentGroupView = inflater.inflate(R.layout.list_item_group, this.currentGroupLayout, false);
+            this.currentGroupLayout.addView(currentGroupView);
+        } else {
+            currentGroupView = currentGroupLayout.getChildAt(0);
+        }
+
+        TextView nameView = (TextView) currentGroupView.findViewById(R.id.group_name);
+        TextView addressView = (TextView) currentGroupView.findViewById(R.id.group_address);
+        ImageView favoriteView = (ImageView) currentGroupView.findViewById(R.id.favorite_group);
+
+        try {
+            nameView.setText(currGroup.getName());
+            addressView.setText(currGroup.getPickupAddress());
+        } catch (NullPointerException e) {
+            nameView.setText("NO GROUP SELECTED");
+            addressView.setText("NO GROUP SELECTED");
+        }
+        if (Build.VERSION.SDK_INT >= 21)
+            favoriteView.setImageDrawable(getContext().getDrawable(R.drawable.ic_favorite_filled));
+        else
+            getResources().getDrawable(R.drawable.ic_favorite_filled);
+
+        // remove current group from list of available groups
+        Group.unselectedGroups.clear();
+        Group.unselectedGroups.addAll(Group.availableGroups);
+        Group.unselectedGroups.remove(currGroup);
+        mAdapter.notifyDataSetChanged();
     }
 
     private void updateGroups() {
@@ -164,41 +188,30 @@ public class ChooseGroupFragment extends Fragment implements GoogleApiClient.Con
         latitude = location.getLatitude();
         longitude = location.getLongitude();
 
-        // update groups
+        // update groupRecyclerView
         mAuthTask = new FetchGroupsTask(getActivity(), latitude, longitude);
         mAuthTask.execute();
     }
 
     /**
      * Changes the user's primary group when they select a new one
-     */
-    private void setNewGroup(int position) {
-        // get new group id and name
-        String currentGroupId = groupIds.get(position);
-        String currentGroupName = groupTexts.get(position);
-
-        // update text in current group button
-        currentGroup.setText(currentGroupName);
-
+    */
+    public void setNewGroup(Group group) {
         // clear browse group items, because that has changed
         Item.browseGroupItems.clear();
 
         // update group name and id in the saved data
         SharedPreferences sharedPref = getContext().getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(getString(R.string.saved_group_id), currentGroupId);
-        editor.putString(getString(R.string.saved_group_name), currentGroupName);
+        editor.putString(getString(R.string.saved_group_id), group.getId());
+        editor.putString(getString(R.string.saved_group_name), group.getName());
         // also, user may or may not be the owner of this group, so we'll set that to false and let
         // the FetchManagedItemsTask figure it out
         editor.putBoolean(getString(R.string.group_owner_boolean), false);
         editor.commit();
-    }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onChooseGroup(uri.toString());
-        }
+        // update current group view
+        updateCurrentGroupView(getActivity().getLayoutInflater(), group);
     }
 
     @Override
@@ -229,20 +242,19 @@ public class ChooseGroupFragment extends Fragment implements GoogleApiClient.Con
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnChooseGroupListener {
-        // TODO: Update argument type and name
-        void onChooseGroup(String group);
+        void onChooseGroup(Group group);
     }
 
     /**
      * Determines the appropriate URL for the API call in FetchGroupsTask based on the availability
      * of location data
-     * @param lat latitiude of user's current position
+     * @param lat latitude of user's current position
      * @param lon longitude of user's current position
      * @return API call as URL
      * @throws MalformedURLException
      */
     protected URL getAPICall(double lat, double lon) throws MalformedURLException {
-        // construct the URL to fetch groups, all if no location data
+        // construct the URL to fetch groupRecyclerView, all if no location data
         if (lat == 0 && lon == 0) {
             Uri.Builder builder = new Uri.Builder();
             builder.scheme("http")
@@ -252,10 +264,10 @@ public class ChooseGroupFragment extends Fragment implements GoogleApiClient.Con
                     .appendPath("groups")
                     .appendPath("allgroups")
                     .build();
-            Log.d("REACHED", "REACHED");
+            Log.d("FetchGroupsTask", builder.toString());
             return new URL(builder.toString());
         }
-        // construct URL to fetch groups in a 20 mile radius if location input
+        // construct URL to fetch groupRecyclerView in a 20 mile radius if location input
         Uri.Builder builder = new Uri.Builder();
         builder.scheme("http")
                 .encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
@@ -326,6 +338,7 @@ public class ChooseGroupFragment extends Fragment implements GoogleApiClient.Con
 
                     // obtain status code
                     responseCode = urlConnection.getResponseCode();
+                    Log.d(LOG_TAG, "response code = "+responseCode);
                     if(responseCode == 200) {
                         // read response to get user data from server
                         reader = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
@@ -337,15 +350,15 @@ public class ChooseGroupFragment extends Fragment implements GoogleApiClient.Con
 
                         // parse response as JSON
                         JSONArray items = new JSONArray(responseBody);
-                        groupTexts.clear();
-                        groupIds.clear();
+                        Group.clearGroups();
 
                         for (int i = 0; i < items.length(); i++) {
                             JSONObject itemJson = items.getJSONObject(i);
 
-                            // update list of group names to display and corresponding IDs
-                            groupTexts.add(itemJson.getString("name")+" \u2014 "+itemJson.getString("address"));
-                            groupIds.add(itemJson.getString("ssGroupId"));
+                            // add group to list
+                            new Group(itemJson.getString("name"), itemJson.getString("ssGroupId"),
+                                    itemJson.getString("address"), itemJson.getString("locationDetail"),
+                                    itemJson.getDouble("rating"));
                         }
 
                         return SUCCESS;
@@ -383,7 +396,10 @@ public class ChooseGroupFragment extends Fragment implements GoogleApiClient.Con
             // stop the progress spinner
             View progressView = rootView.findViewById(R.id.choose_group_progress);
             progressView.setVisibility(View.GONE);
-            Log.d(LOG_TAG, "available groups data set changed");
+            Log.d(LOG_TAG, "available groups data set changed: "+Group.availableGroups.size());
+
+            // update current group view
+            updateCurrentGroupView(getActivity().getLayoutInflater());
         }
     }
 }
