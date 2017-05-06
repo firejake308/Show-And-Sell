@@ -103,7 +103,7 @@ public class ChooseGroupFragment extends Fragment implements GoogleApiClient.Con
         updateCurrentGroupView(inflater, currGroup);
     }
 
-    private void updateCurrentGroupView(LayoutInflater inflater, Group currGroup) {
+    private void updateCurrentGroupView(LayoutInflater inflater, final Group currGroup) {
         currentGroupLayout = (FrameLayout) rootView.findViewById(R.id.current_group);
         View currentGroupView;
         if(this.currentGroupLayout.getChildCount() < 1) {
@@ -112,6 +112,14 @@ public class ChooseGroupFragment extends Fragment implements GoogleApiClient.Con
         } else {
             currentGroupView = currentGroupLayout.getChildAt(0);
         }
+
+        // link to current group
+        currentGroupLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onChooseGroup(currGroup);
+            }
+        });
 
         TextView nameView = (TextView) currentGroupView.findViewById(R.id.group_name);
         TextView addressView = (TextView) currentGroupView.findViewById(R.id.group_address);
