@@ -109,10 +109,6 @@
         </provider>
 
         <activity
-            android:name=".NavBarActivity"
-            android:label="@string/title_activity_nav_bar"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".TutorialActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_tutorial"

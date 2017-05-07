@@ -201,7 +201,7 @@ public class EditAccountActivity extends AppCompatActivity {
                 mParent.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mParent, R.string.error_no_internet, Toast.LENGTH_SHORT).show();
                         Log.d(LOG_TAG, "No connection available");
                     }
                 });

@@ -57,6 +57,8 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     private int lastItemLoaded = 0;
 
+    private boolean showAllGroups = false;
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -151,15 +153,17 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
     /**
      * Creates a new instance with the given number of columns in the grid layout
-     * @param columnCount
+     * @param columnCount number of columns in the grid
+     * @param showAllGroups whether or not this should show items from all groups
      * @return
      */
     @SuppressWarnings("unused")
-    public static BrowseFragment newInstance(int columnCount) {
+    public static BrowseFragment newInstance(int columnCount, boolean showAllGroups) {
         BrowseFragment fragment = new BrowseFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
+        fragment.showAllGroups = showAllGroups;
         return fragment;
     }
 
@@ -286,16 +290,29 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
     protected URL getAPICall(String id) throws MalformedURLException {
         // construct the URL to fetch a user
         Uri.Builder  builder = new Uri.Builder();
-        builder.scheme("http")
-                .encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
-                .appendPath("showandsell")
-                .appendPath("api")
-                .appendPath("items")
-                .appendPath("approvedinrange")
-                .appendQueryParameter("groupId", id)
-                .appendQueryParameter("start", ""+lastItemLoaded)
-                .appendQueryParameter("end", ""+(lastItemLoaded+6))
-                .build();
+        if (showAllGroups) {
+            builder.scheme("http")
+                    .encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
+                    .appendPath("showandsell")
+                    .appendPath("api")
+                    .appendPath("items")
+                    .appendPath("approvedinrange")
+                    .appendQueryParameter("groupId", id)
+                    .appendQueryParameter("start", "" + lastItemLoaded)
+                    .appendQueryParameter("end", "" + (lastItemLoaded + 6))
+                    .build();
+        } else {
+            builder.scheme("http")
+                    .encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
+                    .appendPath("showandsell")
+                    .appendPath("api")
+                    .appendPath("items")
+                    .appendPath("approvedinrange")
+                    .appendQueryParameter("groupId", id)
+                    .appendQueryParameter("start", "" + lastItemLoaded)
+                    .appendQueryParameter("end", "" + (lastItemLoaded + 6))
+                    .build();
+        }
         return new URL(builder.toString());
     }
 
@@ -351,7 +368,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 mParent.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mParent, R.string.error_no_internet, Toast.LENGTH_SHORT).show();
                     }
                 });
                 return NO_INERNET;

@@ -33,4 +33,9 @@
         <item name="android:background">@drawable/splash_background</item>
     </style>
 
+    <style name="RatingBarStyle" parent="AppTheme">
+        <item name="colorControlActivated">#727272</item>
+        <item name="colorControlNormal">#727272</item>
+    </style>
+
 </resources>

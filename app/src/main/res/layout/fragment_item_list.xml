@@ -5,16 +5,15 @@
     android:name="com.insertcoolnamehere.showandsell.BrowseFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp"
     android:layout_marginTop="4dp"
     app:layoutManager="LinearLayoutManager"
     tools:context="com.insertcoolnamehere.showandsell.BrowseFragment">
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swiperefresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+        android:layout_height="match_parent">
         <android.support.v7.widget.RecyclerView
             android:id="@+id/list"
             android:layout_height="match_parent"

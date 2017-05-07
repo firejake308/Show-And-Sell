@@ -581,7 +581,7 @@ public class DonateActivity extends AppCompatActivity {
                 Toast.makeText(mParent, R.string.successful_donation, Toast.LENGTH_SHORT).show();
                 NavUtils.navigateUpFromSameTask(mParent);
             } else if (result == NO_CONNECTION) {
-                Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mParent, R.string.error_no_internet, Toast.LENGTH_SHORT).show();
                 Log.d(LOG_TAG, "No connection available");
             } else if (result == NO_GROUP) {
                 Toast.makeText(mParent, "Please choose a group to donate to.", Toast.LENGTH_SHORT).show();

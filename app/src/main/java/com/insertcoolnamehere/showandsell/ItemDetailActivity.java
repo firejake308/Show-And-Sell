@@ -83,6 +83,7 @@ public class ItemDetailActivity extends AppCompatActivity {
 
     private String mToken;
     private String mItemGroupName = null;
+    private String mGroupId = null;
     private String mGroupAddress = null;
     private String mGroupLocationDetail = null;
     private double mGroupRating = 0.0;
@@ -254,6 +255,7 @@ public class ItemDetailActivity extends AppCompatActivity {
         openGroupIntent.putExtra(GroupDetailActivity.EXTRA_ADDRESS, mGroupAddress);
         openGroupIntent.putExtra(GroupDetailActivity.EXTRA_LOCATION_DETAIL, mGroupLocationDetail);
         openGroupIntent.putExtra(GroupDetailActivity.EXTRA_RATING, mGroupRating);
+        openGroupIntent.putExtra(GroupDetailActivity.EXTRA_ID, mGroupId);
         startActivity(openGroupIntent);
     }
 
@@ -508,7 +510,7 @@ public class ItemDetailActivity extends AppCompatActivity {
                 mParent.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mParent, R.string.error_no_internet, Toast.LENGTH_SHORT).show();
                         Log.d(LOG_TAG, "No connection available");
                     }
                 });
@@ -652,7 +654,7 @@ public class ItemDetailActivity extends AppCompatActivity {
                 mParent.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mParent, R.string.error_no_internet, Toast.LENGTH_SHORT).show();
                         Log.d(LOG_TAG, "No connection available");
                     }
                 });
@@ -755,7 +757,7 @@ public class ItemDetailActivity extends AppCompatActivity {
                 mParent.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mParent, R.string.error_no_internet, Toast.LENGTH_SHORT).show();
                         Log.d(LOG_TAG, "No connection available");
                     }
                 });
@@ -858,7 +860,7 @@ public class ItemDetailActivity extends AppCompatActivity {
                 mParent.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mParent, R.string.error_no_internet, Toast.LENGTH_SHORT).show();
                         Log.d(LOG_TAG, "No connection available");
                     }
                 });
@@ -967,7 +969,7 @@ public class ItemDetailActivity extends AppCompatActivity {
                 mParent.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mParent, R.string.error_no_internet, Toast.LENGTH_SHORT).show();
                         Log.d(LOG_TAG, "No connection available");
                     }
                 });
@@ -1082,7 +1084,7 @@ public class ItemDetailActivity extends AppCompatActivity {
                 mParent.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mParent, R.string.error_no_internet, Toast.LENGTH_SHORT).show();
                         Log.d(LOG_TAG, "No connection available");
                     }
                 });
@@ -1206,7 +1208,7 @@ public class ItemDetailActivity extends AppCompatActivity {
                 mParent.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mParent, R.string.error_no_internet, Toast.LENGTH_SHORT).show();
                         Log.d(LOG_TAG, "No connection available");
                     }
                 });
@@ -1363,7 +1365,7 @@ public class ItemDetailActivity extends AppCompatActivity {
                 mParent.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mParent, R.string.error_no_internet, Toast.LENGTH_SHORT).show();
                         Log.d(LOG_TAG, "No connection available");
                     }
                 });
@@ -1487,7 +1489,7 @@ public class ItemDetailActivity extends AppCompatActivity {
                 mParent.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(mParent, "No connection available. Try again later.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(mParent, R.string.error_no_internet, Toast.LENGTH_SHORT).show();
                         Log.d(LOG_TAG, "No connection available");
                     }
                 });
@@ -1528,6 +1530,7 @@ public class ItemDetailActivity extends AppCompatActivity {
 
                         Log.d(LOG_TAG, itemJson.toString());
                         mItemGroupName = itemJson.getString("name");
+                        mGroupId = itemJson.getString("ssGroupId");
                         mGroupAddress = itemJson.getString("address");
                         mGroupLocationDetail = itemJson.getString("locationDetail");
                         mGroupRating = itemJson.getDouble("rating");

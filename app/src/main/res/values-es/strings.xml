@@ -116,4 +116,9 @@
     <string name="prompt_DOB">Fecha de Nacimiento</string>
     <string name="prompt_account_number">Número de Cuenta</string>
     <string name="explanation">Necesitamos la información siguiente para asegurar que recibe la ganancia de su recuadación de fondos. Nunca usaremos los detalles del banco para cualguier otro propósito.</string>
+    <string name="rate_group">Calificar este grupo</string>
+    <string name="action_send">Enviar</string>
+    <string name="error_no_internet">No hay conexión. Intente de nuevo más tarde.</string>
+    <string name="error_rating">Algo fue mal enviando la calificación</string>
+    <string name="rating_success">Calificación enviado</string>
 </resources>

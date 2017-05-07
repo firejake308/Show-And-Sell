@@ -199,6 +199,7 @@ public class MainActivity extends AppCompatActivity implements BrowseFragment.On
         String name = group.getName();
         String address = group.getPickupAddress();
         String extraInfo = group.getExtraInfo();
+        String id = group.getId();
         double rating = group.getRating();
 
         // send details through intent
@@ -207,6 +208,7 @@ public class MainActivity extends AppCompatActivity implements BrowseFragment.On
         intent.putExtra(GroupDetailActivity.EXTRA_ADDRESS, address);
         intent.putExtra(GroupDetailActivity.EXTRA_LOCATION_DETAIL, extraInfo);
         intent.putExtra(GroupDetailActivity.EXTRA_RATING, rating);
+        intent.putExtra(GroupDetailActivity.EXTRA_ID, id);
         startActivity(intent);
     }
 
@@ -244,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements BrowseFragment.On
                     return new BookmarksFragment();
                 case 1:
                     // bookmarks tab
-                    return BrowseFragment.newInstance(2);
+                    return BrowseFragment.newInstance(2, true);
                 case 2:
                     // group tab
                     return new ChooseGroupFragment(); // TODO create choose group frag
