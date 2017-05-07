@@ -197,8 +197,8 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 mRecyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
                 // use a bottom-stacking staggered grid layout for multiple columns
-                StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(mColumnCount, StaggeredGridLayoutManager.VERTICAL);
-                layoutManager.setReverseLayout(true);
+                GridLayoutManager layoutManager = new GridLayoutManager(context, mColumnCount);
+                layoutManager.setReverseLayout(false);
                 mRecyclerView.setLayoutManager(layoutManager);
             }
             // Show several details for bookmarks, but only picture and price for browse items

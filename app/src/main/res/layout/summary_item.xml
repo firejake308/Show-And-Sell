@@ -2,19 +2,26 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="5dp">
-    <ImageView
+    <android.support.percent.PercentFrameLayout
+        android:id="@+id/picture_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/item_picture"
-        android:adjustViewBounds="true"/>
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/item_picture"
+            app:layout_widthPercent="100%"
+            app:layout_aspectRatio="100%"
+            android:scaleType="centerCrop" />
+    </android.support.percent.PercentFrameLayout>
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignEnd="@id/item_picture"
-        android:layout_alignBottom="@id/item_picture"
         android:id="@+id/item_price"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@id/picture_frame"
+        android:layout_alignBottom="@id/picture_frame"
+        android:padding="16dp"
+        android:textSize="16sp"
         android:textColor="#FFFFFF"
-        android:background="@color/colorAccent"
-        android:padding="5dp"/>
+        android:background="#80000000" />
 </RelativeLayout>

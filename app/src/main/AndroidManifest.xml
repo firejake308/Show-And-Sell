@@ -140,8 +140,8 @@
         <activity
             android:name=".GroupDetailActivity"
             android:label=""
-            android:parentActivityName=".ItemDetailActivity"
-            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustPan" />
     </application>
 
