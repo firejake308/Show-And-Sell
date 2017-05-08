@@ -34,10 +34,16 @@ import android.widget.TextView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.braintreepayments.api.BraintreeFragment;
+import com.braintreepayments.api.PayPal;
 import com.braintreepayments.api.dropin.DropInActivity;
 import com.braintreepayments.api.dropin.DropInRequest;
 import com.braintreepayments.api.dropin.DropInResult;
+import com.braintreepayments.api.interfaces.BraintreeListener;
+import com.braintreepayments.api.models.PayPalAccountNonce;
+import com.braintreepayments.api.models.PayPalRequest;
 import com.braintreepayments.api.models.PaymentMethodNonce;
+import com.braintreepayments.api.models.PostalAddress;
 import com.insertcoolnamehere.showandsell.logic.Item;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
@@ -66,7 +72,7 @@ import java.util.Locale;
 
 import io.fabric.sdk.android.Fabric;
 
-public class ItemDetailActivity extends AppCompatActivity {
+public class ItemDetailActivity extends AppCompatActivity implements BraintreeListener {
 
     public static final String ITEM_ID = "ITEM_ID";
     public static final String OWNER_POWERS = "OWNER_POWERS";
@@ -270,7 +276,15 @@ public class ItemDetailActivity extends AppCompatActivity {
     private void finishPurchase() {
         DropInRequest dropInRequest = new DropInRequest()
                 .clientToken(mToken);
+        Log.e("THGF", "DropInRequest reached");
+        //setupBraintreeAndStartExpressCheckout();
         startActivityForResult(dropInRequest.getIntent(this), REQUEST_CODE);
+    }
+
+    public void setupBraintreeAndStartExpressCheckout() {
+        PayPalRequest request = new PayPalRequest("1")
+                .currencyCode("USD");
+        PayPal.requestOneTimePayment(new BraintreeFragment(), request);
     }
 
     @Override
