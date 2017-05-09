@@ -38,4 +38,10 @@
         <item name="colorControlNormal">#727272</item>
     </style>
 
+    <style name="GreenEditTextStyle" parent="AppTheme">
+        <item name="colorControlNormal">@android:color/white</item>
+        <item name="colorControlActivated">@color/colorPrimary</item>
+        <item name="colorControlHighlight">@android:color/white</item>
+    </style>
+
 </resources>
