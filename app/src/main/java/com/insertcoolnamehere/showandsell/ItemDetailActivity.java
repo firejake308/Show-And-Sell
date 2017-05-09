@@ -276,15 +276,7 @@ public class ItemDetailActivity extends AppCompatActivity implements BraintreeLi
     private void finishPurchase() {
         DropInRequest dropInRequest = new DropInRequest()
                 .clientToken(mToken);
-        Log.e("THGF", "DropInRequest reached");
-        //setupBraintreeAndStartExpressCheckout();
         startActivityForResult(dropInRequest.getIntent(this), REQUEST_CODE);
-    }
-
-    public void setupBraintreeAndStartExpressCheckout() {
-        PayPalRequest request = new PayPalRequest("1")
-                .currencyCode("USD");
-        PayPal.requestOneTimePayment(new BraintreeFragment(), request);
     }
 
     @Override
