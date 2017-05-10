@@ -111,7 +111,7 @@
         buyers can pick up their items.</string>
 
     <!-- Strings related to Settings -->
-    <string name="current_group">CURRENT GROUP</string>
+    <string name="current_group">FAVORITE GROUP</string>
     <string name="groups">AVAILABLE GROUPS</string>
     <string name="choose_group_instructions">Selecting a group here will affect what items appear in
         your feed and where your donated items go.</string>

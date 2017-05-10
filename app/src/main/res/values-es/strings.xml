@@ -18,7 +18,7 @@
     <string name="choose_group_instructions">Seleccionar un grupo aquí decidirá cuales artículos aparezcan en la lista y dónde van los artículos donados.</string>
     <string name="confirm">Bien</string>
     <string name="confirm_delete">¿Está seguro que quieres borrar este artículo?</string>
-    <string name="current_group">GRUPO ACTUAL</string>
+    <string name="current_group">GRUPO FAVORITO</string>
     <string name="error_donate">Un error ocurrió durante la donación.</string>
     <string name="error_email_duplicate">Correo electrónico ya en uso</string>
     <string name="error_field_required">Este campo es necesario</string>
