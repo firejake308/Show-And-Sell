@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_donate"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,7 +9,6 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="24dp"
-    android:orientation="vertical"
     tools:context="com.insertcoolnamehere.showandsell.DonateActivity">
     <ListView
         android:layout_width="match_parent"
@@ -18,9 +18,19 @@
         android:dividerHeight="0dp"
         android:descendantFocusability="afterDescendants"/>
 
+    <TextView
+        android:id="@+id/donate_cash_link"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:paddingStart="24dp"
+        android:paddingBottom="8dp"
+        android:text="@string/prompt_donate_cash_link"
+        android:textColor="@color/colorAccent"/>
+
     <ProgressBar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/donate_progress_bar"
         android:visibility="gone"/>
-</LinearLayout>
+</RelativeLayout>

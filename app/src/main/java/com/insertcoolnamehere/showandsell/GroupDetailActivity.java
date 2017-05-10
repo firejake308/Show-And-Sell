@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NavUtils;
@@ -93,6 +94,19 @@ public class GroupDetailActivity extends AppCompatActivity implements BrowseFrag
             @Override
             public void onClick(View v) {
                 attemptPostRating();
+            }
+        });
+
+        // hook up donate button to action listener
+        FloatingActionButton openDonateBtn = (FloatingActionButton) findViewById(R.id.open_donate_btn);
+        final Context cxt = this;
+        openDonateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent goToDonate = new Intent(cxt, DonateActivity.class);
+                goToDonate.putExtra(DonateActivity.EXTRA_GROUP_ID, mGroupId);
+                goToDonate.putExtra(DonateActivity.EXTRA_GROUP_NAME, getIntent().getStringExtra(EXTRA_NAME));
+                startActivity(goToDonate);
             }
         });
     }

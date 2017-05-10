@@ -125,12 +125,12 @@
         android:layout_height="wrap_content"
         android:clickable="true"
         app:fabSize="normal"
-        app:srcCompat="@drawable/ic_buy"
+        app:srcCompat="@drawable/ic_donate"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:layout_marginEnd="@dimen/fab_margin"
-        android:id="@+id/item_detail_buy"
+        android:id="@+id/open_donate_btn"
         app:backgroundTint="?attr/colorAccent"
         app:elevation="6dp"/>
 </RelativeLayout>

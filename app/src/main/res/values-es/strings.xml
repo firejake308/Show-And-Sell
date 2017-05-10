@@ -126,4 +126,6 @@
     <string name="choose_group_fragment_title">Seleccionar Grupo</string>
     <string name="prompt_donate_cash">Cantidad de Donación</string>
     <string name="donate_cash_label">Donar Dinero</string>
+    <string name="donate_to_group_pattern">"Donar a "</string>
+    <string name="prompt_donate_cash_link"><u>O, puede donar dinero directamente a este grupo.</u></string>
 </resources>

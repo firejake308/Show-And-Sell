@@ -948,6 +948,7 @@ public class ItemDetailActivity extends AppCompatActivity implements BraintreeLi
         }
 
     }
+
     private class PurchaseItemTask extends AsyncTask<Void, Void, Integer> {
         private static final int SUCCESS = 0;
         private static final int NO_INTERNET = 1;

@@ -16,9 +16,11 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.FileProvider;
+import android.support.v4.media.MediaBrowserServiceCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -42,14 +44,22 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.braintreepayments.api.dropin.DropInActivity;
+import com.braintreepayments.api.dropin.DropInRequest;
+import com.braintreepayments.api.dropin.DropInResult;
+import com.braintreepayments.api.models.PaymentMethodNonce;
+import com.insertcoolnamehere.showandsell.logic.ResultCode;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -57,10 +67,17 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class DonateActivity extends AppCompatActivity {
+import static com.insertcoolnamehere.showandsell.logic.ResultCode.NO_INTERNET;
+import static com.insertcoolnamehere.showandsell.logic.ResultCode.OTHER_FAILURE;
+import static com.insertcoolnamehere.showandsell.logic.ResultCode.SUCCESS;
+
+public class DonateActivity extends AppCompatActivity implements DonateCashDialog.OnDonateCashListener {
 
     private static final int REQUEST_TAKE_PHOTO = 13;
+    private static final int REQUEST_PAYMENT = 11;
     private static final String LOG_TAG = DonateActivity.class.getSimpleName();
+    public static final String EXTRA_GROUP_ID = "GROUP_ID";
+    public static final String EXTRA_GROUP_NAME = "GROUP_NAME";
 
     private ListView mListView;
     private StepAdapter mAdapter;
@@ -73,6 +90,8 @@ public class DonateActivity extends AppCompatActivity {
     private Bitmap mImage;
 
     private String mCurrentPhotoPath;
+    private String mToken;
+    private double mAmount;
 
     private boolean donateAttempted;
 
@@ -83,9 +102,33 @@ public class DonateActivity extends AppCompatActivity {
 
         donateAttempted = false;
 
+        // initialize list view of steps
         mListView = (ListView) findViewById(R.id.steps_listview);
         mAdapter = new StepAdapter();
         mListView.setAdapter(mAdapter);
+
+        // set the title to include the name of the group
+        String groupName = getIntent().getStringExtra(EXTRA_GROUP_NAME);
+        if (groupName != null) {
+            setTitle(getString(R.string.donate_to_group_pattern) + " " + groupName);
+        }
+
+        // set up donate cash link
+        View link = findViewById(R.id.donate_cash_link);
+        final DonateCashDialog.OnDonateCashListener listener = this;
+        link.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new DonateCashDialog().setListener(listener).show(getSupportFragmentManager(), "DonateCashDialog");
+            }
+        });
+    }
+
+    @Override
+    public void onDonateCash(double amount) {
+        // pop up payment dialog
+        mAmount = amount;
+        new GetClientTokenTask(this).execute();
     }
 
     private void donate() {
@@ -135,6 +178,15 @@ public class DonateActivity extends AppCompatActivity {
         }
     }
 
+    private void initiatePurchase() {
+        new GetClientTokenTask(this).execute();
+    }
+    private void finishPurchase() {
+        DropInRequest dropInRequest = new DropInRequest()
+                .clientToken(mToken);
+        startActivityForResult(dropInRequest.getIntent(this), REQUEST_PAYMENT);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_TAKE_PHOTO) {
@@ -169,6 +221,14 @@ public class DonateActivity extends AppCompatActivity {
             // get larger image for upload
             bmOptions.inSampleSize = 8;
             mImage = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+        } else if (requestCode == REQUEST_PAYMENT) {
+            if (resultCode == Activity.RESULT_OK) {
+                DropInResult result = data.getParcelableExtra(DropInResult.EXTRA_DROP_IN_RESULT);
+                new DonateMoneyTask(this, result.getPaymentMethodNonce(), mToken, mAmount).execute();
+            } else if (resultCode != Activity.RESULT_CANCELED) {
+                // handle errors here, an exception may be available in
+                Log.e("ItemDetailActivity", ""+data.getSerializableExtra(DropInActivity.EXTRA_ERROR));
+            }
         }
     }
 
@@ -194,11 +254,14 @@ public class DonateActivity extends AppCompatActivity {
      */
     private void showProgress(boolean loading) {
         View progressBar = findViewById(R.id.donate_progress_bar);
+        View textView = findViewById(R.id.donate_cash_link);
         if (loading) {
             mListView.setVisibility(View.GONE);
+            textView.setVisibility(View.GONE);
             progressBar.setVisibility(View.VISIBLE);
         } else {
             mListView.setVisibility(View.VISIBLE);
+            textView.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
         }
     }
@@ -495,7 +558,7 @@ public class DonateActivity extends AppCompatActivity {
 
                     // get values for item
                     SharedPreferences savedData = getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
-                    String groupId = savedData.getString(getString(R.string.saved_group_id), "");
+                    String groupId = mParent.getIntent().getStringExtra(EXTRA_GROUP_ID);
                     String userId = savedData.getString(getString(R.string.userId), "");
                     String name = mName;
                     String price = mPrice;
@@ -592,6 +655,222 @@ public class DonateActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(mParent, R.string.error_donate, Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+
+    private class GetClientTokenTask extends AsyncTask<Void, Void, ResultCode> {
+        private final String LOG_TAG = GetClientTokenTask.class.getSimpleName();
+
+        private final Activity mParent;
+
+        GetClientTokenTask(Activity parent) {
+            mParent = parent;
+        }
+
+        @Override
+        protected ResultCode doInBackground(Void... params) {
+            // check if we have an Internet connection
+            ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo info = manager.getActiveNetworkInfo();
+
+            if(info == null || !info.isConnected()) {
+                // if there is no network, inform user through a toast
+                mParent.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mParent, R.string.error_no_internet, Toast.LENGTH_SHORT).show();
+                        Log.d(LOG_TAG, "No connection available");
+                    }
+                });
+                return NO_INTERNET;
+            } else {
+                // declare resources to close in finally clause
+                HttpURLConnection conn = null;
+                try {
+                    // get group owner password
+                    SharedPreferences savedData = mParent.getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+
+                    // form a URL to connect to
+                    Uri.Builder builder = new Uri.Builder();
+                    String uri = builder.encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
+                            .scheme("http")
+                            .appendPath("showandsell")
+                            .appendPath("api")
+                            .appendPath("items")
+                            .appendPath("paymenttoken").build().toString();
+                    URL url = new URL(uri);
+
+                    // form connection
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setDoOutput(false);
+                    conn.setRequestMethod("GET");
+                    conn.setConnectTimeout(10000);
+                    conn.setReadTimeout(15000);
+                    conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    conn.setChunkedStreamingMode(0);
+                    conn.connect();
+
+                    // see if post was a success
+                    int responseCode = conn.getResponseCode();
+                    Log.d(LOG_TAG, "Response Code from Cloud Server: "+responseCode);
+
+                    if(responseCode == 200) {
+                        Log.d(LOG_TAG, "Token Acquired Successfully");
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                        String responseBody = "";
+                        String line;
+                        while((line = reader.readLine()) != null) {
+                            responseBody += line;
+                        }
+                        try {
+                            // parse response as not JSON
+                            mToken = responseBody;
+                            Log.d(LOG_TAG, "mToken = "+mToken);
+                        } catch (Exception e) {Log.e(LOG_TAG, "Error with JSON");}
+
+                        return SUCCESS;
+                    } else if(responseCode == 404) {
+                        Log.d(LOG_TAG, "Token not acquired-failure");
+                        return OTHER_FAILURE;
+                    } else {
+                        Log.e(LOG_TAG, "response Code = "+responseCode);
+                        return OTHER_FAILURE;
+                    }
+                } catch (MalformedURLException e) {
+                    Log.e(LOG_TAG, "Bad URL", e);
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "Error opening URL connection (probably?)", e);
+                } finally {
+                    conn.disconnect();
+                }
+            }
+
+            // in case of failure
+            return OTHER_FAILURE;
+        }
+        @Override
+        protected void onPostExecute(ResultCode result) {
+            if(result == SUCCESS)
+                finishPurchase();
+            else
+                Toast.makeText(mParent, "An unknown error occurred. Please try again later.", Toast.LENGTH_SHORT).show();
+
+            showProgress(false);
+        }
+    }
+
+    private class DonateMoneyTask extends AsyncTask<Void, Void, ResultCode> {
+        private final String LOG_TAG = DonateMoneyTask.class.getSimpleName();
+
+        private final Activity mParent;
+        private final PaymentMethodNonce mNonce;
+        private final String mToken;
+        private final double mAmount;
+
+        DonateMoneyTask(Activity parent, PaymentMethodNonce nonce, String token, double amount) {
+            mParent = parent;
+            mNonce = nonce;
+            mToken = token;
+            mAmount = amount;
+        }
+
+        @Override
+        protected ResultCode doInBackground(Void... params) {
+            // check if we have an Internet connection
+            ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo info = manager.getActiveNetworkInfo();
+
+            if(info == null || !info.isConnected()) {
+                // if there is no network, inform user through a toast
+                mParent.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mParent, R.string.error_no_internet, Toast.LENGTH_SHORT).show();
+                        Log.d(LOG_TAG, "No connection available");
+                    }
+                });
+                return NO_INTERNET;
+            } else {
+                // declare resources to close in finally clause
+                HttpURLConnection conn = null;
+                BufferedOutputStream out = null;
+                try {
+                    // get group owner password
+                    SharedPreferences savedData = mParent.getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
+                    String un = savedData.getString(getString(R.string.userId), "");
+                    String pw = savedData.getString(getString(R.string.prompt_password), "");
+
+                    // form a URL to connect to
+                    Uri.Builder builder = new Uri.Builder();
+                    String uri = builder.encodedAuthority(LoginActivity.CLOUD_SERVER_IP)
+                            .scheme("http")
+                            .appendPath("showandsell")
+                            .appendPath("api")
+                            .appendPath("groups")
+                            .appendPath("donatetogroup")
+                            .appendQueryParameter("id", mParent.getIntent().getStringExtra(EXTRA_GROUP_ID))
+                            .appendQueryParameter("userId", ""+un)
+                            .appendQueryParameter("password", ""+pw)
+                            .build().toString();
+                    URL url = new URL(uri);
+                    Log.d(LOG_TAG, url.toString());
+
+                    // form connection
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setDoOutput(true);
+                    conn.setRequestMethod("POST");
+                    conn.setConnectTimeout(10000);
+                    conn.setReadTimeout(15000);
+                    conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    conn.setChunkedStreamingMode(0);
+                    conn.connect();
+
+                    // send JSON
+                    out = new BufferedOutputStream(conn.getOutputStream());
+                    JSONObject purchaseInfo = new JSONObject();
+                    purchaseInfo.put("token", mToken);
+                    purchaseInfo.put("paymentMethodNonce", mNonce);
+                    purchaseInfo.put("amount", mAmount);
+                    String body = purchaseInfo.toString();
+                    out.write(body.getBytes());
+                    out.flush();
+
+                    // see if post was a success
+                    int responseCode = conn.getResponseCode();
+                    Log.d(LOG_TAG, "Response Code from Cloud Server: "+responseCode);
+
+                    if(responseCode == 200) {
+                        Log.d(LOG_TAG, "Donation sent successfully!");
+                        return SUCCESS;
+                    } else if(responseCode == 404) {
+                        Log.d(LOG_TAG, "Purchase failed :(");
+                        return OTHER_FAILURE;
+                    } else {
+                        Log.e(LOG_TAG, "response Code = "+responseCode);
+                        return OTHER_FAILURE;
+                    }
+                } catch (MalformedURLException e) {
+                    Log.e(LOG_TAG, "Bad URL", e);
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "Error opening URL connection (probably?)", e);
+                } catch (JSONException e){
+                    Log.e(LOG_TAG, "Error parsing JSON", e);
+                }finally {
+                    conn.disconnect();
+                }
+            }
+
+            // in case of failure
+            return OTHER_FAILURE;
+        }
+        @Override
+        protected void onPostExecute(ResultCode result) {
+            if(result == SUCCESS)
+                Toast.makeText(mParent, R.string.successful_donation, Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(mParent, R.string.error_donate, Toast.LENGTH_SHORT).show();
+
+            showProgress(false);
         }
     }
 }

@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.provider.MediaStore;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -120,16 +119,6 @@ public class MainActivity extends AppCompatActivity implements BrowseFragment.On
         // jump to donate
         if (getIntent().getBooleanExtra(OPEN_CHOOSE_GROUP, false))
             mViewPager.setCurrentItem(2);
-
-        FloatingActionButton openDonateBtn = (FloatingActionButton) findViewById(R.id.openDonateBtn);
-        final Context cxt = this;
-        openDonateBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent goToDonate = new Intent(cxt, DonateActivity.class);
-                startActivity(goToDonate);
-            }
-        });
     }
 
     @Override
