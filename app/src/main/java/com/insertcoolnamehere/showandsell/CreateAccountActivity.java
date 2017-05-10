@@ -119,8 +119,6 @@ public class CreateAccountActivity extends AppCompatActivity implements OnConnec
     }
 
     private void attemptCreateAccount() {
-        // if the AsyncTask has already been created, then don't restart it
-
         // for reporting errors
         boolean cancel = false;
         View focusView = null;

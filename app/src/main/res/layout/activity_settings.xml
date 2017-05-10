@@ -16,19 +16,6 @@
         android:id="@+id/textView2" />
 
     <Button
-        android:text="@string/choose_group"
-        android:textAlignment="textStart"
-        android:paddingLeft="@dimen/patricks_btn_padding"
-        android:layout_width="match_parent"
-        android:id="@+id/settings_choose_default_group"
-        android:background="@android:color/background_light"
-        android:layout_height="wrap_content" />
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="5dp" />
-
-    <Button
         android:text="@string/manage_group"
         android:textAlignment="textStart"
         android:layout_width="match_parent"

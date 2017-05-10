@@ -32,6 +32,9 @@
     <!-- MainActivity -->
     <string name="action_logout">Logout</string>
     <string name="section_format" translatable="false">Hello %1$s from section: %2$d</string>
+    <string name="browse_fragment_title">Browse</string>
+    <string name="bookmark_fragment_title">Bookmarks</string>
+    <string name="choose_group_fragment_title">Choose Group</string>
 
     <!-- Donate Activity -->
     <string name="prompt_item_description">Name</string>
@@ -54,7 +57,7 @@
     <string name="step_condition_label">Is it new or used?</string>
     <string name="next_step_btn_label">Continue</string>
     <string name="prev_step_btn_label">Previous</string>
-    <string name="successful_donation">Item was donated successfully!</string>
+    <string name="successful_donation">Thank you for your donation!</string>
     <string name="error_donate">An error occurred during donation.</string>
     <string name="error_group_not_found">Group Not Found</string>
 
@@ -188,6 +191,8 @@
     <string name="rating_success">Rating sent successfully</string>
     <string name="error_no_internet">No connection available. Please try again later.</string>
     <string name="error_rating">Something went wrong posting the rating</string>
+    <string name="prompt_donate_cash">Donation Amount&#8230;</string>
+    <string name="donate_cash_label">Monetary Donation</string>
 
     <string name="title_activity_nav_bar" translatable="false">NavBarActivity</string>
 

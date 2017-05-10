@@ -74,7 +74,7 @@ public class GroupDetailActivity extends AppCompatActivity implements BrowseFrag
         Log.d("GroupDetail", "rating "+rating);
 
         // show group items
-        Fragment browseFrag = BrowseFragment.newInstance(2, false);
+        Fragment browseFrag = BrowseFragment.newInstance(2, false, mGroupId);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.browse_frag_placeholder, browseFrag).commit();
 
@@ -114,7 +114,8 @@ public class GroupDetailActivity extends AppCompatActivity implements BrowseFrag
 
     @Override
     public void openChooseGroup() {
-        Intent intent = new Intent(this, ChooseGroupActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(MainActivity.OPEN_CHOOSE_GROUP, true);
         startActivity(intent);
     }
 
@@ -200,7 +201,7 @@ public class GroupDetailActivity extends AppCompatActivity implements BrowseFrag
         @Override
         public void onPostExecute(ResultCode result) {
             if(result == SUCCESS) {
-                Toast.makeText(mParent, R.string.successful_donation, Toast.LENGTH_SHORT).show();
+                Toast.makeText(mParent, R.string.rating_success, Toast.LENGTH_SHORT).show();
             } else if (result == NO_INTERNET) {
                 Toast.makeText(mParent, R.string.error_no_internet, Toast.LENGTH_SHORT).show();
                 Log.d(LOG_TAG, "No connection available");

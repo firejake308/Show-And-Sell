@@ -66,7 +66,7 @@
     <string name="step_price_label">¿Cuánto vale?</string>
     <string name="step_take_pic_label"><b>Muestre</b>me lo que quiere vender</string>
     <string name="step_title_label">¿Qué es esto?</string>
-    <string name="successful_donation">¡El artículo fue donado exitosamente!</string>
+    <string name="successful_donation">¡Gracias por su donación!</string>
     <string name="tutorial_1">¡Bienvenidos a Mostrar y Comprar! Para empezar, ¿por qué no se una con un grupo?</string>
     <string name="tutorial_2">Los grupos más cercanos aparecerán aquí. Escoja el grupo de su escuela o organización.</string>
     <string name="tutorial_3">Una vez que haya seleccionado un grupo, los artíclos de ese grupo aparecerán en la página principal. Toque un artículo para aprender más.</string>
@@ -121,4 +121,9 @@
     <string name="error_no_internet">No hay conexión. Intente de nuevo más tarde.</string>
     <string name="error_rating">Algo fue mal enviando la calificación</string>
     <string name="rating_success">Calificación enviado</string>
+    <string name="bookmark_fragment_title">Marcados</string>
+    <string name="browse_fragment_title">Explorar</string>
+    <string name="choose_group_fragment_title">Seleccionar Grupo</string>
+    <string name="prompt_donate_cash">Cantidad de Donación</string>
+    <string name="donate_cash_label">Donar Dinero</string>
 </resources>

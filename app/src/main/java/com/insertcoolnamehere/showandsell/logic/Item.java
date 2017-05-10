@@ -8,29 +8,34 @@ import java.util.ArrayList;
 
 public class Item implements Serializable {
     /**
-     * An ArrayList of all items, both approved and unapproved, in the selected default group
+     * An ArrayList of all items, both approved and unapproved, in the group managed by this user
      */
     public static ArrayList<Item> managedGroupItems = new ArrayList<>();
     /**
-     * An ArrayList of all approved items returned by the server in the selected default group
+     * An ArrayList of all approved items returned by the server in all groups
      */
-    public static ArrayList<Item> browseGroupItems = new ArrayList<>();
+    public static ArrayList<Item> allGroupsItems = new ArrayList<>();
 
     /**
-     * ArrayList of all items that have been bookmarked by this user
+     * An ArrayList of all items that have been bookmarked by this user
      */
     public static ArrayList<Item> bookmarkedItems = new ArrayList<>();
+    /**
+     * An ArrayList of all approved items in the currently viewed group
+     */
+    public static ArrayList<Item> currentGroupItems = new ArrayList<>();
 
     public static final int BROWSE = 0;
     public static final int BOOKMARK = 1;
     public static final int MANAGE = 2;
-    public static final int OTHER = 3;
+    public static final int ALL = 3;
+    public static final int OTHER = 4;
 
     private static int numOfItems = 0;
 
     public static Item getItem(String guid) {
         // search for item in browse items
-        for (Item item: browseGroupItems) {
+        for (Item item: allGroupsItems) {
             if (item.guid.equals(guid))
                 return item;
         }
@@ -52,16 +57,16 @@ public class Item implements Serializable {
     }
 
     public static boolean hasBrowseItems() {
-        return !browseGroupItems.isEmpty();
+        return !allGroupsItems.isEmpty();
     }
 
     /**
      * Returns a list of all items in either the browse group or the managed group
-     * @return
+     * @return all items
      */
     public static ArrayList<Item> getItemsList() {
         ArrayList<Item> list = new ArrayList<>();
-        for(Item item: browseGroupItems) {
+        for(Item item: allGroupsItems) {
             list.add(item);
         }
 
@@ -73,7 +78,8 @@ public class Item implements Serializable {
 
     public static void clearItemsCache() {
         managedGroupItems.clear();
-        browseGroupItems.clear();
+        allGroupsItems.clear();
+        currentGroupItems.clear();
         bookmarkedItems.clear();
     }
 
@@ -100,15 +106,19 @@ public class Item implements Serializable {
         if(itemType == BOOKMARK) {
             if(!bookmarkedItems.contains(this))
                 bookmarkedItems.add(this);
-        } else if (itemType == BROWSE) {
+        } else if (itemType == ALL) {
             number = numOfItems;
             numOfItems += 1;
 
-            // don't add this item to browse feed unless and until it is approved
+            if(!allGroupsItems.contains(this))
+                allGroupsItems.add(this);
         } else if(itemType == MANAGE) {
             // update managedGroupItems with new item
             Log.d("Item", "new item going into manage group items");
             managedGroupItems.add(this);
+        } else if (itemType == BROWSE) {
+            if (!currentGroupItems.contains(this))
+                currentGroupItems.add(this);
         }
     }
 
@@ -168,16 +178,6 @@ public class Item implements Serializable {
 
     public void setApproved(boolean approved) {
         this.approved = approved;
-
-        if(mItemType != BROWSE)
-            return;
-
-        // update approved items list
-        if(approved && !browseGroupItems.contains(this)) {
-            browseGroupItems.add(this);
-        } else if(!approved && browseGroupItems.contains(this)) {
-            browseGroupItems.remove(this);
-        }
     }
 
     public String getOwnerId() {

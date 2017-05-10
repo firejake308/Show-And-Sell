@@ -6,10 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -21,32 +17,20 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
 
 import com.insertcoolnamehere.showandsell.logic.Group;
-import com.insertcoolnamehere.showandsell.logic.Item;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 public class MainActivity extends AppCompatActivity implements BrowseFragment.OnListFragmentInteractionListener, ChooseGroupFragment.OnChooseGroupListener{
 
     private static final int REQUEST_IMAGE_CAPTURE = 0;
+    public static final String OPEN_CHOOSE_GROUP = "OPEN_CHOOSE_GROUP";
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -88,8 +72,54 @@ public class MainActivity extends AppCompatActivity implements BrowseFragment.On
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
         tabLayout.getTabAt(1).setIcon(R.drawable.ic_browse);
-        tabLayout.getTabAt(0).setIcon(R.drawable.ic_bookmarks);
-        tabLayout.getTabAt(2).setIcon(R.drawable.ic_group_light);
+        tabLayout.getTabAt(0).setIcon(R.drawable.ic_bookmarks_dark);
+        tabLayout.getTabAt(2).setIcon(R.drawable.ic_group);
+
+        // highlight the selected tab
+        final Activity activity  = this;
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                switch (tab.getPosition()) {
+                    case 0:
+                        tab.setIcon(R.drawable.ic_bookmarks);
+                        activity.setTitle(R.string.bookmark_fragment_title);
+                        break;
+                    case 1:
+                        tab.setIcon(R.drawable.ic_browse);
+                        activity.setTitle(R.string.browse_fragment_title);
+                        break;
+                    case 2:
+                        tab.setIcon(R.drawable.ic_group_light);
+                        activity.setTitle(R.string.choose_group_fragment_title);
+                        break;
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                switch (tab.getPosition()) {
+                    case 0:
+                        tab.setIcon(R.drawable.ic_bookmarks_dark);
+                        break;
+                    case 1:
+                        tab.setIcon(R.drawable.ic_browse_dark);
+                        break;
+                    case 2:
+                        tab.setIcon(R.drawable.ic_group);
+                        break;
+                }
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
+        // jump to donate
+        if (getIntent().getBooleanExtra(OPEN_CHOOSE_GROUP, false))
+            mViewPager.setCurrentItem(2);
 
         FloatingActionButton openDonateBtn = (FloatingActionButton) findViewById(R.id.openDonateBtn);
         final Context cxt = this;
@@ -223,7 +253,8 @@ public class MainActivity extends AppCompatActivity implements BrowseFragment.On
 
     @Override
     public void openChooseGroup() {
-        Intent intent = new Intent(this, ChooseGroupActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(MainActivity.OPEN_CHOOSE_GROUP, true);
         startActivity(intent);
     }
 
@@ -233,23 +264,24 @@ public class MainActivity extends AppCompatActivity implements BrowseFragment.On
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
+            TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
             switch(position) {
                 case 0:
                     // browse tab
                     return new BookmarksFragment();
                 case 1:
                     // bookmarks tab
-                    return BrowseFragment.newInstance(2, true);
+                    return BrowseFragment.newInstance(2, true, null);
                 case 2:
                     // group tab
-                    return new ChooseGroupFragment(); // TODO create choose group frag
+                    return new ChooseGroupFragment();
             }
             return null;
         }
@@ -258,17 +290,6 @@ public class MainActivity extends AppCompatActivity implements BrowseFragment.On
         public int getCount() {
             // Show 3 total pages.
             return 3;
-        }/*
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return "BROWSE";
-                case 1:
-                    return "BOOKMARKS";
-            }
-            return null;
-        }*/
+        }
     }
 }

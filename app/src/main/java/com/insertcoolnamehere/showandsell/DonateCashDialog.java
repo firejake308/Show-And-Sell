@@ -1,0 +1,57 @@
+package com.insertcoolnamehere.showandsell;
+
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.widget.DrawerLayout;
+import android.text.InputType;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
+
+/**
+ * Dialog to accept cash donations to groups
+ */
+
+public class DonateCashDialog extends DialogFragment {
+    private OnDonateCashListener mListener;
+
+    public DonateCashDialog setListener(OnDonateCashListener listener) {
+        mListener = listener;
+        return this;
+    }
+
+    @Override
+    @NonNull
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        FrameLayout fl = new FrameLayout(getActivity());
+        EditText valueEntry = new EditText(getActivity());
+        valueEntry.setHint(R.string.prompt_donate_cash);
+        valueEntry.setInputType(InputType.TYPE_CLASS_NUMBER|InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        builder.setView(valueEntry);
+        builder.setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // initiate donate
+                mListener.onDonateCash();
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // do nothing
+            }
+        });
+
+        return builder.create();
+    }
+
+    public interface OnDonateCashListener {
+        void onDonateCash();
+    }
+}

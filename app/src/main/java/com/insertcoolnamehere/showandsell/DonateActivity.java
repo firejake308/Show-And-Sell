@@ -586,7 +586,8 @@ public class DonateActivity extends AppCompatActivity {
             } else if (result == NO_GROUP) {
                 Toast.makeText(mParent, "Please choose a group to donate to.", Toast.LENGTH_SHORT).show();
                 showProgress(false);
-                Intent chooseGroupIntent = new Intent(mParent, ChooseGroupActivity.class);
+                Intent chooseGroupIntent = new Intent(mParent, MainActivity.class);
+                chooseGroupIntent.putExtra(MainActivity.OPEN_CHOOSE_GROUP, true);
                 startActivity(chooseGroupIntent);
             } else {
                 Toast.makeText(mParent, R.string.error_donate, Toast.LENGTH_SHORT).show();

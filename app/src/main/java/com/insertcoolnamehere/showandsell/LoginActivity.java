@@ -123,6 +123,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         mSignUpButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                // open the account creation screen
                 Intent createAccountIntent = new Intent(v.getContext(), CreateAccountActivity.class);
                 startActivity(createAccountIntent);
             }

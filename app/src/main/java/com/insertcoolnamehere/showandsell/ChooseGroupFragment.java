@@ -176,7 +176,7 @@ public class ChooseGroupFragment extends Fragment implements GoogleApiClient.Con
 
             // once we have permission, send the request for location
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, request, this);
-        } catch (SecurityException se){Log.e("ChooseGroupActivity", "User Denied Permission");}
+        } catch (SecurityException se){Log.e("ChooseGroupFragment", "User Denied Permission");}
     }
 
     @Override
@@ -186,7 +186,7 @@ public class ChooseGroupFragment extends Fragment implements GoogleApiClient.Con
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
-        Log.e("ChooseGroupActivity", "I'm a failure at life and i should kill myself");
+        Log.e("ChooseGroupFragment", "The connection failed");
         mAuthTask = new FetchGroupsTask(getActivity(), latitude, longitude);
     }
 
@@ -206,7 +206,7 @@ public class ChooseGroupFragment extends Fragment implements GoogleApiClient.Con
     */
     public void setNewGroup(Group group) {
         // clear browse group items, because that has changed
-        Item.browseGroupItems.clear();
+        Item.allGroupsItems.clear();
 
         // update group name and id in the saved data
         SharedPreferences sharedPref = getContext().getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);

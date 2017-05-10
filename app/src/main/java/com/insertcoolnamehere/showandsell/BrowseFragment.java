@@ -14,7 +14,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,6 +33,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 
 /**
  * A fragment representing a list of Items.
@@ -44,17 +44,18 @@ import java.net.URL;
 public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
 
     private static final String ARG_COLUMN_COUNT = "column-count";
+    private static final String ARG_GROUP_ID = "group-id";
     private int mColumnCount = 1;
 
     protected OnListFragmentInteractionListener mListener;
+    private ArrayList<Item> mItemList;
     private RecyclerView.Adapter adapter;
     private AsyncTask mFetchItemsTask;
 
     private RecyclerView mRecyclerView;
     private View fragView;
 
-    private String lastGroupId;
-
+    private String mGroupId;
     private int lastItemLoaded = 0;
 
     private boolean showAllGroups = false;
@@ -84,45 +85,26 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
     }
 
     /**
-     * Updates the <code>Item.browseGroupItems</code> array with fresh items from the server
+     * Updates the <code>Item.allGroupsItems</code> array with fresh items from the server
      */
     public void updateItems() {
         // fetch items from server
         if(mFetchItemsTask == null) {
-            SharedPreferences sharedPref = getActivity().getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
-            String groupId = sharedPref.getString(getString(R.string.saved_group_id), null);
-            lastGroupId = groupId;
-
-            if(groupId == null) {
-                // direct user to choose a group if they haven't done so yet
-                View view = fragView.findViewById(R.id.error_no_group);
-                view.setVisibility(View.VISIBLE);
-                mRecyclerView.setVisibility(View.GONE);
-
-                // link text view to choose group activity
-                view.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mListener.openChooseGroup();
-                    }
-                });
-            } else {
-                // if there is a group selected, turn back on recycler view and hide error
-                View errorView = fragView.findViewById(R.id.error_no_group);
-                if(errorView.getVisibility() == View.VISIBLE) {
-                    errorView.setVisibility(View.GONE);
-                    mRecyclerView.setVisibility(View.VISIBLE);
-                }
-
-                // show progress bar
-                showProgress(true);
-
-                // before clearing items list, record last item index
-                lastItemLoaded = Item.browseGroupItems.size();
-
-                // find all items in that group and update the list
-                mFetchItemsTask = new FetchItemsTask(getActivity(), groupId).execute();
+            // if there is a group selected, turn back on recycler view and hide error
+            View errorView = fragView.findViewById(R.id.error_no_group);
+            if(errorView.getVisibility() == View.VISIBLE) {
+                errorView.setVisibility(View.GONE);
+                mRecyclerView.setVisibility(View.VISIBLE);
             }
+
+            // show progress bar
+            showProgress(true);
+
+            // before clearing items list, record last item index
+            lastItemLoaded = mItemList.size();
+
+            // find all items in that group and update the list
+            mFetchItemsTask = new FetchItemsTask(getActivity(), mGroupId).execute();
         }
     }
 
@@ -130,40 +112,28 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
     public void onResume() {
         super.onResume(); // always have to call super
 
-        // update in-fragment lastGroupId to match persistent storage
-        SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
-        lastGroupId = prefs.getString(getString(R.string.last_group_loaded), "NULL");
-
-        // if group id has changed, we must refresh
-        SharedPreferences savedData = getActivity().getSharedPreferences(getString(R.string.saved_data_file_key), Context.MODE_PRIVATE);
-        if(!lastGroupId.equals(savedData.getString(getString(R.string.saved_group_id), "NULL"))) {
-            updateItems();
-        }
+        // update items list
+        updateItems();
     }
 
     public void onPause() {
         super.onPause();
-
-        // save last group loaded
-        SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(getString(R.string.last_group_loaded), lastGroupId);
-        editor.apply();
     }
 
     /**
      * Creates a new instance with the given number of columns in the grid layout
      * @param columnCount number of columns in the grid
      * @param showAllGroups whether or not this should show items from all groups
-     * @return
+     * @return newly created fragment
      */
     @SuppressWarnings("unused")
-    public static BrowseFragment newInstance(int columnCount, boolean showAllGroups) {
+    public static BrowseFragment newInstance(int columnCount, boolean showAllGroups, String groupId) {
         BrowseFragment fragment = new BrowseFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
-        fragment.setArguments(args);
+        args.putString(ARG_GROUP_ID, groupId);
         fragment.showAllGroups = showAllGroups;
+        fragment.setArguments(args);
         return fragment;
     }
 
@@ -174,6 +144,14 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
         // set the number of columns in the grid layout
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            mGroupId = getArguments().getString(ARG_GROUP_ID);
+        }
+
+        if (showAllGroups)
+            mItemList = Item.allGroupsItems;
+        else {
+            mItemList = Item.currentGroupItems;
+            mItemList.clear();
         }
     }
 
@@ -209,7 +187,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
             if(isBookmark())
                 adapter = new FullItemRecyclerViewAdapter(Item.bookmarkedItems, mListener);
             else
-                adapter = new SummaryItemRecyclerViewAdapter(Item.browseGroupItems, mListener);
+                adapter = new SummaryItemRecyclerViewAdapter(mItemList, mListener);
             mRecyclerView.setAdapter(adapter);
         }
         return view;
@@ -253,7 +231,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
         void onListFragmentInteraction(String itemId);
 
         /**
-         * Opens the ChooseGroupActivity when the user clicks on the link that is shown in the
+         * Opens the ChooseGroupFragment when the user clicks on the link that is shown in the
          * BrowseFragment when no group is selected
          */
         void openChooseGroup();
@@ -296,8 +274,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                     .appendPath("showandsell")
                     .appendPath("api")
                     .appendPath("items")
-                    .appendPath("approvedinrange")
-                    .appendQueryParameter("groupId", id)
+                    .appendPath("allapprovedinrange")
                     .appendQueryParameter("start", "" + lastItemLoaded)
                     .appendQueryParameter("end", "" + (lastItemLoaded + 6))
                     .build();
@@ -313,6 +290,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
                     .appendQueryParameter("end", "" + (lastItemLoaded + 6))
                     .build();
         }
+        Log.d("BrowseFragment", builder.toString());
         return new URL(builder.toString());
     }
 
@@ -406,7 +384,14 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
                             // create a new Item and initialize it with all of the characteristics
                             // provided by the server
-                            Item item = new Item(itemJson.getString("ssItemId"), isBookmark()?Item.BOOKMARK:Item.BROWSE);
+                            int itemType;
+                            if (isBookmark())
+                                itemType = Item.BOOKMARK;
+                            else if (showAllGroups)
+                                itemType = Item.ALL;
+                            else
+                                itemType = Item.BROWSE;
+                            Item item = new Item(itemJson.getString("ssItemId"), itemType);
                             item.setName(itemJson.getString("name"));
                             item.setPrice(itemJson.getDouble("price"));
                             item.setCondition(itemJson.getString("condition"));
