@@ -67,11 +67,11 @@
     <string name="step_take_pic_label"><b>Muestre</b>me lo que quiere vender</string>
     <string name="step_title_label">¿Qué es esto?</string>
     <string name="successful_donation">¡Gracias por su donación!</string>
-    <string name="tutorial_1">¡Bienvenidos a Mostrar y Comprar! Para empezar, ¿por qué no se una con un grupo?</string>
+    <string name="tutorial_1">¡Bienvenidos a Mostrar y Comprar! Para empezar, ¿por qué no enuentre un grupo?</string>
     <string name="tutorial_2">Los grupos más cercanos aparecerán aquí. Escoja el grupo de su escuela o organización.</string>
-    <string name="tutorial_3">Una vez que haya seleccionado un grupo, los artíclos de ese grupo aparecerán en la página principal. Toque un artículo para aprender más.</string>
+    <string name="tutorial_3">Una vez que haya seleccionado un grupo, los artíclos de ese grupo aparecerán en esta página. Toque un artículo para aprender más.</string>
     <string name="tutorial_4">Aquí, puede ver el precio, la condición, y los detalles del artículo. Si tenga preguntas, pregúntelas en la sección de comentarios. \nUna vez que esté listo, puede pagar por el artículo en la app, y entonces puede mostrar el correo de confirmación en la Estación de Recoger para recoger la compra.</string>
-    <string name="tutorial_5">También en la página principal, puede tocar la mayús (+) para donar su propio artículo a la venta de garaje.</string>
+    <string name="tutorial_5">También en esta página, puede tocar la mayús (+) para donar su propio artículo a la venta de garaje.</string>
     <string name="tutorial_6">Sólo entreque la información solicitada y lleve el artículo a la Estación de Recoger para que la gerente del grupo lo apruebe.</string>
     <string name="tutorial_7">Los gerentes pueden crear sus propios Grupos desde Configuración &gt; Mi Grupo. Sólo llene la información sobre la escuela. Para el campo\nde \"Información Extra de Ubicación\" provea instrucciones sobre dónde en la escuela los compradores puedan recoger los artículos.</string>
     <string name="tweet_pattern">¡Mira este %2$s de $%1$.2f en Mostrar y Comprar! http://ich-showandsell.gear.host/?itemId=%3$s</string>

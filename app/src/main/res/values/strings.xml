@@ -95,14 +95,14 @@
         you\'d like to start your own yard sale, tap here and we\'ll help you out.</string>
 
     <!--Tutorial-->
-    <string name="tutorial_1">Welcome to Show &amp; Sell! To start off, why don\'t you join a group?</string>
+    <string name="tutorial_1">Welcome to Show &amp; Sell! To start off, why don\'t you find a group?</string>
     <string name="tutorial_2">The groups closest to you will show up here. Pick the one for your school or organization.</string>
     <string name="tutorial_3">Once you\'ve selected a group, the items for that group will appear in
-        your <b>Browse Feed</b>. Tap an item to learn more.</string>
+        the <b>Group Details</b>. Tap an item to learn more.</string>
     <string name="tutorial_4">Here, you can see an item\'s price, condition, and other details. If you have questions,
         feel free to ask in the comments section. Once you\'re ready, you can buy the item right here, and then
         show the confirmation email at the Pickup Station to get your item.</string>
-    <string name="tutorial_5">Back on your Browse Feed, you can tap the <b>+</b> icon to donate your own item
+    <string name="tutorial_5">Back on the Group Details, you can tap the <b>+</b> icon to donate your own item
         to the yard sale.</string>
     <string name="tutorial_6">Just enter the info about the item, submit it, and then take the item to the
         pickup station for the group manager to approve it. Ta-da!</string>

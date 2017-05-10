@@ -180,7 +180,7 @@ public class BrowseFragment extends Fragment implements SwipeRefreshLayout.OnRef
             } else {
                 // use a bottom-stacking staggered grid layout for multiple columns
                 GridLayoutManager layoutManager = new GridLayoutManager(context, mColumnCount);
-                layoutManager.setReverseLayout(false);
+                layoutManager.setReverseLayout(showAllGroups);
                 mRecyclerView.setLayoutManager(layoutManager);
             }
             // Show several details for bookmarks, but only picture and price for browse items
