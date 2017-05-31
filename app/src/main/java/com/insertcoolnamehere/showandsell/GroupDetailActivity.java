@@ -170,7 +170,7 @@ public class GroupDetailActivity extends AppCompatActivity implements BrowseFrag
                             .appendPath("groups")
                             .appendPath("rategroup")
                             .appendQueryParameter("id", mGroupId)
-                            .appendQueryParameter("rating", rating+"")
+                            .appendQueryParameter("rating", ((int)rating)+"")
                             .appendQueryParameter("userId", userId)
                             .appendQueryParameter("password", password)
                             .build().toString();
